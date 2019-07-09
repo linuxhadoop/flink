@@ -79,6 +79,8 @@ public interface AsyncFunction<IN, OUT> extends Function, Serializable {
 	/**
 	 * Trigger async operation for each stream input.
 	 *
+	 * 对每一个流输入 触发异步操作
+	 *
 	 * @param input element coming from an upstream task
 	 * @param resultFuture to be completed with the result data
 	 * @exception Exception in case of a user code error. An exception will make the task fail and

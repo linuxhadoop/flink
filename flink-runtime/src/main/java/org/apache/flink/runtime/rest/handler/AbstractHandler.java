@@ -58,11 +58,13 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Super class for netty-based handlers that work with {@link RequestBody}.
  *
- * <p>Subclasses must be thread-safe
+ * 基于netty的handler的父类, 请求体为RequestBody
  *
- * @param <T> type of the leader gateway
- * @param <R> type of the incoming request
- * @param <M> type of the message parameters
+ * <p>Subclasses must be thread-safe 子类必须是线程安全的
+ *
+ * @param <T> type of the leader gateway	leader网关的类型
+ * @param <R> type of the incoming request	进入的请求
+ * @param <M> type of the message parameters	消息参数
  */
 public abstract class AbstractHandler<T extends RestfulGateway, R extends RequestBody, M extends MessageParameters> extends RedirectHandler<T> implements AutoCloseableAsync {
 

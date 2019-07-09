@@ -26,6 +26,8 @@ import org.apache.flink.runtime.instance.InstanceID
 
 /**
  * Miscellaneous actor messages exchanged with the TaskManager.
+  *
+  * 混杂的 与TaskManager进行通讯的消息
  */
 object TaskManagerMessages {
   
@@ -39,6 +41,8 @@ object TaskManagerMessages {
   
   /**
    * Tells the task manager to send a heartbeat message to the job manager.
+   *
+   * 告知 taskManager 发送心跳消息到jobManager
    */
   case object SendHeartbeat {
 

@@ -1120,7 +1120,7 @@ class TaskManager(
    */
   private def submitTask(tdd: TaskDeploymentDescriptor): Unit = {
     try {
-      // grab some handles and sanity check on the fly
+      // grab some handles and sanity check on the fly 获取jobManager的actor
       val jobManagerActor = currentJobManager match {
         case Some(jm) => jm
         case None =>
@@ -1222,6 +1222,7 @@ class TaskManager(
         tdd.getTaskRestore,
         checkpointResponder)
 
+      // 创建task
       val task = new Task(
         jobInformation,
         taskInformation,
@@ -1251,6 +1252,10 @@ class TaskManager(
 
       log.info(s"Received task ${task.getTaskInfo.getTaskNameWithSubtasks()}")
 
+      /**
+        * 将新建的task加入到runningTasks中
+        * 如果发现已经有相同的execId, 已经存在执行的task, 将execId放入map中,然后再抛出异常
+        * */
       val execId = tdd.getExecutionAttemptId
       // add the task to the map
       val prevTask = runningTasks.put(execId, task)
@@ -1261,6 +1266,7 @@ class TaskManager(
       }
 
       // all good, we kick off the task, which performs its own initialization
+      // 一切ok, 启动task
       task.startTaskThread()
 
       sender ! decorateMessage(Acknowledge.get())

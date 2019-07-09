@@ -31,6 +31,8 @@ public interface FencedRpcGateway<F extends Serializable> extends RpcGateway {
 	/**
 	 * Get the current fencing token.
 	 *
+	 * 获取fencing token
+	 *
 	 * @return current fencing token
 	 */
 	F getFencingToken();

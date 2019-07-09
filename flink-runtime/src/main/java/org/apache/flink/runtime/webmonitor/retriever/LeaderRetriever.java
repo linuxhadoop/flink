@@ -31,6 +31,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Retrieves and stores the current leader address.
+ *
+ * 查询、存储当前leader的地址
  */
 public class LeaderRetriever implements LeaderRetrievalListener {
 	protected final Logger log = LoggerFactory.getLogger(getClass());
@@ -44,6 +46,8 @@ public class LeaderRetriever implements LeaderRetrievalListener {
 	/**
 	 * Returns the current leader information if available. Otherwise it returns an
 	 * empty optional.
+	 *
+	 * 返回当前可用的leader信息, 否则返回空Optional
 	 *
 	 * @return The current leader information if available. Otherwise it returns an
 	 * empty optional.
@@ -64,6 +68,8 @@ public class LeaderRetriever implements LeaderRetrievalListener {
 
 	/**
 	 * Returns the current JobManagerGateway future.
+	 *
+	 * 返回当前jobManagerGateway的feature
 	 */
 	public CompletableFuture<Tuple2<String, UUID>> getLeaderFuture() {
 		return atomicLeaderFuture.get();

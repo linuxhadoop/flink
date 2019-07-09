@@ -56,10 +56,13 @@ public class KeyGroupStreamPartitioner<T, K> extends StreamPartitioner<T> implem
 
 		K key;
 		try {
+			/** 通过keySelector从传入的record中提取出对应的key */
 			key = keySelector.getKey(record.getInstance().getValue());
 		} catch (Exception e) {
 			throw new RuntimeException("Could not extract key from " + record.getInstance().getValue(), e);
 		}
+
+		/** 根据提取的key，最大并行度，以及输出通道数，决定出record要转发到的通道编号 */
 		returnArray[0] = KeyGroupRangeAssignment.assignKeyToParallelOperator(key, maxParallelism, numberOfOutputChannels);
 		return returnArray;
 	}

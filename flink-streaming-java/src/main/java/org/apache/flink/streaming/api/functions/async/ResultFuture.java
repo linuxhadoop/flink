@@ -25,6 +25,8 @@ import java.util.Collection;
 /**
  * {@link ResultFuture} collects data / error in user codes while processing async i/o.
  *
+ * 在处理异步io时,在用户代码中通过ResultFuture来收集数据或错误
+ *
  * @param <OUT> Output type
  */
 @PublicEvolving
@@ -36,6 +38,8 @@ public interface ResultFuture<OUT> {
 	 * Calling this function for multiple times will cause data lose.
 	 *
 	 * <p>Put all results in a {@link Collection} and then emit output.
+	 *
+	 * 将所有结果放在一个Collection中并将其发送出去
 	 *
 	 * @param result A list of results.
 	 */

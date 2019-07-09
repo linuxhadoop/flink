@@ -48,11 +48,15 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * The {@link ResourceManager}'s RPC gateway interface.
+ *
+ * ResourceManager网关接口
  */
 public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManagerId> {
 
 	/**
 	 * Register a {@link JobMaster} at the resource manager.
+	 *
+	 * 注册一个JobMaster到资源管理器
 	 *
 	 * @param jobMasterId The fencing token for the JobMaster leader
 	 * @param jobMasterResourceId The resource ID of the JobMaster that registers
@@ -71,6 +75,8 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 	/**
 	 * Requests a slot from the resource manager.
 	 *
+	 * 从资源管理器中 申请slot
+	 *
 	 * @param jobMasterId id of the JobMaster
 	 * @param slotRequest The slot to request
 	 * @return The confirmation that the slot gets allocated
@@ -83,12 +89,16 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 	/**
 	 * Cancel the slot allocation requests from the resource manager.
 	 *
+	 * 取消slot申请
+	 *
 	 * @param allocationID The slot to request
 	 */
 	void cancelSlotRequest(AllocationID allocationID);
 
 	/**
 	 * Register a {@link TaskExecutor} at the resource manager.
+	 *
+	 * 注册TaskExecutor至资源管理器
 	 *
 	 * @param taskExecutorAddress The address of the TaskExecutor that registers
 	 * @param resourceId The resource ID of the TaskExecutor that registers
@@ -108,6 +118,8 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 	/**
 	 * Sends the given {@link SlotReport} to the ResourceManager.
 	 *
+	 * 发送SlotReport至资源管理器
+	 *
 	 * @param taskManagerRegistrationId id identifying the sending TaskManager
 	 * @param slotReport which is sent to the ResourceManager
 	 * @param timeout for the operation
@@ -122,6 +134,8 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 	/**
 	 * Sent by the TaskExecutor to notify the ResourceManager that a slot has become available.
 	 *
+	 * 由taskExecutor发送, 用来通知ResourceManager 一个slot已经可用
+	 *
 	 * @param instanceId TaskExecutor's instance id
 	 * @param slotID The SlotID of the freed slot
 	 * @param oldAllocationId to which the slot has been allocated
@@ -134,12 +148,16 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 	/**
 	 * Registers an infoMessage listener
 	 *
+	 * 注册一个消息监听器
+	 *
 	 * @param infoMessageListenerAddress address of infoMessage listener to register to this resource manager
 	 */
 	void registerInfoMessageListener(String infoMessageListenerAddress);
 
 	/**
 	 * Unregisters an infoMessage listener
+	 *
+	 * 撤销一个消息监听器
 	 *
 	 * @param infoMessageListenerAddress address of infoMessage listener to unregister from this resource manager
 	 *
@@ -149,6 +167,8 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 	/**
 	 * Deregister Flink from the underlying resource management system.
 	 *
+	 * 从资源管理系统中撤销 flink应用
+	 *
 	 * @param finalStatus final status with which to deregister the Flink application
 	 * @param diagnostics additional information for the resource management system, can be {@code null}
 	 */
@@ -156,6 +176,8 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 
 	/**
 	 * Gets the currently registered number of TaskManagers.
+	 *
+	 * 获取当前已经注册的TaskManager数量
 	 * 
 	 * @return The future to the number of registered TaskManagers.
 	 */
@@ -163,6 +185,8 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 
 	/**
 	 * Sends the heartbeat to resource manager from task manager
+	 *
+	 * 从task manager发送心跳至资源管理器
 	 *
 	 * @param heartbeatOrigin unique id of the task manager
 	 * @param slotReport Current slot allocation on the originating TaskManager
@@ -172,12 +196,16 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 	/**
 	 * Sends the heartbeat to resource manager from job manager
 	 *
+	 * 从job manager发送心跳至资源管理器
+	 *
 	 * @param heartbeatOrigin unique id of the job manager
 	 */
 	void heartbeatFromJobManager(final ResourceID heartbeatOrigin);
 
 	/**
 	 * Disconnects a TaskManager specified by the given resourceID from the {@link ResourceManager}.
+	 *
+	 * 根据指定的resourceId, 将一个taskManager从资源管理器断开
 	 *
 	 * @param resourceID identifying the TaskManager to disconnect
 	 * @param cause for the disconnection of the TaskManager
@@ -187,6 +215,8 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 	/**
 	 * Disconnects a JobManager specified by the given resourceID from the {@link ResourceManager}.
 	 *
+	 * 根据指定的JobId, 将一个taskManager从资源管理器断开
+	 *
 	 * @param jobId JobID for which the JobManager was the leader
 	 * @param cause for the disconnection of the JobManager
 	 */
@@ -195,6 +225,8 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 	/**
 	 * Requests information about the registered {@link TaskExecutor}.
 	 *
+	 * 请求已注册的TaskExecutor信息
+	 *
 	 * @param timeout of the request
 	 * @return Future collection of TaskManager information
 	 */
@@ -202,6 +234,8 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 
 	/**
 	 * Requests information about the given {@link TaskExecutor}.
+	 *
+	 * 根据taskManagerId 请求taskExecutor信息
 	 *
 	 * @param taskManagerId identifying the TaskExecutor for which to return information
 	 * @param timeout of the request
@@ -212,6 +246,12 @@ public interface ResourceManagerGateway extends FencedRpcGateway<ResourceManager
 	/**
 	 * Requests the resource overview. The resource overview provides information about the
 	 * connected TaskManagers, the total number of slots and the number of available slots.
+	 *
+	 * 请求资源概况。
+	 * 资源概况主要包含:
+	 * 	1、已经连接的taskManagers
+	 * 	2、slot总数
+	 * 	3、可用的slot数量
 	 *
 	 * @param timeout of the request
 	 * @return Future containing the resource overview

@@ -193,6 +193,8 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 	/**
 	 * Creates a new Flink mini cluster based on the given configuration.
 	 *
+	 * 根据配置 创建一个新的Flink迷你集群
+	 *
 	 * @param miniClusterConfiguration The configuration for the mini cluster
 	 */
 	public MiniCluster(MiniClusterConfiguration miniClusterConfiguration) {
@@ -230,6 +232,8 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 
 	/**
 	 * Starts the mini cluster, based on the configured properties.
+	 *
+	 * 启动迷你集群
 	 *
 	 * @throws Exception This method passes on any exception that occurs during the startup of
 	 *                   the mini cluster.

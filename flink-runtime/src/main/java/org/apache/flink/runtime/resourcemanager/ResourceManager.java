@@ -253,9 +253,10 @@ public abstract class ResourceManager<WorkerType extends ResourceIDRetrievable>
 	}
 
 	// ------------------------------------------------------------------------
-	//  RPC methods
+	//  RPC methods rpc方法
 	// ------------------------------------------------------------------------
 
+	// 注册jobManager
 	@Override
 	public CompletableFuture<RegistrationResponse> registerJobManager(
 			final JobMasterId jobMasterId,
@@ -629,7 +630,7 @@ public abstract class ResourceManager<WorkerType extends ResourceIDRetrievable>
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Registers a new JobMaster.
+	 * Registers a new JobMaster. 注册一个新的JobMaster
 	 *
 	 * @param jobMasterGateway to communicate with the registering JobMaster
 	 * @param jobId of the job for which the JobMaster is responsible
@@ -662,7 +663,7 @@ public abstract class ResourceManager<WorkerType extends ResourceIDRetrievable>
 				jmResourceIdRegistrations.put(jobManagerResourceId, jobManagerRegistration);
 			}
 		} else {
-			// new registration for the job
+			// new registration for the job 创建一个新的job并注册
 			JobManagerRegistration jobManagerRegistration = new JobManagerRegistration(
 				jobId,
 				jobManagerResourceId,
@@ -692,6 +693,8 @@ public abstract class ResourceManager<WorkerType extends ResourceIDRetrievable>
 
 	/**
 	 * Registers a new TaskExecutor.
+	 *
+	 * 注册一个新的TaskExecutor
 	 *
 	 * @param taskExecutorGateway to communicate with the registering TaskExecutor
 	 * @param taskExecutorAddress address of the TaskExecutor

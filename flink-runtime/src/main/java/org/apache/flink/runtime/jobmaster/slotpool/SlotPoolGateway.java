@@ -42,6 +42,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * The gateway for calls on the {@link SlotPool}.
+ *
+ * slotPoll网关接口
  */
 public interface SlotPoolGateway extends AllocatedSlotActions, RpcGateway {
 
@@ -52,12 +54,15 @@ public interface SlotPoolGateway extends AllocatedSlotActions, RpcGateway {
 	void suspend();
 
 	// ------------------------------------------------------------------------
-	//  resource manager connection
+	//  resource manager connection 资源管理器连接
 	// ------------------------------------------------------------------------
 
 	/**
 	 * Connects the SlotPool to the given ResourceManager. After this method is called, the
 	 * SlotPool will be able to request resources from the given ResourceManager.
+	 *
+	 * 将slotPool连接到资源管理器
+	 * 该方法被调用后, SlotPool 可以请求从资源管理器中请求资源
 	 *
 	 * @param resourceManagerGateway  The RPC gateway for the resource manager.
 	 */
@@ -67,6 +72,9 @@ public interface SlotPoolGateway extends AllocatedSlotActions, RpcGateway {
 	 * Disconnects the slot pool from its current Resource Manager. After this call, the pool will not
 	 * be able to request further slots from the Resource Manager, and all currently pending requests
 	 * to the resource manager will be canceled.
+	 *
+	 * 断开slotPool与资源管理器之间的连接
+	 * 断开后, 无法请求资源, 并且pending状态的请求也会被canceled
 	 *
 	 * <p>The slot pool will still be able to serve slots from its internal pool.
 	 */
@@ -79,6 +87,8 @@ public interface SlotPoolGateway extends AllocatedSlotActions, RpcGateway {
 	/**
 	 * Registers a TaskExecutor with the given {@link ResourceID} at {@link SlotPool}.
 	 *
+	 * 在slotPool中注册一个TaskExecutor
+	 *
 	 * @param resourceID identifying the TaskExecutor to register
 	 * @return Future acknowledge which is completed after the TaskExecutor has been registered
 	 */
@@ -86,6 +96,8 @@ public interface SlotPoolGateway extends AllocatedSlotActions, RpcGateway {
 
 	/**
 	 * Releases a TaskExecutor with the given {@link ResourceID} from the {@link SlotPool}.
+	 *
+	 * 在slotPool中释放一个已经注册的TaskExecutor
 	 *
 	 * @param resourceId identifying the TaskExecutor which shall be released from the SlotPool
 	 * @param cause for the releasing of the TaskManager
@@ -96,6 +108,9 @@ public interface SlotPoolGateway extends AllocatedSlotActions, RpcGateway {
 	/**
 	 * Offers a slot to the {@link SlotPool}. The slot offer can be accepted or
 	 * rejected.
+	 *
+	 * 提供一个slot至slotPool
+	 * slot可以被接受或拒绝
 	 *
 	 * @param taskManagerLocation from which the slot offer originates
 	 * @param taskManagerGateway to talk to the slot offerer

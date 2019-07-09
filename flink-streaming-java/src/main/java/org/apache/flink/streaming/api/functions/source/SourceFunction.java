@@ -34,7 +34,15 @@ import java.io.Serializable;
  * The run method can run for as long as necessary. The source must, however, react to an
  * invocation of {@link #cancel()} by breaking out of its main loop.
  *
+ * Flink中所有流式数据源的祖宗。
+ * 它的作用如下:
+ * 	当source开始emit元素时, #run()方法被调用, 使用sourceContext来emit数据
+ * 	只要你愿意, #run()是可以一直运行的。
+ * 	可以调用#cancel()来结束主循环, 这样就无法emit数据了
+ *
  * <h3>CheckpointedFunction Sources</h3>
+ *
+ * 检查点Function
  *
  * <p>Sources that also implement the {@link org.apache.flink.streaming.api.checkpoint.CheckpointedFunction}
  * interface must ensure that state checkpointing, updating of internal state and emission of
@@ -92,16 +100,22 @@ import java.io.Serializable;
  * ({@link TimeCharacteristic#IngestionTime} and {@link TimeCharacteristic#ProcessingTime}),
  * the watermarks from the source function are ignored.
  *
+ * 时间戳与水印
+ *
  * <h3>Gracefully Stopping Functions</h3>
  * Functions may additionally implement the {@link org.apache.flink.api.common.functions.StoppableFunction}
  * interface. "Stopping" a function, in contrast to "canceling" means a graceful exit that leaves the
  * state and the emitted elements in a consistent state.
  *
+ * 优雅停机
+ *
  * <p>When a source is stopped, the executing thread is not interrupted, but expected to leave the
  * {@link #run(SourceContext)} method in reasonable time on its own, preserving the atomicity
  * of state updates and element emission.
  *
- * @param <T> The type of the elements produced by this source.
+ * 当source被停止了, 执行线程并没有被interrupted, 而是离开了#run()方法
+ *
+ * @param <T> The type of the elements produced by this source. 生产数据的类型
  *
  * @see org.apache.flink.api.common.functions.StoppableFunction
  * @see org.apache.flink.streaming.api.TimeCharacteristic
@@ -186,14 +200,19 @@ public interface SourceFunction<T> extends Function, Serializable {
 	/**
 	 * Interface that source functions use to emit elements, and possibly watermarks.
 	 *
+	 * 可以用来emit元素以及水印
+	 *
 	 * @param <T> The type of the elements produced by the source.
 	 */
-	@Public // Interface might be extended in the future with additional methods.
+	@Public // Interface might be extended in the future with additional methods. 将来该接口可能被扩展, 增加一些方法
 	interface SourceContext<T> {
 
 		/**
 		 * Emits one element from the source, without attaching a timestamp. In most cases,
 		 * this is the default way of emitting elements.
+		 *
+		 * 发送一个不包含时间戳的元素。
+		 * 大多数情况下, 都是这么使用的
 		 *
 		 * <p>The timestamp that the element will get assigned depends on the time characteristic of
 		 * the streaming program:

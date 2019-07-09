@@ -26,6 +26,8 @@ import org.apache.flink.streaming.api.transformations.SourceTransformation;
 /**
  * The DataStreamSource represents the starting point of a DataStream.
  *
+ * DataStreamSource表示了一个DataStream的开始点
+ *
  * @param <T> Type of the elements in the DataStream created from the this source.
  */
 @Public

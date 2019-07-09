@@ -51,6 +51,8 @@ import java.util.concurrent.TimeUnit;
  * {@link SimpleChannelInboundHandler} which encapsulates the redirection logic for the
  * REST endpoints.
  *
+ * 为rest endpoints 封装了重定向逻辑
+ *
  * @param <T> type of the leader to retrieve
  */
 @ChannelHandler.Sharable

@@ -62,6 +62,8 @@ public interface JobMasterGateway extends
 	/**
 	 * Cancels the currently executed job.
 	 *
+	 * 取消当前执行的job
+	 *
 	 * @param timeout of this operation
 	 * @return Future acknowledge of the operation
 	 */
@@ -78,6 +80,8 @@ public interface JobMasterGateway extends
 	/**
 	 * Triggers rescaling of the executed job.
 	 *
+	 * 对已经执行的job使用新的并行度进行rescaling
+	 *
 	 * @param newParallelism new parallelism of the job
 	 * @param rescalingBehaviour defining how strict the rescaling has to be executed
 	 * @param timeout of this operation
@@ -90,6 +94,8 @@ public interface JobMasterGateway extends
 
 	/**
 	 * Triggers rescaling of the given set of operators.
+	 *
+	 * 对给定的一组operator进行rescaling
 	 *
 	 * @param operators set of operators which shall be rescaled
 	 * @param newParallelism new parallelism of the given set of operators
@@ -105,6 +111,8 @@ public interface JobMasterGateway extends
 
 	/**
 	 * Updates the task execution state for a given task.
+	 *
+	 * 更新task执行状态
 	 *
 	 * @param taskExecutionState New task execution state for a given task
 	 * @return Future flag of the task execution state update result

@@ -54,6 +54,8 @@ import java.util.stream.Collectors;
 
 /**
  * This handler can be used to submit jobs to a Flink cluster.
+ *
+ * 用来将job提交至flink集群
  */
 public final class JobSubmitHandler extends AbstractRestHandler<DispatcherGateway, JobSubmitRequestBody, JobSubmitResponseBody, EmptyMessageParameters> {
 

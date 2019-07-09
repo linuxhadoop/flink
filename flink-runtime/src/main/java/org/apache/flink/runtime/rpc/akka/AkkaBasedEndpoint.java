@@ -24,11 +24,15 @@ import akka.actor.ActorRef;
 
 /**
  * Interface for Akka based rpc gateways.
+ *
+ * 基于akka的rpc网关
  */
 interface AkkaBasedEndpoint extends RpcGateway {
 
 	/**
 	 * Returns the {@link ActorRef} of the underlying RPC actor.
+	 *
+	 * 返回一个actor的引用
 	 *
 	 * @return the {@link ActorRef} of the underlying RPC actor
 	 */

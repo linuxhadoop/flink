@@ -59,8 +59,13 @@ public class TumblingProcessingTimeWindows extends WindowAssigner<Object, TimeWi
 
 	@Override
 	public Collection<TimeWindow> assignWindows(Object element, long timestamp, WindowAssignerContext context) {
+		/** 根据传入的WindowAssignerContext获取当前处理时间 */
 		final long now = context.getCurrentProcessingTime();
+
+		/** 获取最近一次的窗口的开始时间 */
 		long start = TimeWindow.getWindowStartWithOffset(now, offset, size);
+
+		// 将满足条件的窗口添加到集合中
 		return Collections.singletonList(new TimeWindow(start, start + size));
 	}
 

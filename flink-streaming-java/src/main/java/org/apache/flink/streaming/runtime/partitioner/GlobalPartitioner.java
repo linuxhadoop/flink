@@ -24,6 +24,8 @@ import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 /**
  * Partitioner that sends all elements to the downstream operator with subtask ID=0.
  *
+ * 全局分区器:将所有数据发送到下游算中的id=0的子任务。 即选取了索引为0的channel
+ *
  * @param <T> Type of the elements in the Stream being partitioned
  */
 @Internal

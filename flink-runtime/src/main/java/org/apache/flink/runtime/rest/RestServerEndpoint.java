@@ -67,6 +67,8 @@ import java.util.stream.Collectors;
 
 /**
  * An abstract class for netty-based REST server endpoints.
+ *
+ * 基于netty的rest server endpoint基类
  */
 public abstract class RestServerEndpoint implements AutoCloseableAsync {
 

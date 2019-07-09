@@ -246,6 +246,8 @@ public class TimeWindow extends Window {
 	/**
 	 * Method to get the window start for a timestamp.
 	 *
+	 * 根据一个时间戳 来获取window的开始时间
+	 *
 	 * @param timestamp epoch millisecond to get the window start.
 	 * @param offset The offset which window start would be shifted by.
 	 * @param windowSize The size of the generated windows.

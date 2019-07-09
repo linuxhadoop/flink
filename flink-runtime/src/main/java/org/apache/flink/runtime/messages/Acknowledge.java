@@ -22,12 +22,18 @@ import java.io.Serializable;
 
 /**
  * A generic acknowledgement message.
+ *
+ * 通用的响应消息
  */
 public class Acknowledge implements Serializable {
 
 	private static final long serialVersionUID = 7808628311617273755L;
 
-	/** The singleton instance */
+	/**
+	 * 	The singleton instance
+	 *
+	 * 	单例类实例
+	 * */
 	private static final Acknowledge INSTANCE = new Acknowledge();
 
 	/**
@@ -40,7 +46,11 @@ public class Acknowledge implements Serializable {
 	
 	// ------------------------------------------------------------------------
 	
-	/** Private constructor to prevent instantiation */
+	/**
+	 * 	Private constructor to prevent instantiation
+	 *
+	 * 	私有构造器,为了保护实例
+	 * */
 	private Acknowledge() {}
 
 	// ------------------------------------------------------------------------

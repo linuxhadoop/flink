@@ -126,10 +126,16 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	/** The class logger. */
 	private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
-	/** The tread group that contains all task threads. */
+	/** The thread group that contains all task threads.
+	 *
+	 * 	包含所有任务线程的线程组
+	 * */
 	private static final ThreadGroup TASK_THREADS_GROUP = new ThreadGroup("Flink Task Threads");
 
-	/** For atomic state updates. */
+	/** For atomic state updates.
+	 *
+	 * 	原子状态更新
+	 * */
 	private static final AtomicReferenceFieldUpdater<Task, ExecutionState> STATE_UPDATER =
 			AtomicReferenceFieldUpdater.newUpdater(Task.class, ExecutionState.class, "executionState");
 
@@ -137,7 +143,10 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	//  Constant fields that are part of the initial Task construction
 	// ------------------------------------------------------------------------
 
-	/** The job that the task belongs to. */
+	/** The job that the task belongs to.
+	 *
+	 * 	当前task所在的jobId
+	 * */
 	private final JobID jobId;
 
 	/** The vertex in the JobGraph whose code the task executes. */
@@ -188,6 +197,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	/** Serialized version of the job specific execution configuration (see {@link ExecutionConfig}). */
 	private final SerializedValue<ExecutionConfig> serializedExecutionConfig;
 
+	// 生产数据的 结果分区数组
 	private final ResultPartition[] producedPartitions;
 
 	private final SingleInputGate[] inputGates;
@@ -218,7 +228,10 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	/** The registry of this task which enables live reporting of accumulators. */
 	private final AccumulatorRegistry accumulatorRegistry;
 
-	/** The thread that executes the task. */
+	/** The thread that executes the task.
+	 *
+	 * 	执行task的线程
+	 * */
 	private final Thread executingThread;
 
 	/** Parent group for all metrics of this task. */
@@ -244,7 +257,10 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	@Nullable
 	private volatile AbstractInvokable invokable;
 
-	/** The current execution state of the task. */
+	/** The current execution state of the task.
+	 *
+	 * 	任务的当前执行状态
+	 * */
 	private volatile ExecutionState executionState = ExecutionState.CREATED;
 
 	/** The observed exception, in case the task execution failed. */
@@ -522,9 +538,10 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	public void run() {
 
 		// ----------------------------
-		//  Initial State transition
+		//  Initial State transition 初始化转换
 		// ----------------------------
 		while (true) {
+			// 如果是created状态, 则先将状态转换为deploying, 然后退出循环
 			ExecutionState current = this.executionState;
 			if (current == ExecutionState.CREATED) {
 				if (transitionState(ExecutionState.CREATED, ExecutionState.DEPLOYING)) {
@@ -534,6 +551,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			}
 			else if (current == ExecutionState.FAILED) {
 				// we were immediately failed. tell the TaskManager that we reached our final state
+				// 如果当前状态为failed, 则立即执行失败操作。 通知taskManager,我们已经达到了最终状态, 最后直接返回
 				notifyFinalState();
 				if (metrics != null) {
 					metrics.close();
@@ -543,6 +561,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			else if (current == ExecutionState.CANCELING) {
 				if (transitionState(ExecutionState.CANCELING, ExecutionState.CANCELED)) {
 					// we were immediately canceled. tell the TaskManager that we reached our final state
+					// 如果是cancel状态。 通知taskManager, 我们已经达到了最终状态, 最后直接返回
 					notifyFinalState();
 					if (metrics != null) {
 						metrics.close();
@@ -551,6 +570,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 				}
 			}
 			else {
+				// 如果是其他状态, 则抛出异常
 				if (metrics != null) {
 					metrics.close();
 				}
@@ -577,6 +597,10 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 
 			// first of all, get a user-code classloader
 			// this may involve downloading the job's JAR files and/or classes
+			/**
+			 * 首先, 获取一个user-code类加载器
+			 * 这可能涉及到下载job相关的jar文件或类
+			 * */
 			LOG.info("Loading JAR files for task {}.", this);
 
 			userCodeClassLoader = createUserCodeClassloader();
@@ -678,7 +702,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 				metrics,
 				this);
 
-			// now load and instantiate the task's invokable code
+			// now load and instantiate the task's invokable code 实例化AbstractInvokable的具体子类
 			invokable = loadAndInstantiateInvokable(userCodeClassLoader, nameOfInvokableClass, env);
 
 			// ----------------------------------------------------------------
@@ -879,6 +903,8 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	/**
 	 * Try to transition the execution state from the current state to the new state.
 	 *
+	 * 状态转换: 当前状态 -> 新状态
+	 *
 	 * @param currentState of the execution
 	 * @param newState of the execution
 	 * @return true if the transition was successful, otherwise false
@@ -889,6 +915,8 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 
 	/**
 	 * Try to transition the execution state from the current state to the new state.
+	 *
+	 * 状态转换: 当前状态 -> 新状态
 	 *
 	 * @param currentState of the execution
 	 * @param newState of the execution

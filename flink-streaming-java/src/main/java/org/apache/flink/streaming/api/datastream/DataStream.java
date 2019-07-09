@@ -309,15 +309,20 @@ public class DataStream<T> {
 	/**
 	 * Partitions the operator state of a {@link DataStream} by the given key positions.
 	 *
+	 * 通过给定的key, 对DateStream算子状态 进行分区
+	 *
 	 * @param fields
 	 *            The position of the fields on which the {@link DataStream}
 	 *            will be grouped.
 	 * @return The {@link DataStream} with partitioned state (i.e. KeyedStream)
 	 */
 	public KeyedStream<T, Tuple> keyBy(int... fields) {
+
+		// 数组类型
 		if (getType() instanceof BasicArrayTypeInfo || getType() instanceof PrimitiveArrayTypeInfo) {
 			return keyBy(KeySelectorUtil.getSelectorForArray(fields, getType()));
 		} else {
+			// 非数组类型
 			return keyBy(new Keys.ExpressionKeys<>(fields, getType()));
 		}
 	}
@@ -1177,6 +1182,7 @@ public class DataStream<T> {
 	public <R> SingleOutputStreamOperator<R> transform(String operatorName, TypeInformation<R> outTypeInfo, OneInputStreamOperator<T, R> operator) {
 
 		// read the output type of the input Transform to coax out errors about MissingTypeInfo
+		// 读取输入Tranform的输出类型, 如果输出类型是MissingTypeInfo, 则抛出异常
 		transformation.getOutputType();
 
 		OneInputTransformation<T, R> resultTransform = new OneInputTransformation<>(
@@ -1189,6 +1195,7 @@ public class DataStream<T> {
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		SingleOutputStreamOperator<R> returnStream = new SingleOutputStreamOperator(environment, resultTransform);
 
+		// 将算子添加到env的算子集合中
 		getExecutionEnvironment().addOperator(resultTransform);
 
 		return returnStream;

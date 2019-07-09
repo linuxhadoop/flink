@@ -51,6 +51,7 @@ public class StreamSource<OUT, SRC extends SourceFunction<OUT>>
 	public StreamSource(SRC sourceFunction) {
 		super(sourceFunction);
 
+		// 连接策略为HEAD
 		this.chainingStrategy = ChainingStrategy.HEAD;
 	}
 

@@ -24,6 +24,8 @@ import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 /**
  * Partitioner that forwards elements only to the locally running downstream operation.
  *
+ * 只将数据发送给本地运行的下游算子。与globalPartitioner实现是一样的
+ *
  * @param <T> Type of the elements in the Stream
  */
 @Internal

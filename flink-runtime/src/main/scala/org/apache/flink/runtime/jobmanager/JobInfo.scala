@@ -28,11 +28,18 @@ import org.apache.flink.runtime.akka.ListeningBehaviour
  * Additionally, it stores whether the job was started in the detached mode. Detached means that
  * the submitting actor does not wait for the job result once the job has terminated.
  *
+ * 工具类:用来在JobManager上存储job信息。
+ * 它保存了 哪一个actor提交的job, 启动时间、job的结束时间。
+ * 此外,还保存了job是否是以detached模式启动的。
+ * Detached的意思是 提交job的actor不用等待job的结果
+ *
  * Important: This class is serializable, but needs to be deserialized in the context of an actor
  * system in order to resolve the client [[ActorRef]]. It is possible to serialize the Akka URL
  * manually, but it is cumbersome and complicates testing in certain scenarios, where you need to
  * make sure to resolve the correct [[ActorRef]]s when submitting jobs (RepointableActorRef vs.
  * RemoteActorRef).
+ *
+ * 该类是可序列化的
  *
  * @param client Actor which submitted the job
  * @param start Starting time

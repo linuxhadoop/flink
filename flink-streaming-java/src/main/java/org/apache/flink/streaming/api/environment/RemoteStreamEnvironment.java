@@ -171,14 +171,24 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 
 	@Override
 	public JobExecutionResult execute(String jobName) throws ProgramInvocationException {
+
+		// 获取流式任务的StreamGraph, 在StreamGraphGenerator#generate中生成graph
 		StreamGraph streamGraph = getStreamGraph();
+
+		// 设置job名称
 		streamGraph.setJobName(jobName);
+
+		// 清空trans列表
 		transformations.clear();
+
+		// 执行远程job
 		return executeRemotely(streamGraph, jarFiles);
 	}
 
 	/**
 	 * Executes the remote job.
+	 *
+	 * 执行远程job
 	 *
 	 * @param streamGraph
 	 *            Stream Graph to execute
@@ -191,6 +201,7 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 			LOG.info("Running remotely at {}:{}", host, port);
 		}
 
+		// 构建用户代码类加载器
 		ClassLoader usercodeClassLoader = JobWithJars.buildUserCodeClassLoader(jarFiles, globalClasspaths,
 			getClass().getClassLoader());
 
@@ -202,6 +213,7 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 
 		configuration.setInteger(RestOptions.PORT, port);
 
+		// 初始化 集群客户端
 		final ClusterClient<?> client;
 		try {
 			client = new RestClusterClient<>(configuration, "RemoteStreamEnvironment");
@@ -214,6 +226,7 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 		client.setPrintStatusDuringExecution(getConfig().isSysoutLoggingEnabled());
 
 		try {
+			// 实际调用的是RestClusterClient#submitJob
 			return client.run(streamGraph, jarFiles, globalClasspaths, usercodeClassLoader).getJobExecutionResult();
 		}
 		catch (ProgramInvocationException e) {

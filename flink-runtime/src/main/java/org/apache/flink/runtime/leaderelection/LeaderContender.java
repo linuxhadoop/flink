@@ -23,6 +23,8 @@ import java.util.UUID;
 /**
  * Interface which has to be implemented to take part in the leader election process of the
  * {@link LeaderElectionService}.
+ *
+ * 用于leader选举
  */
 public interface LeaderContender {
 

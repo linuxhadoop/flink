@@ -96,6 +96,7 @@ public class StreamGraphGenerator {
 
 	// Keep track of which Transforms we have already transformed, this is necessary because
 	// we have loops, i.e. feedback edges.
+	// 用来记录那些Transforms已经被转转换过, 这个是必须的, 因为有回路,比如feedback边
 	private Map<StreamTransformation<?>, Collection<Integer>> alreadyTransformed;
 
 
@@ -114,6 +115,8 @@ public class StreamGraphGenerator {
 	 * Generates a {@code StreamGraph} by traversing the graph of {@code StreamTransformations}
 	 * starting from the given transformations.
 	 *
+	 * 将给定的transformations转换成StreamGraph
+	 *
 	 * @param env The {@code StreamExecutionEnvironment} that is used to set some parameters of the
 	 *            job
 	 * @param transformations The transformations starting from which to transform the graph
@@ -126,6 +129,8 @@ public class StreamGraphGenerator {
 
 	/**
 	 * This starts the actual transformation, beginning from the sinks.
+	 *
+	 * 这里开始真正的转换, 从sink开始
 	 */
 	private StreamGraph generateInternal(List<StreamTransformation<?>> transformations) {
 		for (StreamTransformation<?> transformation: transformations) {
@@ -139,15 +144,19 @@ public class StreamGraphGenerator {
 	 *
 	 * <p>This checks whether we already transformed it and exits early in that case. If not it
 	 * delegates to one of the transformation specific methods.
+	 *
+	 * 首先检查是否已经转换过
 	 */
 	private Collection<Integer> transform(StreamTransformation<?> transform) {
 
+		// 如果已经转换过, 直接从alreadyTransformed获取
 		if (alreadyTransformed.containsKey(transform)) {
 			return alreadyTransformed.get(transform);
 		}
 
 		LOG.debug("Transforming " + transform);
 
+		// 并行度如果<=0, 需要重新设置
 		if (transform.getMaxParallelism() <= 0) {
 
 			// if the max parallelism hasn't been set, then first use the job wide max parallelism
@@ -161,6 +170,54 @@ public class StreamGraphGenerator {
 		// call at least once to trigger exceptions about MissingTypeInfo
 		transform.getOutputType();
 
+		// 根据传入的transform类型,执行相应的操作
+		/**
+		 * 以下列代码为例
+			 DataStream<Tuple2<String, Integer>> windowCounts = text
+			 .flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
+				@Override
+					public void flatMap(String value, Collector<Tuple2<String, Integer>> out) {
+						for (String word : value.split("\\s")) {
+							out.collect(Tuple2.of(word, 1));
+						}
+					}
+				}).setParallelism(4).slotSharingGroup("flatMap_sg")
+				.keyBy(0)
+				.countWindow(10, 5)
+				.sum(1).setParallelism(3).slotSharingGroup("sum_sg");
+
+				windowCounts.print().setParallelism(3);
+		 *
+		 *	------------------------------------------------------------------------
+		 *	会生成以下的transforms
+		 *	transformations: size = 3
+		 *
+		 *	0: OneInputTransformation{id=2, name='Flat Map', outputType=Java Tuple2<String, Integer>, parallelism=4}
+		 *			input属性:SourceTransformation{id=1, name='Socket Stream', outputType=String, parallelism=1}
+		 *
+		 *	1: OneInputTransformation{id=4, name='Window(GlobalWindows(), CountTrigger, CountEvictor, SumAggregator, PassThroughWindowFunction)', outputType=Java Tuple2<String, Integer>, parallelism=3}
+		 *  		input属性:PartitionTransformation{id=3, name='Partition', outputType=Java Tuple2<String, Integer>, parallelism=4}
+		 *
+		 *  2: SinkTransformation{id=5, name='Print to Std. Out', outputType=GenericType<java.lang.Object>, parallelism=3}
+		 *  		input属性:OneInputTransformation{id=4, name='Window(GlobalWindows(), CountTrigger, CountEvictor, SumAggregator, PassThroughWindowFunction)', outputType=Java Tuple2<String, Integer>, parallelism=3}
+		 *
+		 *
+		 *  因为0号元素是OneInputTransformation类型,所以执行第一个if中的语句: transformOneInputTransform()
+		 *  进入transformOneInputTransform后, 首先又递归调用 transform(transform.getInput()),
+		 *  	因为0号元素的input是SourceTrans, 所以会先进行SourceTrans的转换, 并生成一个节点(此时第1个节点产生了 source)
+		 *  	接着对0号元素进行转化, 并将其生成一个节点((第2个节点产生了 flatmap)
+		 *
+		 *	1号元素来了: 还是先进行它的input的转换, 它的输入是一个OneInputTransformation, 需要生成一个节点(第3个节点 window)
+		 *		接着再处理1号本身: 但是此时生成的却是虚拟节点: addVirtualPartitionNode ==> "6" -> "(2,HASH)"
+		 *
+		 *  2号元素: 它的input是以个OneInputTransformation, 该trans不能生成节点了。
+		 *  		然后在处理2本身: 先进行sinkTrans的转换, 可以转成一个节点(第4个节点)
+		 *
+		 *  此时4个几点全部生成
+		 *
+		 */
+
+		// 开始转换
 		Collection<Integer> transformedIds;
 		if (transform instanceof OneInputTransformation<?, ?>) {
 			transformedIds = transformOneInputTransform((OneInputTransformation<?, ?>) transform);
@@ -208,6 +265,28 @@ public class StreamGraphGenerator {
 			streamGraph.setResources(transform.getId(), transform.getMinResources(), transform.getPreferredResources());
 		}
 
+		/**
+		 * streamNodes = {HashMap@1113}  size = 4
+				 0 = {HashMap$Node@1419} "1" -> "Source: Socket Stream-1"
+				 1 = {HashMap$Node@1420} "2" -> "Flat Map-2"
+				 2 = {HashMap$Node@1421} "4" -> "Window(GlobalWindows(), CountTrigger, CountEvictor, SumAggregator, PassThroughWindowFunction)-4"
+				 3 = {HashMap$Node@1422} "5" -> "Sink: Print to Std. Out-5"
+
+		 	sources = {HashSet@1114}  size = 1
+		 	sinks = {HashSet@1115}  size = 1
+
+		 	virtualSelectNodes = {HashMap@1116}  size = 0
+		 	virtualSideOutputNodes = {HashMap@1117}  size = 0
+
+		 	virtualPartitionNodes = {HashMap@1118}  size = 1
+		 		0 = {HashMap$Node@1452} "6" -> "(2,HASH)"
+		 			key = {Integer@1453} "6"
+		 			value = {Tuple2@1454} "(2,HASH)"
+		 	vertexIDtoBrokerID = {HashMap@1119}  size = 0
+		 	vertexIDtoLoopTimeout = {HashMap@1120}  size = 0
+		 *
+		 * */
+
 		return transformedIds;
 	}
 
@@ -233,14 +312,27 @@ public class StreamGraphGenerator {
 	 *
 	 * <p>For this we create a virtual node in the {@code StreamGraph} that holds the partition
 	 * property. @see StreamGraphGenerator
+	 * 在streamGraph中创建一个虚拟节点, 保存了分区信息
+	 *
+	 * partition.getInput
 	 */
 	private <T> Collection<Integer> transformPartition(PartitionTransformation<T> partition) {
 		StreamTransformation<T> input = partition.getInput();
 		List<Integer> resultIds = new ArrayList<>();
 
+		// 还是需要处理它的input
 		Collection<Integer> transformedIds = transform(input);
+
 		for (Integer transformedId: transformedIds) {
+
+			// 生成1个新虚拟节点(节点id还是在原来id的基础上累加的)
 			int virtualId = StreamTransformation.getNewNodeId();
+
+			/**
+			 * transformedId = originalId = 2 (id=2 表示是flatMap。就是说 在这里通过 生成的虚拟节点的上游节点是2)
+			 * virtualId = 6
+			 * partition.getPartitioner() = KeyGroupStreamPartitioner (HASH)
+			 * */
 			streamGraph.addVirtualPartitionNode(transformedId, virtualId, partition.getPartitioner());
 			resultIds.add(virtualId);
 		}
@@ -466,17 +558,58 @@ public class StreamGraphGenerator {
 
 	/**
 	 * Transforms a {@code SourceTransformation}.
+	 * 进行sourceTrans的转换。 简单认为就是 将source添加到streamGraph中
+	 *
+	 *  以wordcount中的为例:
+	 *	input = {SourceTransformation@1391} "SourceTransformation{id=1, name='Socket Stream', outputType=String, parallelism=1}"
+	 operator = {StreamSource@1400}
+	 id = 1
+	 name = "Socket Stream"
+	 outputType = {BasicTypeInfo@1402} "String"
+	 typeUsed = true
+	 parallelism = 1
+	 maxParallelism = -1
+	 minResources = {ResourceSpec@1386} "ResourceSpec{cpuCores=0.0, heapMemoryInMB=0, directMemoryInMB=0, nativeMemoryInMB=0, stateSizeInMB=0}"
+	 preferredResources = {ResourceSpec@1386} "ResourceSpec{cpuCores=0.0, heapMemoryInMB=0, directMemoryInMB=0, nativeMemoryInMB=0, stateSizeInMB=0}"
+	 uid = null
+	 userProvidedNodeHash = null
+	 bufferTimeout = -1
+	 slotSharingGroup = null
+	 coLocationGroupKey = null
 	 */
 	private <T> Collection<Integer> transformSource(SourceTransformation<T> source) {
+		// 确定slot共享组
 		String slotSharingGroup = determineSlotSharingGroup(source.getSlotSharingGroup(), Collections.emptyList());
 
+		/***
+		 * source.getId() = 1
+		 * slotSharingGroup = null
+		 * source.getCoLocationGroupKey() = null
+		 * source.getOperator()
+		 * source.getOutputType() = {StreamSource@1400}
+		 * 		 userFunction = {SocketTextStreamFunction@1459}
+				 hostname = "localhost"
+				 port = 9000
+				 delimiter = "\n"
+				 maxNumRetries = 0
+				 delayBetweenRetries = 500
+				 currentSocket = null
+				 isRunning = true
+
+		 * inTypeInfo = null
+		 * source.getOutputType() = Java Tuple2<String, Integer>
+		 * source.getName() = "Flat Map"
+		 *
+		 * 那么最终生成的source, 并为其生成一个Node, 同时为streamGraph.source = 赋值该source
+		 */
+
 		streamGraph.addSource(source.getId(),
-				slotSharingGroup,
-				source.getCoLocationGroupKey(),
-				source.getOperator(),
-				null,
-				source.getOutputType(),
-				"Source: " + source.getName());
+			slotSharingGroup,
+			source.getCoLocationGroupKey(),
+			source.getOperator(),
+			null,
+			source.getOutputType(),
+			"Source: " + source.getName());
 		if (source.getOperator().getUserFunction() instanceof InputFormatSourceFunction) {
 			InputFormatSourceFunction<T> fs = (InputFormatSourceFunction<T>) source.getOperator().getUserFunction();
 			streamGraph.setInputFormat(source.getId(), fs.getFormat());
@@ -529,6 +662,7 @@ public class StreamGraphGenerator {
 	 */
 	private <IN, OUT> Collection<Integer> transformOneInputTransform(OneInputTransformation<IN, OUT> transform) {
 
+		// 先转换当前trans的输入input strans
 		Collection<Integer> inputIds = transform(transform.getInput());
 
 		// the recursive call might have already transformed this
@@ -536,8 +670,26 @@ public class StreamGraphGenerator {
 			return alreadyTransformed.get(transform);
 		}
 
+		// 确定slot共享组
 		String slotSharingGroup = determineSlotSharingGroup(transform.getSlotSharingGroup(), inputIds);
 
+		/**
+		 * 已0号元素为例
+		 * 	transform.getId() = 2
+		 *	slotSharingGroup = flatMap_sg
+		 *	transform.getCoLocationGroupKey() = null
+		 *	transform.getOperator() =
+		 *	transform.getInputType() = input.getOutput() = String
+		 *
+		 *	transform.getOutputType() = Java Tuple2<String, Integer>
+				 outputType = {TupleTypeInfo@1394} "Java Tuple2<String, Integer>"
+				 fieldNames = {String[2]@1465}
+				 types = {TypeInformation[2]@1466}
+				 totalFields = 2
+				 typeClass = {Class@933} "class org.apache.flink.api.java.tuple.Tuple2"
+
+		 *	transform.getName()	 = Flat Map
+		 * */
 		streamGraph.addOperator(transform.getId(),
 				slotSharingGroup,
 				transform.getCoLocationGroupKey(),
@@ -546,6 +698,8 @@ public class StreamGraphGenerator {
 				transform.getOutputType(),
 				transform.getName());
 
+		//  对于keyedStream, 还需要记录keySelector方法
+		// 因此自定义的keySelector方法需要保持幂等性
 		if (transform.getStateKeySelector() != null) {
 			TypeSerializer<?> keySerializer = transform.getStateKeyType().createSerializer(env.getConfig());
 			streamGraph.setOneInputStateKey(transform.getId(), transform.getStateKeySelector(), keySerializer);
@@ -554,6 +708,7 @@ public class StreamGraphGenerator {
 		streamGraph.setParallelism(transform.getId(), transform.getParallelism());
 		streamGraph.setMaxParallelism(transform.getId(), transform.getMaxParallelism());
 
+		// 为当前节点和它的依赖关系建立边
 		for (Integer inputId: inputIds) {
 			streamGraph.addEdge(inputId, transform.getId(), 0);
 		}

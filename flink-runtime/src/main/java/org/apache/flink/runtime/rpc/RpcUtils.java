@@ -32,6 +32,8 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Utility functions for Flink's RPC implementation.
+ *
+ * Flink rpc工具类
  */
 public class RpcUtils {
 
@@ -39,11 +41,15 @@ public class RpcUtils {
 	 * <b>HACK:</b> Set to 21474835 seconds, Akka's maximum delay (Akka 2.4.20). The value cannot be
 	 * higher or an {@link IllegalArgumentException} will be thrown during an RPC. Check the private
 	 * method {@code checkMaxDelay()} in {@link akka.actor.LightArrayRevolverScheduler}.
+	 *
+	 * akka的最大延迟。 不能超过该阈值,否则会抛出无效参数异常。
 	 */
 	public static final Time INF_TIMEOUT = Time.seconds(21474835);
 
 	/**
 	 * Extracts all {@link RpcGateway} interfaces implemented by the given clazz.
+	 *
+	 * 所有实现rpcGateway的接口
 	 *
 	 * @param clazz from which to extract the implemented RpcGateway interfaces
 	 * @return A set of all implemented RpcGateway interfaces
@@ -67,6 +73,8 @@ public class RpcUtils {
 	/**
 	 * Shuts the given {@link RpcEndpoint} down and awaits its termination.
 	 *
+	 * 关闭给定的endpoint,并等待其完成。
+	 *
 	 * @param rpcEndpoint to terminate
 	 * @param timeout for this operation
 	 * @throws ExecutionException if a problem occurred
@@ -81,6 +89,8 @@ public class RpcUtils {
 	/**
 	 * Shuts the given rpc service down and waits for its termination.
 	 *
+	 * 关闭给定的rpc service,并等待其完成。
+	 *
 	 * @param rpcService to shut down
 	 * @param timeout for this operation
 	 * @throws InterruptedException if the operation has been interrupted
@@ -93,6 +103,8 @@ public class RpcUtils {
 
 	/**
 	 * Shuts the given rpc services down and waits for their termination.
+	 *
+	 * 同上。 循环关闭多个rpc service
 	 *
 	 * @param rpcServices to shut down
 	 * @param timeout for this operation
@@ -114,6 +126,6 @@ public class RpcUtils {
 		FutureUtils.waitForAll(terminationFutures).get(timeout.toMilliseconds(), TimeUnit.MILLISECONDS);
 	}
 
-	// We don't want this class to be instantiable
+	// We don't want this class to be instantiable 私有构造器,不希望该类被实例化。
 	private RpcUtils() {}
 }

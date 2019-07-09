@@ -911,6 +911,10 @@ class JobManager(
         case None => log.debug(s"Received $msg for nonexistent job $jobID.")
       }
 
+    /**
+      * 该消息是在ResultPartition#notifyPipelinedConsumers()发送的
+      * 用来通知 结分区的数据已经ok
+      */
     case ScheduleOrUpdateConsumers(jobId, partitionId) =>
       currentJobs.get(jobId) match {
         case Some((executionGraph, _)) =>
@@ -1209,11 +1213,16 @@ class JobManager(
    * creates the job's class loader. The job graph is appended to the corresponding execution
    * graph and the execution vertices are queued for scheduling.
    *
+   * 提交一个job至job manager。
+   * job被注册到libraryCacheManager, 它创建了job的类加载器
+   *
    * @param jobGraph representing the Flink job
    * @param jobInfo the job info
    * @param isRecovery Flag indicating whether this is a recovery or initial submission
    */
   private def submitJob(jobGraph: JobGraph, jobInfo: JobInfo, isRecovery: Boolean = false): Unit = {
+
+    // 如果jobGraph为空, 则发送失败消息给提交job的actor
     if (jobGraph == null) {
       jobInfo.notifyClients(
         decorateMessage(JobResultFailure(
@@ -1231,6 +1240,8 @@ class JobManager(
         // Important: We need to make sure that the library registration is the first action,
         // because this makes sure that the uploaded jar files are removed in case of
         // unsuccessful
+
+        // 首先:需要确保在library中注册。 如果注册失败,则抛出异常
         try {
           libraryCacheManager.registerJob(
             jobGraph.getJobID, jobGraph.getUserJarBlobKeys, jobGraph.getClasspaths)
@@ -1241,16 +1252,19 @@ class JobManager(
               "Cannot set up the user code libraries: " + t.getMessage, t)
         }
 
+        // 获取用户的类加载器, 如为null,抛出异常
         val userCodeLoader = libraryCacheManager.getClassLoader(jobGraph.getJobID)
         if (userCodeLoader == null) {
           throw new JobSubmissionException(jobId,
             "The user code class loader could not be initialized.")
         }
 
+        // 判断jobGraph的顶点个数, 如果为0, 抛出异常
         if (jobGraph.getNumberOfVertices == 0) {
           throw new JobSubmissionException(jobId, "The given job is empty")
         }
 
+        // 重启策略
         val restartStrategyConfiguration = jobGraph
           .getSerializedExecutionConfig
           .deserializeValue(userCodeLoader)
@@ -1265,9 +1279,12 @@ class JobManager(
 
         val jobMetrics = jobManagerMetricGroup.addJob(jobGraph)
 
+        // 所有可用的slot数量
         val numSlots = scheduler.getTotalNumberOfSlots()
 
         // see if there already exists an ExecutionGraph for the corresponding job ID
+        // currentJob = HashMap[JobID, (ExecutionGraph, JobInfo)], 返回值是一个tuple
+        // 如果根据jobID发现已经存在一个对应的ExecutionGraph, 直接返回。否则将registerNewGraph置空
         val registerNewGraph = currentJobs.get(jobGraph.getJobID) match {
           case Some((graph, currentJobInfo)) =>
             executionGraph = graph
@@ -1277,9 +1294,11 @@ class JobManager(
             true
         }
 
+        // 申请slot的超时时间,默认为5分钟
         val allocationTimeout: Long = flinkConfiguration.getLong(
           JobManagerOptions.SLOT_REQUEST_TIMEOUT)
 
+        // 构建ExecutionGraph
         executionGraph = ExecutionGraphBuilder.buildGraph(
           executionGraph,
           jobGraph,
@@ -1296,17 +1315,19 @@ class JobManager(
           blobServer,
           Time.milliseconds(allocationTimeout),
           log.logger)
-        
+
+        // 如果registerNewGraph为空, 则进行job的注册
         if (registerNewGraph) {
           currentJobs.put(jobGraph.getJobID, (executionGraph, jobInfo))
         }
 
-        // get notified about job status changes
+        // get notified about job status changes 注册job状态变化监听器
         executionGraph.registerJobStatusListener(
           new StatusListenerMessenger(self, leaderSessionID.orNull))
 
         jobInfo.clients foreach {
           // the sender wants to be notified about state changes
+          // 如果客户端关心执行结果与状态毕爱华, 则为客户端在executionGraph中注册相应的监听器 HashSet[(ActorRef, ListeningBehaviour)]
           case (client, ListeningBehaviour.EXECUTION_RESULT_AND_STATE_CHANGES) =>
             val listener  = new StatusListenerMessenger(client, leaderSessionID.orNull)
             executionGraph.registerExecutionListener(listener)

@@ -45,20 +45,26 @@ import scala.language.postfixOps
  * This class contains utility functions for akka. It contains methods to start an actor system with
  * a given akka configuration. Furthermore, the akka configuration used for starting the different
  * actor systems resides in this class.
+ *
+ * akka工具类
+ * 包含了启动一个actor系统的方法
  */
 object AkkaUtils {
   val LOG: Logger = LoggerFactory.getLogger(AkkaUtils.getClass)
 
+  // 超时时间
   val INF_TIMEOUT: FiniteDuration = 21474835 seconds
 
+  // actor系统的名称
   val FLINK_ACTOR_SYSTEM_NAME = "flink"
 
+  // 获取flink actor系统名称
   def getFlinkActorSystemName = {
     FLINK_ACTOR_SYSTEM_NAME
   }
 
   /**
-   * Creates a local actor system without remoting.
+   * Creates a local actor system without remoting. 创建一个本地actor系统
    *
    * @param configuration instance containing the user provided configuration values
    * @return The created actor system

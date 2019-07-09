@@ -32,9 +32,13 @@ object JobClientMessages {
   /**
    * This message is sent to the JobClientActor (via ask) to submit a job and
    * get a response when the job execution has finished.
+   *
+   * 该消息被发送到JobClientActor 用来提交job 并且可在job执行完成后获得相应消息
    * 
    * The response to this message is a
    * [[org.apache.flink.runtime.client.SerializedJobExecutionResult]]
+   *
+   * 序列化的job执行结果
    *
    * @param jobGraph The job to be executed.
    */
@@ -43,6 +47,9 @@ object JobClientMessages {
   /**
     * This message is sent to the JobClientActor to ask it to register at the JobManager
     * and then return once the job execution is complete.
+    *
+    * 为了在JobManager注册, 并且当job执行完成后 返回结果
+    *
     * @param jobID The job id
     */
   case class AttachToJobAndWait(jobID: JobID)

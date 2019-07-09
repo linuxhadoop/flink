@@ -62,16 +62,32 @@ public abstract class RpcEndpoint implements RpcGateway {
 
 	// ------------------------------------------------------------------------
 
-	/** RPC service to be used to start the RPC server and to obtain rpc gateways. */
+	/**
+	 * RPC service to be used to start the RPC server and to obtain rpc gateways.
+	 *
+	 * RPC service被用来启动RPC server 与 获得rpc网关
+	 * */
 	private final RpcService rpcService;
 
-	/** Unique identifier for this rpc endpoint. */
+	/**
+	 * Unique identifier for this rpc endpoint.
+	 *
+	 * rcp endpoint的唯一标识符
+	 * */
 	private final String endpointId;
 
-	/** Interface to access the underlying rpc server. */
+	/**
+	 * Interface to access the underlying rpc server.
+	 *
+	 * 	用来访问下层的rpc server
+	 * */
 	protected final RpcServer rpcServer;
 
-	/** A reference to the endpoint's main thread, if the current method is called by the main thread. */
+	/**
+	 * A reference to the endpoint's main thread, if the current method is called by the main thread.
+	 *
+	 * 如果当前方法被主线程调用, 该变量指向endpoint的主线程
+	 * */
 	final AtomicReference<Thread> currentMainThread = new AtomicReference<>(null);
 
 	/** The main thread executor to be used to execute future callbacks in the main thread
@@ -80,6 +96,8 @@ public abstract class RpcEndpoint implements RpcGateway {
 
 	/**
 	 * Initializes the RPC endpoint.
+	 *
+	 * 初始化rpc endpoint
 	 *
 	 * @param rpcService The RPC server that dispatches calls to this RPC endpoint.
 	 * @param endpointId Unique identifier for this endpoint
@@ -96,6 +114,8 @@ public abstract class RpcEndpoint implements RpcGateway {
 	/**
 	 * Initializes the RPC endpoint with a random endpoint id.
 	 *
+	 * 使用随机uuid来初始化rpc endpoint
+	 *
 	 * @param rpcService The RPC server that dispatches calls to this RPC endpoint.
 	 */
 	protected RpcEndpoint(final RpcService rpcService) {
@@ -104,6 +124,8 @@ public abstract class RpcEndpoint implements RpcGateway {
 
 	/**
 	 * Returns the rpc endpoint's identifier.
+	 *
+	 * 获取endpoint标识符id
 	 *
 	 * @return Rpc endpoint's identifier.
 	 */
@@ -119,6 +141,8 @@ public abstract class RpcEndpoint implements RpcGateway {
 	 * Starts the rpc endpoint. This tells the underlying rpc server that the rpc endpoint is ready
 	 * to process remote procedure calls.
 	 *
+	 * 启动rpc endpoint. 用来告知底层的rpc server, 当前endpoint已经可以处理远程调用
+	 *
 	 * <p>IMPORTANT: Whenever you override this method, call the parent implementation to enable
 	 * rpc processing. It is advised to make the parent call last.
 	 *
@@ -131,6 +155,8 @@ public abstract class RpcEndpoint implements RpcGateway {
 	/**
 	 * Stops the rpc endpoint. This tells the underlying rpc server that the rpc endpoint is
 	 * no longer ready to process remote procedure calls.
+	 *
+	 * 停止rpc endpoint. 告知底层的rpc server, 当前endpoint已经不再处理远程调用
 	 */
 	protected final void stop() {
 		rpcServer.stop();
@@ -139,10 +165,16 @@ public abstract class RpcEndpoint implements RpcGateway {
 	/**
 	 * User overridable callback.
 	 *
+	 * 用户可以重写该callback
+	 *
 	 * <p>This method is called when the RpcEndpoint is being shut down. The method is guaranteed
 	 * to be executed in the main thread context and can be used to clean up internal state.
 	 *
+	 * 在停止endpoint时调用该方法。 常用来进行内部状态的清理
+	 *
 	 * <p>IMPORTANT: This method should never be called directly by the user.
+	 *
+	 * 该方法不能被用户直接调用
 	 *
 	 * @return Future which is completed once all post stop actions are completed. If an error
 	 * occurs this future is completed exceptionally
@@ -151,6 +183,8 @@ public abstract class RpcEndpoint implements RpcGateway {
 
 	/**
 	 * Triggers the shut down of the rpc endpoint. The shut down is executed asynchronously.
+	 *
+	 * 出发关闭rpc endpoint。 关闭是异步执行的
 	 *
 	 * <p>In order to wait on the completion of the shut down, obtain the termination future
 	 * via {@link #getTerminationFuture()}} and wait on its completion.
@@ -210,6 +244,8 @@ public abstract class RpcEndpoint implements RpcGateway {
 	 * Gets the main thread execution context. The main thread execution context can be used to
 	 * execute tasks in the main thread of the underlying RPC endpoint.
 	 *
+	 * 获得主线程执行上线文
+	 *
 	 * @return Main thread execution context
 	 */
 	protected MainThreadExecutor getMainThreadExecutor() {
@@ -218,6 +254,8 @@ public abstract class RpcEndpoint implements RpcGateway {
 
 	/**
 	 * Gets the endpoint's RPC service.
+	 *
+	 * 获取rpc service
 	 *
 	 * @return The endpoint's RPC service
 	 */
@@ -292,6 +330,8 @@ public abstract class RpcEndpoint implements RpcGateway {
 	/**
 	 * Validates that the method call happens in the RPC endpoint's main thread.
 	 *
+	 * 验证该方法是否是在rpc endpoint的主线程中被调用的
+	 *
 	 * <p><b>IMPORTANT:</b> This check only happens when assertions are enabled,
 	 * such as when running tests.
 	 *
@@ -314,6 +354,8 @@ public abstract class RpcEndpoint implements RpcGateway {
 
 	/**
 	 * Executor which executes runnables in the main thread context.
+	 *
+	 * Executor:用来在主线程中执行提交的runnable task
 	 */
 	protected static class MainThreadExecutor implements ScheduledExecutor {
 

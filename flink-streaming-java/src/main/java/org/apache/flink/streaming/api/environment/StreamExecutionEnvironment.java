@@ -116,6 +116,8 @@ public abstract class StreamExecutionEnvironment {
 
 	/**
 	 * The environment of the context (local by default, cluster if invoked through command line).
+	 *
+	 * 环境上线文(默认为local, 如果通过命令行调用 则为cluster)
 	 */
 	private static StreamExecutionEnvironmentFactory contextEnvironmentFactory;
 
@@ -1244,13 +1246,17 @@ public abstract class StreamExecutionEnvironment {
 	 * Creates a new data stream that contains the strings received infinitely from a socket. Received strings are
 	 * decoded by the system's default character set. The reader is terminated immediately when the socket is down.
 	 *
+	 * 创建一个新的数据流:包含了从socket中接收到的字符串
+	 * 接收到的字符串被编码为系统默认的字符集
+	 * 当socket关闭时,reader会立即结束
+	 *
 	 * @param hostname
-	 * 		The host name which a server socket binds
+	 * 		The host name which a server socket binds 主机名
 	 * @param port
 	 * 		The port number which a server socket binds. A port number of 0 means that the port number is automatically
-	 * 		allocated.
+	 * 		allocated. 端口
 	 * @param delimiter
-	 * 		A string which splits received strings into records
+	 * 		A string which splits received strings into records 分隔符
 	 * @return A data stream containing the strings received from the socket
 	 */
 	@PublicEvolving
@@ -1465,6 +1471,7 @@ public abstract class StreamExecutionEnvironment {
 			}
 		}
 
+		// 是否是可并行的数据源
 		boolean isParallel = function instanceof ParallelSourceFunction;
 
 		clean(function);
@@ -1472,9 +1479,10 @@ public abstract class StreamExecutionEnvironment {
 		if (function instanceof StoppableFunction) {
 			sourceOperator = new StoppableStreamSource<>(cast2StoppableSourceFunction(function));
 		} else {
+			// 构建一个新的StreamSource
 			sourceOperator = new StreamSource<>(function);
 		}
-
+		// 返回一个新的DataStreamSource
 		return new DataStreamSource<>(this, typeInfo, sourceOperator, isParallel, sourceName);
 	}
 
@@ -1499,8 +1507,18 @@ public abstract class StreamExecutionEnvironment {
 	 * the program that have resulted in a "sink" operation. Sink operations are
 	 * for example printing results or forwarding them to a message queue.
 	 *
+	 * 触发程序的执行。
+	 * 会执行程序中所有的部分, 结果在sink中。
+	 * sink操作 可以打印结果 或者 将数据发送到一个消息队列中
+	 *
+	 *
 	 * <p>The program execution will be logged and displayed with a generated
 	 * default name.
+	 *
+	 * 程序执行时会记录日志,并且以提供的名称作为显示
+	 * StreamExecutionEnvironment有2个子类
+	 * 		RemoteStreamEnvironment
+	 * 		LocalStreamEnvironment
 	 *
 	 * @return The result of the job execution, containing elapsed time and accumulators.
 	 * @throws Exception which occurs during job execution.
@@ -1525,6 +1543,8 @@ public abstract class StreamExecutionEnvironment {
 
 	/**
 	 * Getter of the {@link org.apache.flink.streaming.api.graph.StreamGraph} of the streaming job.
+	 *
+	 * 获取流式任务的StreamGraph
 	 *
 	 * @return The streamgraph representing the transformations
 	 */
@@ -1565,11 +1585,16 @@ public abstract class StreamExecutionEnvironment {
 	 * Adds an operator to the list of operators that should be executed when calling
 	 * {@link #execute}.
 	 *
+	 * 将一个算子添加到算子列表中, 当调用env#execute()时, 算子就会被执行
+	 *
 	 * <p>When calling {@link #execute()} only the operators that where previously added to the list
 	 * are executed.
 	 *
+	 * 当调用#execute时, 只有被之前被加入到算子节后中的才能被执行
+	 *
 	 * <p>This is not meant to be used by users. The API methods that create operators must call
 	 * this method.
+	 * 这并不意味着该函数可以被用户使用。 创建算子的api,才可以调用该方法(可以认为是在用户的main函数中吧)
 	 */
 	@Internal
 	public void addOperator(StreamTransformation<?> transformation) {

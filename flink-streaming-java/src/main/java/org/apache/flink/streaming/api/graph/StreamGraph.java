@@ -340,6 +340,7 @@ public class StreamGraph extends StreamingPlan {
 	/**
 	 * Adds a new virtual node that is used to connect a downstream vertex to an input with a
 	 * certain partitioning.
+	 * 添加一个虚拟及节点, 它被用来连接: 一个特定输入分区 与 下游的节点
 	 *
 	 * <p>When adding an edge from the virtual node to a downstream node the connection will be made
 	 * to the original node, but with the partitioning given here.
@@ -377,6 +378,7 @@ public class StreamGraph extends StreamingPlan {
 		}
 	}
 
+	// 使用边 来建立当前节点 与 依赖节点的关系
 	public void addEdge(Integer upStreamVertexID, Integer downStreamVertexID, int typeNumber) {
 		addEdgeInternal(upStreamVertexID,
 				downStreamVertexID,
@@ -387,6 +389,16 @@ public class StreamGraph extends StreamingPlan {
 
 	}
 
+	/**
+	 * upStreamVertexID 上游节点id
+	 * downStreamVertexID 下游节点id
+	 * typeNumber = 0
+	 * partitioner 分区器
+	 * outputNames 输出名字
+	 * outputTag = null
+	 *
+	 * wordcount例子中virtualPartitionNodes "6" -> "(2,HASH)", 所以先执行virtualPartitionNodes#containsKey()
+	 * */
 	private void addEdgeInternal(Integer upStreamVertexID,
 			Integer downStreamVertexID,
 			int typeNumber,
@@ -410,8 +422,15 @@ public class StreamGraph extends StreamingPlan {
 			}
 			addEdgeInternal(upStreamVertexID, downStreamVertexID, typeNumber, partitioner, outputNames, outputTag);
 		} else if (virtualPartitionNodes.containsKey(upStreamVertexID)) {
+
+			// virtualId = 上游节点 = 6
 			int virtualId = upStreamVertexID;
+
+			// 根据virtualId=6获取上游节点(2,HASH)
+			// upStreamVertexID = 2
 			upStreamVertexID = virtualPartitionNodes.get(virtualId).f0;
+
+			// partitioner不为空,它是一个KeyGroupStreamPartitioner类型的分区器
 			if (partitioner == null) {
 				partitioner = virtualPartitionNodes.get(virtualId).f1;
 			}
@@ -654,6 +673,8 @@ public class StreamGraph extends StreamingPlan {
 
 	/**
 	 * Gets the assembled {@link JobGraph} with a given job id.
+	 *
+	 * 生成一个JobGraph
 	 */
 	@SuppressWarnings("deprecation")
 	@Override

@@ -26,6 +26,8 @@ import java.io.Serializable;
 
 /**
  * A special {@link ChannelSelector} for use in streaming programs.
+ *
+ * 流分区器的基类，它只定义了一个抽象方法
  */
 @Internal
 public abstract class StreamPartitioner<T> implements

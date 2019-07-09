@@ -28,6 +28,8 @@ public interface RpcServer extends StartStoppable, MainThreadExecutable, RpcGate
 	/**
 	 * Return a future which is completed when the rpc endpoint has been terminated.
 	 *
+	 * 当endpoint被terminated时, 返回一个已完成的future
+	 *
 	 * @return Future indicating when the rpc endpoint has been terminated
 	 */
 	CompletableFuture<Void> getTerminationFuture();

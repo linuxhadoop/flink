@@ -64,20 +64,26 @@ class AkkaInvocationHandler implements InvocationHandler, AkkaBasedEndpoint, Rpc
 	/**
 	 * The Akka (RPC) address of {@link #rpcEndpoint} including host and port of the ActorSystem in
 	 * which the actor is running.
+	 *
+	 * Akka rpc地址:包含host与port
 	 */
 	private final String address;
 
 	/**
 	 * Hostname of the host, {@link #rpcEndpoint} is running on.
+	 *
+	 * 主机名
 	 */
 	private final String hostname;
 
+	// endpoint的引用
 	private final ActorRef rpcEndpoint;
 
 	// whether the actor ref is local and thus no message serialization is needed
+	// actor ref是否是本地。如果是,则不需要进行序列化
 	protected final boolean isLocal;
 
-	// default timeout for asks
+	// default timeout for asks 默认ask的超时时间
 	private final Time timeout;
 
 	private final long maximumFramesize;

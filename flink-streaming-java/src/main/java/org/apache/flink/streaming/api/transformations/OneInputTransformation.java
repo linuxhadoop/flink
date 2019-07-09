@@ -51,6 +51,8 @@ public class OneInputTransformation<IN, OUT> extends StreamTransformation<OUT> {
 	/**
 	 * Creates a new {@code OneInputTransformation} from the given input and operator.
 	 *
+	 * 根据给定的输入与算子, 创建一个新的OneInputTransformation
+	 *
 	 * @param input The input {@code StreamTransformation}
 	 * @param name The name of the {@code StreamTransformation}, this will be shown in Visualizations and the Log
 	 * @param operator The {@code TwoInputStreamOperator}

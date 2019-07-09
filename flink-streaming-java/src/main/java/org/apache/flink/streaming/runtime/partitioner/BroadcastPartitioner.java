@@ -24,6 +24,8 @@ import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 /**
  * Partitioner that selects all the output channels.
  *
+ * 将数据发送给下游所有的子任务
+ *
  * @param <T> Type of the elements in the Stream being broadcast
  */
 @Internal
