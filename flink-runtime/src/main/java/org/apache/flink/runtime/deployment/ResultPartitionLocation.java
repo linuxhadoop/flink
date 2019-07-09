@@ -48,12 +48,23 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 public class ResultPartitionLocation implements Serializable {
 
 	private static final long serialVersionUID = -6354238166937194463L;
-	/** The type of location for the result partition. */
+	/** The type of location for the result partition.
+	 *
+	 * 	结果分区位置的类型
+	 * */
 	private final LocationType locationType;
 
-	/** The connection ID of a remote result partition. */
+	/** The connection ID of a remote result partition.
+	 *
+	 * 	远程结果分区的connectionId
+	 * */
 	private final ConnectionID connectionId;
 
+	/**
+	 * LOCAL,  本地
+	 * REMOTE, 远程
+	 * UNKNOWN 未知
+	 * */
 	private enum LocationType {
 		LOCAL,
 		REMOTE,

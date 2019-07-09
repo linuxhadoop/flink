@@ -48,6 +48,10 @@ public final class Preconditions {
 	 * Ensures that the given object reference is not null.
 	 * Upon violation, a {@code NullPointerException} with no message is thrown.
 	 *
+	 * 确保给定的对象不能为空
+	 * 如果为空,则抛出NPE
+	 * 否则,返回该对象
+	 *
 	 * @param reference The object reference
 	 * @return The object reference itself (generically typed).
 	 *

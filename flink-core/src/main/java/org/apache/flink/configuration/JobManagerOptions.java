@@ -157,6 +157,8 @@ public class JobManagerOptions {
 
 	/**
 	 * The timeout in milliseconds for requesting a slot from Slot Pool.
+	 *
+	 * 从Slot池中 请求一个slot的超时时间, 默认是5分钟
 	 */
 	public static final ConfigOption<Long> SLOT_REQUEST_TIMEOUT =
 		key("slot.request.timeout")

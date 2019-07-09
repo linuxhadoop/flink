@@ -32,6 +32,9 @@ import java.util.List;
 /**
  * A JobWithJars is a Flink dataflow plan, together with a bunch of JAR files that contain
  * the classes of the functions and libraries necessary for the execution.
+ *
+ * jobWithJars是一个flink数据流计划, 与一些jar文件组合在一起,
+ * 包含了一些运行时需要用到的函数与类库
  */
 public class JobWithJars {
 
@@ -41,6 +44,8 @@ public class JobWithJars {
 
 	/**
 	 * classpaths that are needed during user code execution.
+	 *
+	 * 用户代码执行时的classpath
 	 */
 	private List<URL> classpaths;
 

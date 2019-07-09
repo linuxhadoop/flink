@@ -119,6 +119,8 @@ public class ExecutionGraphBuilder {
 	 * Builds the ExecutionGraph from the JobGraph.
 	 * If a prior execution graph exists, the JobGraph will be attached. If no prior execution
 	 * graph exists, then the JobGraph will become attach to a new empty execution graph.
+	 *
+	 * 根据JobGraph构建ExecutionGraph
 	 */
 	@Deprecated
 	public static ExecutionGraph buildGraph(

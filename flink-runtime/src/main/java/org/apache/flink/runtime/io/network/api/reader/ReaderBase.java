@@ -25,11 +25,15 @@ import java.io.IOException;
 
 /**
  * The basic API for every reader.
+ *
+ * 每个reader的基本操作API
  */
 public interface ReaderBase {
 
 	/**
 	 * Returns whether the reader has consumed the input.
+	 *
+	 * 判断reader是否已经消费了input
 	 */
 	boolean isFinished();
 
@@ -37,14 +41,17 @@ public interface ReaderBase {
 	// Task events
 	// ------------------------------------------------------------------------
 
+	// 发送taskEvent
 	void sendTaskEvent(TaskEvent event) throws IOException;
 
+	// 注册TaskEventListener
 	void registerTaskEventListener(EventListener<TaskEvent> listener, Class<? extends TaskEvent> eventType);
 
 	// ------------------------------------------------------------------------
 	// Iterations
 	// ------------------------------------------------------------------------
 
+	// 设置可迭代的reader
 	void setIterativeReader();
 
 	void startNextSuperstep();

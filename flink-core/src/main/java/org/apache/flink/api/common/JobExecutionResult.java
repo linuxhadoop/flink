@@ -30,6 +30,9 @@ import java.util.stream.Collectors;
 /**
  * The result of a job execution. Gives access to the execution time of the job,
  * and to all accumulators created by this job.
+ *
+ * job执行的结果。
+ * 可用来访问job的执行时间, 以及该job创建的所有的累加器
  */
 @Public
 public class JobExecutionResult extends JobSubmissionResult {
@@ -41,9 +44,11 @@ public class JobExecutionResult extends JobSubmissionResult {
 	/**
 	 * Creates a new JobExecutionResult.
 	 *
+	 * 创建一个新的JobExecutionResult
+	 *
 	 * @param jobID The job's ID.
 	 * @param netRuntime The net runtime of the job (excluding pre-flight phase like the optimizer) in milliseconds
-	 * @param accumulators A map of all accumulators produced by the job.
+	 * @param accumulators A map of all accumulators produced by the job. 记录该job产生的所有累加器
 	 */
 	public JobExecutionResult(JobID jobID, long netRuntime, Map<String, OptionalFailure<Object>> accumulators) {
 		super(jobID);

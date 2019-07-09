@@ -24,6 +24,9 @@ import org.apache.flink.annotation.Public;
  * This interface acts as a marker for input formats for inputs which cannot be split.
  * Data sources with a non-parallel input formats are always executed with a parallelism
  * of one.
+ *
+ * 用来标注: 输入数据不能被分割
+ * 如果一个DS使用的是非并行的输入格式, 那么执行时并行度为1
  * 
  * @see InputFormat
  */

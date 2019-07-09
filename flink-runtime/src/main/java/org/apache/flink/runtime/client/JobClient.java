@@ -106,6 +106,9 @@ public class JobClient {
 		// for this job, we create a proxy JobClientActor that deals with all communication with
 		// the JobManager. It forwards the job submission, checks the success/failure responses, logs
 		// update messages, watches for disconnect between client and JobManager, ...
+		/**
+		 * 针对当前job, 我们创建一个代理JobClientActor 用来处理与JobManager之间的通讯。
+		 * */
 
 		Props jobClientActorProps = JobSubmissionClientActor.createActorProps(
 			highAvailabilityServices.getJobManagerLeaderRetriever(HighAvailabilityServices.DEFAULT_JOB_ID),

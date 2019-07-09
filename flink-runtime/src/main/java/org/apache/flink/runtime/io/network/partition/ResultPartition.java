@@ -48,13 +48,21 @@ import static org.apache.flink.util.Preconditions.checkState;
 /**
  * A result partition for data produced by a single task.
  *
+ * 用于生产数据, 每一个task会生成一个结果分区
+ *
  * <p>This class is the runtime part of a logical {@link IntermediateResultPartition}. Essentially,
  * a result partition is a collection of {@link Buffer} instances. The buffers are organized in one
  * or more {@link ResultSubpartition} instances, which further partition the data depending on the
  * number of consuming tasks and the data {@link DistributionPattern}.
  *
+ * 该类是一个逻辑intermediateResultPartition 的运行时部分。
+ * 实际上, 一个RP(结果分区) 是一个buffer实例的集合。
+ * buffer被一个或多个RSP(结果子分区)管理,
+ *
  * <p>Tasks, which consume a result partition have to request one of its subpartitions. The request
  * happens either remotely (see {@link RemoteInputChannel}) or locally (see {@link LocalInputChannel})
+ *
+ * 消费一个RP的task 需要请求一个对应的子分区。
  *
  * <h2>Life-cycle</h2>
  *
@@ -65,16 +73,27 @@ import static org.apache.flink.util.Preconditions.checkState;
  * <li><strong>Release</strong>: </li>
  * </ol>
  *
+ * 每一个RP的生命周期,有3个阶段(可能会重叠): 生产、消费、释放
+ *
  * <h2>Lazy deployment and updates of consuming tasks</h2>
+ *
+ * 延迟部署与消费任务的更新
  *
  * <p>Before a consuming task can request the result, it has to be deployed. The time of deployment
  * depends on the PIPELINED vs. BLOCKING characteristic of the result partition. With pipelined
  * results, receivers are deployed as soon as the first buffer is added to the result partition.
  * With blocking results on the other hand, receivers are deployed after the partition is finished.
  *
+ * 在消费程序能够请求结果之前, 它必须被部署。
+ * 部署的时机依赖于RP上的PIPELINED、BLOCKING。
+ * 对于PIPELINED, 当第一个buffer被加入到RP中后, receivers就被部署。
+ * 对于BLOCKING则不然。当整个partition完成后, receivers才会被部署
+ *
  * <h2>Buffer management</h2>
+ * buffer管理
  *
  * <h2>State management</h2>
+ * 状态管理
  */
 public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 
@@ -88,10 +107,16 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 
 	private final ResultPartitionID partitionId;
 
-	/** Type of this partition. Defines the concrete subpartition implementation to use. */
+	/** Type of this partition. Defines the concrete subpartition implementation to use.
+	 *
+	 * 	当前partition的类型
+	 * */
 	private final ResultPartitionType partitionType;
 
-	/** The subpartitions of this partition. At least one. */
+	/** The subpartitions of this partition. At least one.
+	 *
+	 * 	当前分区的子分区。至少包含一个
+	 * */
 	private final ResultSubpartition[] subpartitions;
 
 	private final ResultPartitionManager partitionManager;
@@ -451,6 +476,14 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 
 	/**
 	 * Notifies pipelined consumers of this result partition once.
+	 * 给当前RP的pipelined consumers发送一个通知
+	 *
+	 * ResultPartitionConsumableNotifier有2个实现类
+	 * 1、ActorGatewayResultPartitionConsumableNotifier
+	 * 	在TaskManager中被实例化
+	 *
+	 * 2、RpcResultPartitionConsumableNotifier
+	 * 	在TaskExecutor中被调用
 	 */
 	private void notifyPipelinedConsumers() {
 		if (sendScheduleOrUpdateConsumersMessage && !hasNotifiedPipelinedConsumers && partitionType.isPipelined()) {

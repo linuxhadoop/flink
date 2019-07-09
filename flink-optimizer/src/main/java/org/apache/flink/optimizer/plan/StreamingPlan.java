@@ -28,12 +28,16 @@ import javax.annotation.Nullable;
 
 /**
  * Abstract class representing Flink Streaming plans
+ *
+ * 用来表示flink流式流式执行计划的抽象类
  * 
  */
 public abstract class StreamingPlan implements FlinkPlan {
 
 	/**
 	 * Gets the assembled {@link JobGraph} with a random {@link JobID}.
+	 *
+	 * 获取一个 有随机jobId的JobGraph
 	 */
 	@SuppressWarnings("deprecation")
 	public JobGraph getJobGraph() {

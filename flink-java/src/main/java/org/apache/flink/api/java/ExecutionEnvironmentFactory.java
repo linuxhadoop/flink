@@ -22,12 +22,16 @@ import org.apache.flink.annotation.Public;
 
 /**
  * Factory class for execution environments.
+ *
+ * 执行环境工厂类
  */
 @Public
 public interface ExecutionEnvironmentFactory {
 
 	/**
 	 * Creates an ExecutionEnvironment from this factory.
+	 *
+	 * 从该工厂中创建一个执行环境
 	 *
 	 * @return An ExecutionEnvironment.
 	 */

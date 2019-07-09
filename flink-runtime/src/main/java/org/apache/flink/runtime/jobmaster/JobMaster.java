@@ -289,7 +289,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 	}
 
 	//----------------------------------------------------------------------------------------------
-	// Lifecycle management
+	// Lifecycle management 生命周期管理
 	//----------------------------------------------------------------------------------------------
 
 	@Override
@@ -300,14 +300,17 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 	/**
 	 * Start the rpc service and begin to run the job.
 	 *
+	 * 启动rpc服务, 开始执行job
+	 *
 	 * @param newJobMasterId The necessary fencing token to run the job
 	 * @param timeout for the operation
 	 * @return Future acknowledge if the job could be started. Otherwise the future contains an exception
 	 */
 	public CompletableFuture<Acknowledge> start(final JobMasterId newJobMasterId, final Time timeout) throws Exception {
-		// make sure we receive RPC and async calls
+		// make sure we receive RPC and async calls 确保收到了RPC,并且异步调用
 		super.start();
 
+		// startJobExecution 执行job
 		return callAsyncWithoutFencing(() -> startJobExecution(newJobMasterId), timeout);
 	}
 
@@ -998,6 +1001,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 
 	//-- job starting and stopping  -----------------------------------------------------------------
 
+	// 开始执行job
 	private Acknowledge startJobExecution(JobMasterId newJobMasterId) throws Exception {
 		validateRunsInMainThread();
 
@@ -1011,29 +1015,40 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 
 		setNewFencingToken(newJobMasterId);
 
+		// 启动jobMaster服务:slotPool, resourceManager
 		startJobMasterServices();
 
 		log.info("Starting execution of job {} ({})", jobGraph.getName(), jobGraph.getJobID());
 
+		// 重置、调度执行
 		resetAndScheduleExecutionGraph();
 
 		return Acknowledge.get();
 	}
 
+	// 开始启动jobMaster服务
 	private void startJobMasterServices() throws Exception {
 		startHeartbeatServices();
 
 		// start the slot pool make sure the slot pool now accepts messages for this leader
+		// 启动slot poll, 确保slot poll可以对当前leader接收消息
 		slotPool.start(getFencingToken(), getAddress());
 
 		//TODO: Remove once the ZooKeeperLeaderRetrieval returns the stored address upon start
-		// try to reconnect to previously known leader
+		// try to reconnect to previously known leader 尝试连接之前已知的资源管理器
 		reconnectToResourceManager(new FlinkException("Starting JobMaster component."));
 
 		// job is ready to go, try to establish connection with resource manager
 		//   - activate leader retrieval for the resource manager
 		//   - on notification of the leader, the connection will be established and
 		//     the slot pool will start requesting slots
+
+		/**
+		 * job已经准备好, 尝试创建与资源管理器的连接
+		 * 	- 激活资源管理的leader查询
+		 * 	-
+		 * */
+
 		resourceManagerLeaderRetriever.start(new ResourceManagerLeaderListener());
 	}
 
@@ -1126,6 +1141,9 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 		jobManagerJobMetricGroup = newJobManagerJobMetricGroup;
 	}
 
+	/**
+	 * 调度执行
+	 * */
 	private void resetAndScheduleExecutionGraph() throws Exception {
 		validateRunsInMainThread();
 
@@ -1303,17 +1321,23 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 		}
 	}
 
+	// 重新连接至ResourceManager
 	private void reconnectToResourceManager(Exception cause) {
+		// 先关闭连接
 		closeResourceManagerConnection(cause);
+
+		// 重新连接
 		tryConnectToResourceManager();
 	}
 
+	// 重新连接
 	private void tryConnectToResourceManager() {
 		if (resourceManagerAddress != null) {
 			connectToResourceManager();
 		}
 	}
 
+	// 连接至ResourceManager
 	private void connectToResourceManager() {
 		assert(resourceManagerAddress != null);
 		assert(resourceManagerConnection == null);
@@ -1331,6 +1355,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 			resourceManagerAddress.getResourceManagerId(),
 			scheduledExecutorService);
 
+		// 注册至resourceManager
 		resourceManagerConnection.start();
 	}
 
@@ -1370,6 +1395,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 		}
 	}
 
+	// 关闭连接
 	private void closeResourceManagerConnection(Exception cause) {
 		if (establishedResourceManagerConnection != null) {
 			dissolveResourceManagerConnection(establishedResourceManagerConnection, cause);
@@ -1545,7 +1571,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 	}
 
 	//----------------------------------------------------------------------------------------------
-
+	// 资源管理器连接
 	private class ResourceManagerConnection
 			extends RegisteredRpcConnection<ResourceManagerId, ResourceManagerGateway, JobMasterRegistrationSuccess> {
 		private final JobID jobID;

@@ -19,18 +19,28 @@
 package org.apache.flink.runtime.jobgraph;
 
 /**
- * The ScheduleMode decides how tasks of an execution graph are started.  
+ * The ScheduleMode decides how tasks of an execution graph are started.
+ *
+ * 调度模型用来决定 执行图的task的启动方式
  */
 public enum ScheduleMode {
 
-	/** Schedule tasks lazily from the sources. Downstream tasks are started once their input data are ready */
+	/** Schedule tasks lazily from the sources. Downstream tasks are started once their input data are ready
+	 *
+	 * 	当输入数据ready时, 下游任务才被启动
+	 * */
 	LAZY_FROM_SOURCES,
 
-	/** Schedules all tasks immediately. */
+	/** Schedules all tasks immediately.
+	 *
+	 * 	所有task立即启动, Stream类型的job使用此方式
+	 * */
 	EAGER;
 	
 	/**
 	 * Returns whether we are allowed to deploy consumers lazily.
+	 *
+	 * 返回 是否允许以lazily的方式部署
 	 */
 	public boolean allowLazyDeployment() {
 		return this == LAZY_FROM_SOURCES;

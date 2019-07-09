@@ -36,80 +36,144 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
  * The base class for job vertexes.
+ *
+ * job节点的基类
  */
 public class JobVertex implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	// 顶点的默认名称:  哈哈  无名氏
 	private static final String DEFAULT_NAME = "(unnamed vertex)";
 
 	// --------------------------------------------------------------------------------------------
-	// Members that define the structure / topology of the graph
+	// Members that define the structure / topology of the graph 用来定义graph结构或拓扑的变量
 	// --------------------------------------------------------------------------------------------
 
-	/** The ID of the vertex. */
+	/** The ID of the vertex.
+	 *
+	 * 	顶点id
+	 * */
 	private final JobVertexID id;
 
-	/** The alternative IDs of the vertex. */
+	/** The alternative IDs of the vertex.
+	 *
+	 * 	顶点可选择的id
+	 * */
 	private final ArrayList<JobVertexID> idAlternatives = new ArrayList<>();
 
-	/** The IDs of all operators contained in this vertex. */
+	/** The IDs of all operators contained in this vertex.
+	 *
+	 * 	当前顶点中 包含的所有算子的id
+	 * */
 	private final ArrayList<OperatorID> operatorIDs = new ArrayList<>();
 
-	/** The alternative IDs of all operators contained in this vertex. */
+	/** The alternative IDs of all operators contained in this vertex.
+	 *
+	 * 	当前顶点中 包含的所有算子的可选择id
+	 * */
 	private final ArrayList<OperatorID> operatorIdsAlternatives = new ArrayList<>();
 
-	/** List of produced data sets, one per writer */
+	/** List of produced data sets, one per writer
+	 *
+	 * 	生产结果集的集合, 每一个包含一个writer
+	 * */
 	private final ArrayList<IntermediateDataSet> results = new ArrayList<IntermediateDataSet>();
 
-	/** List of edges with incoming data. One per Reader. */
+	/** List of edges with incoming data. One per Reader.
+	 *
+	 * 	边的集合,每一个包含一个reader
+	 * */
 	private final ArrayList<JobEdge> inputs = new ArrayList<JobEdge>();
 
-	/** Number of subtasks to split this task into at runtime.*/
+	/** Number of subtasks to split this task into at runtime.
+	 *
+	 * 	子任务的数量, 用来在运行时 将任务进行切分
+	 * */
 	private int parallelism = ExecutionConfig.PARALLELISM_DEFAULT;
 
-	/** Maximum number of subtasks to split this task into a runtime. */
+	/** Maximum number of subtasks to split this task into a runtime.
+	 *
+	 * 	最大子任务数量
+	 * */
 	private int maxParallelism = -1;
 
-	/** The minimum resource of the vertex */
+	/** The minimum resource of the vertex
+	 *
+	 * 	顶点的最小资源
+	 * */
 	private ResourceSpec minResources = ResourceSpec.DEFAULT;
 
-	/** The preferred resource of the vertex */
+	/** The preferred resource of the vertex
+	 *
+	 * 	顶点的最佳资源
+	 * */
 	private ResourceSpec preferredResources = ResourceSpec.DEFAULT;
 
-	/** Custom configuration passed to the assigned task at runtime. */
+	/** Custom configuration passed to the assigned task at runtime.
+	 *
+	 * 	传递给运行时任务的配置
+	 * */
 	private Configuration configuration;
 
-	/** The class of the invokable. */
+	/** The class of the invokable.
+	 *
+	 * 	可被调用的类名
+	 * */
 	private String invokableClassName;
 
-	/** Indicates of this job vertex is stoppable or not. */
+	/** Indicates of this job vertex is stoppable or not.
+	 *
+	 * 	当前job顶点能否被停止
+	 * */
 	private boolean isStoppable = false;
 
-	/** Optionally, a source of input splits */
+	/** Optionally, a source of input splits
+	 *
+	 * 	输入切分的源
+	 * */
 	private InputSplitSource<?> inputSplitSource;
 
-	/** The name of the vertex. This will be shown in runtime logs and will be in the runtime environment */
+	/** The name of the vertex. This will be shown in runtime logs and will be in the runtime environment
+	 *
+	 * 	顶点的名称
+	 * 	会出现在运行时日志 与 环境中
+	 * */
 	private String name;
 
-	/** Optionally, a sharing group that allows subtasks from different job vertices to run concurrently in one slot */
+	/** Optionally, a sharing group that allows subtasks from different job vertices to run concurrently in one slot
+	 *
+	 * 	可选项, 允许多个来自多个不同顶点的子任务 能够同时运行在一个slot中
+	 * */
 	private SlotSharingGroup slotSharingGroup;
 
 	/** The group inside which the vertex subtasks share slots */
 	private CoLocationGroup coLocationGroup;
 
-	/** Optional, the name of the operator, such as 'Flat Map' or 'Join', to be included in the JSON plan */
+	/** Optional, the name of the operator, such as 'Flat Map' or 'Join', to be included in the JSON plan
+	 *
+	 * 	可选项,算子的名称, 例如:'Flat Map'或者'Join'
+	 * */
 	private String operatorName;
 
 	/** Optional, the description of the operator, like 'Hash Join', or 'Sorted Group Reduce',
-	 * to be included in the JSON plan */
+	 * to be included in the JSON plan
+	 *
+	 * 	可选项, 算子的描述, 例如:'Hash Join'或者'Sorted Group Reduce'
+	 * */
 	private String operatorDescription;
 
-	/** Optional, pretty name of the operator, to be displayed in the JSON plan */
+	/** Optional, pretty name of the operator, to be displayed in the JSON plan
+	 *
+	 * 	可选项, operator的pretty名称
+	 * */
 	private String operatorPrettyName;
 
 	/** Optional, the JSON for the optimizer properties of the operator result,
-	 * to be included in the JSON plan */
+	 * to be included in the JSON plan
+	 *
+	 * 	可选项, 算子结果的优化器属性
+	 * */
 	private String resultOptimizerProperties;
 
 	// --------------------------------------------------------------------------------------------

@@ -42,7 +42,10 @@ import org.apache.flink.configuration.Configuration;
 @Public
 public class LocalEnvironment extends ExecutionEnvironment {
 
-	/** The user-defined configuration for the local execution. */
+	/** The user-defined configuration for the local execution.
+	 *
+	 * 	本地执行所用的用户自定义的配置
+	 * */
 	private final Configuration configuration;
 
 	/** Create lazily upon first use. */
@@ -62,6 +65,8 @@ public class LocalEnvironment extends ExecutionEnvironment {
 
 	/**
 	 * Creates a new local environment that configures its local executor with the given configuration.
+	 *
+	 * 根据给定的配置, 创建一个新的本地环境(config主要用来 配置本地executor)
 	 *
 	 * @param config The configuration used to configure the local executor.
 	 */

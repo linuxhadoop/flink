@@ -483,7 +483,9 @@ public class TypeExtractor {
 	/**
 	 * Returns the unary operator's return type.
 	 *
-	 * <p>This method can extract a type in 4 different ways:
+	 * 返回一元操作符的类型
+	 *
+	 * <p>This method can extract a type in 4 different ways: 该方法可以通过4种不同的方法来提取类型
 	 *
 	 * <p>1. By using the generics of the base class like MyFunction<X, Y, Z, IN, OUT>.
 	 *    This is what outputTypeArgumentIndex (in this example "4") is good for.

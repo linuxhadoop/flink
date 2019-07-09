@@ -29,11 +29,15 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface for the new cluster client.
+ *
+ * 新集群客户端的基础接口
  */
 public interface NewClusterClient {
 
 	/**
 	 * Submit the given {@link JobGraph} to the cluster.
+	 *
+	 * 提交jobGraph至集群, 返回JobSubmissionResult结果
 	 *
 	 * @param jobGraph to submit
 	 * @return Future which is completed with the {@link JobSubmissionResult}
@@ -42,6 +46,8 @@ public interface NewClusterClient {
 
 	/**
 	 * Request the {@link JobResult} for the given {@link JobID}.
+	 *
+	 * 根据JobID请求JobResult
 	 *
 	 * @param jobId for which to request the {@link JobResult}
 	 * @return Future which is completed with the {@link JobResult}

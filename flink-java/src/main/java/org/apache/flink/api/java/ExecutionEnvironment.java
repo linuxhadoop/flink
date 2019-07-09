@@ -101,10 +101,16 @@ public abstract class ExecutionEnvironment {
 	/** The logger used by the environment and its subclasses. */
 	protected static final Logger LOG = LoggerFactory.getLogger(ExecutionEnvironment.class);
 
-	/** The environment of the context (local by default, cluster if invoked through command line). */
+	/** The environment of the context (local by default, cluster if invoked through command line).
+	 *
+	 * 	上下文环境(默认为local, 通过命令行调用则为cluster)
+	 * */
 	private static ExecutionEnvironmentFactory contextEnvironmentFactory;
 
-	/** The default parallelism used by local environments. */
+	/** The default parallelism used by local environments.
+	 *
+	 * 	本地环境的默认并行度(获取默认的可用cpu核数)
+	 * */
 	private static int defaultLocalDop = Runtime.getRuntime().availableProcessors();
 
 	// --------------------------------------------------------------------------------------------
@@ -141,6 +147,8 @@ public abstract class ExecutionEnvironment {
 
 	/**
 	 * Gets the config object that defines execution parameters.
+	 *
+	 * 返回配置定义了执行参数的配置对象
 	 *
 	 * @return The environment's execution configuration.
 	 */
@@ -387,10 +395,14 @@ public abstract class ExecutionEnvironment {
 	 * Creates a {@link DataSet} that represents the Strings produced by reading the given file line wise.
 	 * The file will be read with the system's default character set.
 	 *
-	 * @param filePath The path of the file, as a URI (e.g., "file:///some/local/file" or "hdfs://host:port/file/path").
-	 * @return A {@link DataSet} that represents the data read from the given file as text lines.
+	 * 创建一个 从文件中读取的字符串数据集
+	 *
+	 * @param filePath The path of the file, as a URI (e.g., "file:///some/local/file" or "hdfs://host:port/file/path"). 文件路径
+	 * @return A {@link DataSet} that represents the data read from the given file as text lines. 返回从文件读取的内容
 	 */
 	public DataSource<String> readTextFile(String filePath) {
+
+		// 确保filePath不能为空
 		Preconditions.checkNotNull(filePath, "The file path may not be null.");
 
 		return new DataSource<>(this, new TextInputFormat(new Path(filePath)), BasicTypeInfo.STRING_TYPE_INFO, Utils.getCallLocationName());
@@ -1058,6 +1070,10 @@ public abstract class ExecutionEnvironment {
 	 * {@link #createLocalEnvironment()}. If the program is invoked from within the command line client to be
 	 * submitted to a cluster, this method returns the execution environment of this cluster.
 	 *
+	 * 生成一个当前程序的上下文环境
+	 * 如果程序是standalone模式, 返回一个本地执行环境 #createLocalEnvironment()
+	 * 如果是通过命令行 提交至集群,则会返回当前集群的运行时环境
+	 *
 	 * @return The execution environment of the context in which the program is executed.
 	 */
 	public static ExecutionEnvironment getExecutionEnvironment() {
@@ -1084,6 +1100,10 @@ public abstract class ExecutionEnvironment {
 	 * parallelism of the local environment is the number of hardware contexts (CPU cores / threads),
 	 * unless it was specified differently by {@link #setDefaultLocalParallelism(int)}.
 	 *
+	 * 创建一个本地环境
+	 * 本地执行环境会 以多线程的方式运行在同一个JVM环境中
+	 * 本地环境默认的并行度是硬件上线文的数量(cup核数/线程数), 也可以通过#setDefaultLocalParallelism(int)来设置并行度
+	 *
 	 * @return A local execution environment.
 	 */
 	public static LocalEnvironment createLocalEnvironment() {
@@ -1094,6 +1114,8 @@ public abstract class ExecutionEnvironment {
 	 * Creates a {@link LocalEnvironment}. The local execution environment will run the program in a
 	 * multi-threaded fashion in the same JVM as the environment was created in. It will use the
 	 * parallelism specified in the parameter.
+	 *
+	 * 同上, 在createLocalEnvironment函数中增加了空的Configuration(其实就是一个HashMap)
 	 *
 	 * @param parallelism The parallelism for the local environment.
 	 * @return A local execution environment with the specified parallelism.
@@ -1142,13 +1164,16 @@ public abstract class ExecutionEnvironment {
 	/**
 	 * Creates a {@link LocalEnvironment} which is used for executing Flink jobs.
 	 *
-	 * @param configuration to start the {@link LocalEnvironment} with
-	 * @param defaultParallelism to initialize the {@link LocalEnvironment} with
+	 * 创建一个本地环境, 用来执行Flink job
+	 *
+	 * @param configuration to start the {@link LocalEnvironment} with 默认配置
+	 * @param defaultParallelism to initialize the {@link LocalEnvironment} with 默认并行度
 	 * @return {@link LocalEnvironment}
 	 */
 	private static LocalEnvironment createLocalEnvironment(Configuration configuration, int defaultParallelism) {
 		final LocalEnvironment localEnvironment = new LocalEnvironment(configuration);
 
+		// 如果并行度>0, 则重新设置并行度
 		if (defaultParallelism > 0) {
 			localEnvironment.setParallelism(defaultParallelism);
 		}

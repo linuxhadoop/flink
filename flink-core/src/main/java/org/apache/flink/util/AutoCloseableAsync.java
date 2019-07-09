@@ -24,6 +24,8 @@ import java.util.concurrent.ExecutionException;
 /**
  * Closeable interface which allows to close a resource in a non
  * blocking fashion.
+ *
+ * 允许在非阻塞的情况下关闭一个资源
  */
 public interface AutoCloseableAsync extends AutoCloseable {
 

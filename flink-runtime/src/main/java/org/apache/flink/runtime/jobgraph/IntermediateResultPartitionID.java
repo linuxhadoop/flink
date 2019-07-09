@@ -28,6 +28,8 @@ public class IntermediateResultPartitionID extends AbstractID {
 
 	/**
 	 * Creates an new random intermediate result partition ID.
+	 *
+	 * 创建一个新的随机ID
 	 */
 	public IntermediateResultPartitionID() {
 		super();

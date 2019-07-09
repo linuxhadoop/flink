@@ -26,11 +26,18 @@ import java.util.Optional;
 /**
  * An input gate consumes one or more partitions of a single produced intermediate result.
  *
+ * inputGate消费 一个生产intermediateResut的一个或多个分区
+ *
  * <p>Each intermediate result is partitioned over its producing parallel subtasks; each of these
  * partitions is furthermore partitioned into one or more subpartitions.
  *
+ * 每个intermediate result 通过生产数据的并行子任务 被分成多个分区RP。
+ * 每个RP被进一步分成1个多个子分区
+ *
  * <p>As an example, consider a map-reduce program, where the map operator produces data and the
  * reduce operator consumes the produced data.
+ *
+ * 例如一个map-reduce程序, map算子生产数据,reduce算子消费数据
  *
  * <pre>{@code
  * +-----+              +---------------------+              +--------+
@@ -41,6 +48,8 @@ import java.util.Optional;
  * <p>When deploying such a program in parallel, the intermediate result will be partitioned over its
  * producing parallel subtasks; each of these partitions is furthermore partitioned into one or more
  * subpartitions.
+ *
+ * 如果程序是并行的, intermediate result被分成多个分区RP(通过生产数据的并行子任务); 每个RP被进一步分成1个多个子分区
  *
  * <pre>{@code
  *                            Intermediate result
@@ -64,6 +73,10 @@ import java.util.Optional;
  * subpartitions -- one for each parallel reduce subtask. As shown in the Figure, each reduce task
  * will have an input gate attached to it. This will provide its input, which will consist of one
  * subpartition from each partition of the intermediate result.
+ *
+ * 在上面的例子中, 2个map子任务并行生成数据至intermediate result, 最终的生成2个分区。
+ * 每一个分区被进一步分成2个子分区 - 每个子分区对应reduce任务。
+ * 如上图所示, 每一个reduce任务有一个inputGate。 这样产生它的输入, 由每个分区的一个子分区组成。
  */
 public interface InputGate {
 

@@ -91,9 +91,10 @@ public class LocalInputChannel extends InputChannel implements BufferAvailabilit
 	}
 
 	// ------------------------------------------------------------------------
-	// Consume
+	// Consume 消费
 	// ------------------------------------------------------------------------
 
+	// 请求子分区
 	@Override
 	void requestSubpartition(int subpartitionIndex) throws IOException, InterruptedException {
 

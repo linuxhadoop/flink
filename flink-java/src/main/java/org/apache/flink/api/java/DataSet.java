@@ -95,6 +95,8 @@ import java.util.List;
 /**
  * A DataSet represents a collection of elements of the same type.
  *
+ * 用来表达相同类型元素集合的数据集
+ *
  * <p>A DataSet can be transformed into another DataSet by applying a transformation as for example
  * <ul>
  *   <li>{@link DataSet#map(org.apache.flink.api.common.functions.MapFunction)},</li>
@@ -102,6 +104,9 @@ import java.util.List;
  *   <li>{@link DataSet#join(DataSet)}, or</li>
  *   <li>{@link DataSet#coGroup(DataSet)}.</li>
  * </ul>
+ *
+ * * 一个DataSet可以通过transformation被转换成另外一个DataSet
+ * 比如通过map, reduce, join, coGroup
  *
  * @param <T> The type of the DataSet, i.e., the type of the elements of the DataSet.
  */
@@ -164,11 +169,14 @@ public abstract class DataSet<T> {
 	/**
 	 * Returns the {@link TypeInformation} for the type of this DataSet.
 	 *
+	 * 返回当前数据集的type
+	 *
 	 * @return The TypeInformation for the type of this DataSet.
 	 *
 	 * @see TypeInformation
 	 */
 	public TypeInformation<T> getType() {
+		// 丢失类型信息
 		if (type instanceof MissingTypeInfo) {
 			MissingTypeInfo typeInfo = (MissingTypeInfo) type;
 			throw new InvalidTypesException("The return type of function '" + typeInfo.getFunctionName()
@@ -246,9 +254,13 @@ public abstract class DataSet<T> {
 
 	/**
 	 * Applies a FlatMap transformation on a {@link DataSet}.
+	 * 在Dataset上 应用FlatMap转换
 	 *
 	 * <p>The transformation calls a {@link org.apache.flink.api.common.functions.RichFlatMapFunction} for each element of the DataSet.
 	 * Each FlatMapFunction call can return any number of elements including none.
+	 *
+	 * transformation对DataSet中每一个元素调用RichFlatMapFunction
+	 * 在wordcount例子中, 输入为string, 输出为tuple2<string, integer)
 	 *
 	 * @param flatMapper The FlatMapFunction that is called for each element of the DataSet.
 	 * @return A FlatMapOperator that represents the transformed DataSet.
@@ -258,11 +270,18 @@ public abstract class DataSet<T> {
 	 * @see DataSet
 	 */
 	public <R> FlatMapOperator<T, R> flatMap(FlatMapFunction<T, R> flatMapper) {
+
+		// 必须实现flatmap函数
 		if (flatMapper == null) {
 			throw new NullPointerException("FlatMap function must not be null.");
 		}
 
 		String callLocation = Utils.getCallLocationName();
+
+		/**
+		 * getType是在env#readTextFile()中
+		 * 由 return new DataSource<>(this, format, BasicTypeInfo.STRING_TYPE_INFO, Utils.getCallLocationName()); 设置的
+		 */
 		TypeInformation<R> resultType = TypeExtractor.getFlatMapReturnTypes(flatMapper, getType(), callLocation, true);
 		return new FlatMapOperator<>(this, resultType, clean(flatMapper), callLocation);
 	}

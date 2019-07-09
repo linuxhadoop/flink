@@ -24,6 +24,8 @@ import akka.actor.ActorSystem;
 
 /**
  * Interface which allows to load an {@link ActorSystem}.
+ *
+ * actor系统加载器
  */
 public interface ActorSystemLoader extends AutoCloseable {
 

@@ -35,17 +35,23 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * An input channel consumes a single {@link ResultSubpartitionView}.
  *
+ * 一个输入通道 消费一个ResultSubpartitionView
+ *
  * <p>For each channel, the consumption life cycle is as follows:
  * <ol>
  * <li>{@link #requestSubpartition(int)}</li>
  * <li>{@link #getNextBuffer()}</li>
  * <li>{@link #releaseAllResources()}</li>
  * </ol>
+ *
+ * 对于每一个channel, 消费生命周期可以分为:请求自分区、获取下一个buffer、释放所有资源
  */
 public abstract class InputChannel {
 
+	// channel索引
 	protected final int channelIndex;
 
+	// 要读取的 结果分区的ID
 	protected final ResultPartitionID partitionId;
 
 	protected final SingleInputGate inputGate;
@@ -56,17 +62,27 @@ public abstract class InputChannel {
 
 	// - Partition request backoff --------------------------------------------
 
-	/** The initial backoff (in ms). */
+	/** The initial backoff (in ms).
+	 *
+	 * 	初始化退避延迟
+	 * */
 	private final int initialBackoff;
 
-	/** The maximum backoff (in ms). */
+	/** The maximum backoff (in ms).
+	 *
+	 * 	最大退避延迟
+	 * */
 	private final int maxBackoff;
 
+	// 输入的字节数
 	protected final Counter numBytesIn;
 
 	protected final Counter numBuffersIn;
 
-	/** The current backoff (in ms). */
+	/** The current backoff (in ms).
+	 *
+	 * 	当前的backoff延迟
+	 * */
 	private int currentBackoff;
 
 	protected InputChannel(

@@ -44,8 +44,12 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * Partition request client for remote partition requests.
  *
+ * 主要用于对远程分区发起请求
+ *
  * <p>This client is shared by all remote input channels, which request a partition
  * from the same {@link ConnectionID}.
+ *
+ * 该client被所有远程input channel共享
  */
 public class PartitionRequestClient {
 

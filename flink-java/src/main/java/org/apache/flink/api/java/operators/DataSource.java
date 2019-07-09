@@ -35,6 +35,8 @@ import org.apache.flink.configuration.Configuration;
  * data set on which to apply further transformations. It encapsulates additional
  * configuration parameters, to customize the execution.
  *
+ * 用来创建一个数据集
+ *
  * @param <OUT> The type of the elements produced by this data source.
  */
 @Public
@@ -53,9 +55,11 @@ public class DataSource<OUT> extends Operator<OUT, DataSource<OUT>> {
 	/**
 	 * Creates a new data source.
 	 *
+	 * 创建一个新的数据源
+	 *
 	 * @param context The environment in which the data source gets executed.
-	 * @param inputFormat The input format that the data source executes.
-	 * @param type The type of the elements produced by this input format.
+	 * @param inputFormat The input format that the data source executes. 输入格式
+	 * @param type The type of the elements produced by this input format. 输出格式
 	 */
 	public DataSource(ExecutionEnvironment context, InputFormat<OUT, ?> inputFormat, TypeInformation<OUT> type, String dataSourceLocationName) {
 		super(context, type);

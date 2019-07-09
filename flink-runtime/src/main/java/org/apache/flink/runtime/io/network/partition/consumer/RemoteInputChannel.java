@@ -52,6 +52,8 @@ import static org.apache.flink.util.Preconditions.checkState;
 
 /**
  * An input channel, which requests a remote partition queue.
+ *
+ * 一个输入通道, 用来请求一个远程分区队列
  */
 public class RemoteInputChannel extends InputChannel implements BufferRecycler, BufferListener {
 
@@ -61,7 +63,11 @@ public class RemoteInputChannel extends InputChannel implements BufferRecycler, 
 	/** The connection to use to request the remote partition. */
 	private final ConnectionID connectionId;
 
-	/** The connection manager to use connect to the remote partition provider. */
+	/** The connection manager to use connect to the remote partition provider.
+	 *
+	 * 	用来连接到远程分区provider
+	 *  使用的是NettyConnectionManager具体实现, 主要用于远程交互
+	 * */
 	private final ConnectionManager connectionManager;
 
 	/**
@@ -76,7 +82,10 @@ public class RemoteInputChannel extends InputChannel implements BufferRecycler, 
 	 */
 	private final AtomicBoolean isReleased = new AtomicBoolean();
 
-	/** Client to establish a (possibly shared) TCP connection and request the partition. */
+	/** Client to establish a (possibly shared) TCP connection and request the partition.
+	 *
+	 * 	客户端: 建立一个(可能共享)tcp连接 和 对分区发起请求
+	 * */
 	private volatile PartitionRequestClient partitionRequestClient;
 
 	/**
@@ -155,7 +164,7 @@ public class RemoteInputChannel extends InputChannel implements BufferRecycler, 
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Requests a remote subpartition.
+	 * Requests a remote subpartition. 请求与远程子分区
 	 */
 	@VisibleForTesting
 	@Override

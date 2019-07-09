@@ -668,6 +668,8 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 
 	/**
 	 * Schedules or updates the consumer tasks of the result partition with the given ID.
+	 *
+	 * 调度或更新 给定的结果分区id的消费者
 	 */
 	void scheduleOrUpdateConsumers(ResultPartitionID partitionId) {
 
@@ -685,7 +687,7 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 		}
 
 		if (partition.getIntermediateResult().getResultType().isPipelined()) {
-			// Schedule or update receivers of this partition
+			// Schedule or update receivers of this partition 这里开始************
 			execution.scheduleOrUpdateConsumers(partition.getConsumers());
 		}
 		else {

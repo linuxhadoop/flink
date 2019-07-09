@@ -26,6 +26,8 @@ import java.io.IOException;
 
 /**
  * A buffer-oriented runtime result writer API for producing results.
+ *
+ * 面向buffer的运行时结果writer。用来生成结果数据
  */
 public interface ResultPartitionWriter {
 
@@ -40,8 +42,12 @@ public interface ResultPartitionWriter {
 	/**
 	 * Adds the bufferConsumer to the subpartition with the given index.
 	 *
+	 * 按照给定的index, 将bufferConsumer添加至子分区
+	 *
 	 * <p>For PIPELINED {@link org.apache.flink.runtime.io.network.partition.ResultPartitionType}s,
 	 * this will trigger the deployment of consuming tasks after the first buffer has been added.
+	 *
+	 * 在PIPELINED模式下, 在首次buffer被添加时, 会触发消费任务的部署
 	 *
 	 * <p>This method takes the ownership of the passed {@code bufferConsumer} and thus is responsible for releasing
 	 * it's resources.
@@ -53,11 +59,15 @@ public interface ResultPartitionWriter {
 
 	/**
 	 * Manually trigger consumption from enqueued {@link BufferConsumer BufferConsumers} in all subpartitions.
+	 *
+	 * 手动触发消费 所有的子分区中 排队的BufferConsumers
 	 */
 	void flushAll();
 
 	/**
 	 * Manually trigger consumption from enqueued {@link BufferConsumer BufferConsumers} in one specified subpartition.
+	 *
+	 * 手动触发消费 一个特定子分区中 排队的BufferConsumers
 	 */
 	void flush(int subpartitionIndex);
 }

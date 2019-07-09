@@ -154,6 +154,8 @@ public class JobGraphGenerator implements Visitor<PlanNode> {
 
 	/**
 	 * Creates a new job graph generator that uses the default values for its resource configuration.
+	 *
+	 * 使用默认的资源配置来创建一个jobGraphGenerator
 	 */
 	public JobGraphGenerator() {
 		this.defaultMaxFan = AlgorithmOptions.SPILLING_MAX_FAN.defaultValue();
@@ -172,6 +174,8 @@ public class JobGraphGenerator implements Visitor<PlanNode> {
 	/**
 	 * Translates a {@link org.apache.flink.optimizer.plan.OptimizedPlan} into a
 	 * {@link org.apache.flink.runtime.jobgraph.JobGraph}.
+	 *
+	 * 将OptimizedPlan转换成JobGraph
 	 * 
 	 * @param program Optimized plan that is translated into a JobGraph.
 	 * @return JobGraph generated from the plan.

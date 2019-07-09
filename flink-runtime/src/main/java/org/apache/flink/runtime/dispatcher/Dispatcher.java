@@ -282,6 +282,9 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 		}));
 	}
 
+	/**
+	 * 运行job
+	 * */
 	private CompletableFuture<Void> runJob(JobGraph jobGraph) {
 		Preconditions.checkState(!jobManagerRunnerFutures.containsKey(jobGraph.getJobID()));
 
@@ -300,6 +303,11 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 				getMainThreadExecutor());
 	}
 
+	/**
+	 *
+	 * 创建jobManagerRunner, 在jobManagerRunner中创建JobMaster
+	 *
+	 * */
 	private CompletableFuture<JobManagerRunner> createJobManagerRunner(JobGraph jobGraph) {
 		final RpcService rpcService = getRpcService();
 

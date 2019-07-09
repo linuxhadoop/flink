@@ -22,6 +22,8 @@ import org.apache.flink.annotation.Public;
 
 /**
  * The result of submitting a job to a JobManager.
+ *
+ * 提交job至JobManager 返回的结果
  */
 @Public
 public class JobSubmissionResult {
@@ -35,7 +37,11 @@ public class JobSubmissionResult {
 	/**
 	 * Returns the JobID assigned to the job by the Flink runtime.
 	 *
+	 * 返回在运行时赋值给job的jobId
+	 *
 	 * @return jobID, or null if the job has been executed on a runtime without JobIDs or if the execution failed.
+	 *
+	 * job运行时必须有jobid, 否则会执行失败
 	 */
 	public JobID getJobID() {
 		return jobID;
@@ -44,6 +50,9 @@ public class JobSubmissionResult {
 	/**
 	 * Checks if this JobSubmissionResult is also a JobExecutionResult.
 	 * See {@code getJobExecutionResult} to retrieve the JobExecutionResult.
+	 *
+	 * 判断当前JobSubmissionResult是否也是一个JobSubmissionResult
+	 *
 	 * @return True if this is a JobExecutionResult, false otherwise
 	 */
 	public boolean isJobExecutionResult() {
@@ -52,6 +61,9 @@ public class JobSubmissionResult {
 
 	/**
 	 * Returns the JobExecutionResult if available.
+	 *
+	 * JobExecutionResult是否可用
+	 *
 	 * @return The JobExecutionResult
 	 * @throws ClassCastException if this is not a JobExecutionResult
 	 */

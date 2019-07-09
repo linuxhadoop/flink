@@ -32,16 +32,27 @@ import static org.apache.flink.util.Preconditions.checkState;
 
 /**
  * A basic reader implementation, which wraps an input gate and handles events.
+ *
+ * 一个基本的reader实现, 封装了1个inputGate与事件处理
  */
 public abstract class AbstractReader implements ReaderBase {
 
-	/** The input gate to read from. */
+	/** The input gate to read from.
+	 *
+	 * 	从哪里读取
+	 * */
 	protected final InputGate inputGate;
 
-	/** The task event handler to manage task event subscriptions. */
+	/** The task event handler to manage task event subscriptions.
+	 *
+	 * 	管理task even事件的订阅
+	 * */
 	private final TaskEventHandler taskEventHandler = new TaskEventHandler();
 
-	/** Flag indicating whether this reader allows iteration events. */
+	/** Flag indicating whether this reader allows iteration events.
+	 *
+	 * 	当前reader是否允许迭代事件
+	 * */
 	private boolean isIterative;
 
 	/**
@@ -63,11 +74,13 @@ public abstract class AbstractReader implements ReaderBase {
 	// Events
 	// ------------------------------------------------------------------------
 
+	// 注册TaskEventListener
 	@Override
 	public void registerTaskEventListener(EventListener<TaskEvent> listener, Class<? extends TaskEvent> eventType) {
 		taskEventHandler.subscribe(listener, eventType);
 	}
 
+	// 发送TaskEvent
 	@Override
 	public void sendTaskEvent(TaskEvent event) throws IOException {
 		inputGate.sendTaskEvent(event);
@@ -76,13 +89,15 @@ public abstract class AbstractReader implements ReaderBase {
 	/**
 	 * Handles the event and returns whether the reader reached an end-of-stream event (either the
 	 * end of the whole stream or the end of an superstep).
+	 *
+	 * 处理event 且 返回是否读取到end-of-stream event
 	 */
 	protected boolean handleEvent(AbstractEvent event) throws IOException {
 		final Class<?> eventType = event.getClass();
 
 		try {
 			// ------------------------------------------------------------
-			// Runtime events
+			// Runtime events 运行时事件
 			// ------------------------------------------------------------
 
 			// This event is also checked at the (single) input gate to release the respective

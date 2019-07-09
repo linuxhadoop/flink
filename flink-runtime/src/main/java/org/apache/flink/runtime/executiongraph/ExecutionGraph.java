@@ -860,6 +860,7 @@ public class ExecutionGraph implements AccessExecutionGraph {
 		failoverStrategy.notifyNewVertices(newExecJobVertices);
 	}
 
+	// 执行调度
 	public void scheduleForExecution() throws JobException {
 
 		final long currentGlobalModVersion = globalModVersion;
@@ -1623,6 +1624,10 @@ public class ExecutionGraph implements AccessExecutionGraph {
 	/**
 	 * Schedule or updates consumers of the given result partition.
 	 *
+	 * 调度或更新 给定的结果分区的消费者
+	 *
+	 * 其实就是:告诉消费者, 我这里的数据已经ok啦, 你来米西吧
+	 *
 	 * @param partitionId specifying the result partition whose consumer shall be scheduled or updated
 	 * @throws ExecutionGraphException if the schedule or update consumers operation could not be executed
 	 */
@@ -1638,6 +1643,7 @@ public class ExecutionGraph implements AccessExecutionGraph {
 			throw new ExecutionGraphException("Execution with execution Id " +
 				partitionId.getPartitionId() + " has no vertex assigned.");
 		} else {
+			// 通知消息来到了这里
 			execution.getVertex().scheduleOrUpdateConsumers(partitionId);
 		}
 	}

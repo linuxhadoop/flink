@@ -718,6 +718,10 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 		}
 	}
 
+	/**
+	 * 上游ResultPartition生产完成数据后,会通知下游来消费数据。
+	 * 上游ResultPartition -> jobManager -> ExecutionGraph#scheduleOrUpdateConsumers -> ExecutionVertex#scheduleOrUpdateConsumers
+	 * */
 	void scheduleOrUpdateConsumers(List<List<ExecutionEdge>> allConsumers) {
 		final int numConsumers = allConsumers.size();
 

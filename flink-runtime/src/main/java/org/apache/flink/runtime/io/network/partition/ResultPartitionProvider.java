@@ -22,6 +22,8 @@ import java.io.IOException;
 
 /**
  * Interface for creating result partitions.
+ *
+ * 用来生成结果分区的接口
  */
 public interface ResultPartitionProvider {
 

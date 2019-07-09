@@ -23,6 +23,8 @@ import org.apache.flink.runtime.taskmanager.TaskActions;
 
 /**
  * Interface for notifications about consumable partitions.
+ *
+ * 关于可消费分区的通知接口
  */
 public interface ResultPartitionConsumableNotifier {
 	void notifyPartitionConsumable(JobID jobId, ResultPartitionID partitionId, TaskActions taskActions);

@@ -96,25 +96,42 @@ import scala.concurrent.duration.FiniteDuration;
 /**
  * Encapsulates the functionality necessary to submit a program to a remote cluster.
  *
+ * 封装了一些必要的功能, 用来向集群提交程序
+ *
  * @param <T> type of the cluster id
  */
 public abstract class ClusterClient<T> {
 
 	protected final Logger log = LoggerFactory.getLogger(getClass());
 
-	/** The optimizer used in the optimization of batch programs. */
+	/** The optimizer used in the optimization of batch programs.
+	 *
+	 * 	优化器, 用于batch应用中
+	 * */
 	final Optimizer compiler;
 
-	/** The actor system used to communicate with the JobManager. */
+	/** The actor system used to communicate with the JobManager.
+	 *
+	 * 	actor系统, 用来与JobManager进行通讯
+	 * */
 	protected final ActorSystemLoader actorSystemLoader;
 
-	/** Configuration of the client. */
+	/** Configuration of the client.
+	 *
+	 * 	客户端的配置信息
+	 * */
 	protected final Configuration flinkConfig;
 
-	/** Timeout for futures. */
+	/** Timeout for futures.
+	 *
+	 * 	features的超时时间
+	 * */
 	protected final FiniteDuration timeout;
 
-	/** Lookup timeout for the job manager retrieval service. */
+	/** Lookup timeout for the job manager retrieval service.
+	 *
+	 * 	job mananger查询服务的超时间
+	 * */
 	private final FiniteDuration lookupTimeout;
 
 	/** Service factory for high available. */

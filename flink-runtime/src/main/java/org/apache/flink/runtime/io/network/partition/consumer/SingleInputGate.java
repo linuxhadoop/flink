@@ -103,10 +103,16 @@ public class SingleInputGate implements InputGate {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SingleInputGate.class);
 
-	/** Lock object to guard partition requests and runtime channel updates. */
+	/** Lock object to guard partition requests and runtime channel updates.
+	 *
+	 * 	锁对象:用来保证分区请求 与 运行时channel更新
+	 * */
 	private final Object requestLock = new Object();
 
-	/** The name of the owning task, for logging purposes. */
+	/** The name of the owning task, for logging purposes.
+	 *
+	 * 	任务的名字, 用于记录日志
+	 * */
 	private final String owningTaskName;
 
 	/** The job ID of the owning task. */
@@ -116,19 +122,32 @@ public class SingleInputGate implements InputGate {
 	 * The ID of the consumed intermediate result. Each input gate consumes partitions of the
 	 * intermediate result specified by this ID. This ID also identifies the input gate at the
 	 * consuming task.
+	 *
+	 * 消费的intermediate result的ID
+	 * 每个inputGate 根据ID来消费分区数据
+	 * 该id也用来在消费任务中识别inputGate
 	 */
 	private final IntermediateDataSetID consumedResultId;
 
-	/** The type of the partition the input gate is consuming. */
+	/** The type of the partition the input gate is consuming.
+	 *
+	 * 	正在消费的分区的类型
+	 * */
 	private final ResultPartitionType consumedPartitionType;
 
 	/**
 	 * The index of the consumed subpartition of each consumed partition. This index depends on the
 	 * {@link DistributionPattern} and the subtask indices of the producing and consuming task.
+	 *
+	 * 每个消费的分区的自分区的索引。
+	 * 该索引依赖DistributionPattern, 生产任务与消费任务 子任务的索引
 	 */
 	private final int consumedSubpartitionIndex;
 
-	/** The number of input channels (equivalent to the number of consumed partitions). */
+	/** The number of input channels (equivalent to the number of consumed partitions).
+	 *
+	 * 	input channel的数量 (等价于消费分区的数量)
+	 * */
 	private final int numberOfInputChannels;
 
 	/**

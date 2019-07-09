@@ -59,6 +59,8 @@ public interface RuntimeContext {
 	/**
 	 * Returns the name of the task in which the UDF runs, as assigned during plan construction.
 	 *
+	 * 返回任务的名称
+	 *
 	 * @return The name of the task in which the UDF runs.
 	 */
 	String getTaskName();

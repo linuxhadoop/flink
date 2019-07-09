@@ -48,12 +48,42 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * The JobGraph represents a Flink dataflow program, at the low level that the JobManager accepts.
  * All programs from higher level APIs are transformed into JobGraphs.
  *
+ * jobGraph表示 flink数据流, JobManager会接收它。
+ * 所有通过高级api调用的 都会被转换成jobGraph
+ *
  * <p>The JobGraph is a graph of vertices and intermediate results that are connected together to
  * form a DAG. Note that iterations (feedback edges) are currently not encoded inside the JobGraph
  * but inside certain special vertices that establish the feedback channel amongst themselves.
  *
+ * jobGraph由 顶点 与 intermediate结果 连接在一起组成一个有向无环图。
+ *
  * <p>The JobGraph defines the job-wide configuration settings, while each vertex and intermediate result
  * define the characteristics of the concrete operation and intermediate data.
+ *
+ *
+ * wordcount为例:
+ * JobGraph(jobId: 2daf1e4469e3477b691236ef9c65569b)
+ *
+ * taskVertices size = 3
+ * 		0:"e70bbd798b564e0a50e10e343f1ac56b" -> "Window(GlobalWindows(), CountTrigger, CountEvictor, SumAggregator, PassThroughWindowFunction) -> Sink: Print to Std. Out (org.apache.flink.streaming.runtime.tasks.OneInputStreamTask)"
+ *			jobVertexID id = e70bbd798b564e0a50e10e343f1ac56b
+ *			operatorIDs = {ArrayList@1568}  size = 2
+ 				0 = {OperatorID@1593} "604ee7bed040266218075078a35a4449"
+ 				1 = {OperatorID@1594} "e70bbd798b564e0a50e10e343f1ac56b"
+ *
+ *		1:"0a448493b4782967b150582570326227" -> "Flat Map (org.apache.flink.streaming.runtime.tasks.OneInputStreamTask)"
+ *
+ *
+ *		2:"bc764cd8ddf7a0cff126f51c16239658" -> "Source: Socket Stream (org.apache.flink.streaming.runtime.tasks.SourceStreamTask)"
+ * jobID = 2daf1e4469e3477b691236ef9c65569b
+ * jobConfiguration = {}
+ * sessionTimeOut = 0
+ * allowQueuedScheduling = false;
+ * scheduleMode = EAGER
+ * serializedExecutionConfig = SerializedValue
+ * snapshotSettings = SnapshotSettings: config=JobCheckpointingConfiguration{checkpointInterval=9223372036854775807, checkpointTimeout=600000, minPauseBetweenCheckpoints=0, maxConcurrentCheckpoints=1, checkpointRetentionPolicy=NEVER_RETAIN_AFTER_TERMINATION}, trigger=[bc764cd8ddf7a0cff126f51c16239658], ack=[bc764cd8ddf7a0cff126f51c16239658, 0a448493b4782967b150582570326227, e70bbd798b564e0a50e10e343f1ac56b], commit=[bc764cd8ddf7a0cff126f51c16239658, 0a448493b4782967b150582570326227, e70bbd798b564e0a50e10e343f1ac56b]
+ * savepointRestoreSettings = SavepointRestoreSettings.none()
+ * userJars size = 0
  */
 public class JobGraph implements Serializable {
 
@@ -61,51 +91,87 @@ public class JobGraph implements Serializable {
 
 	// --- job and configuration ---
 
-	/** List of task vertices included in this job graph. */
+	/** List of task vertices included in this job graph.
+	 *
+	 * 	jobGraph中所有task的顶点
+	 * */
 	private final Map<JobVertexID, JobVertex> taskVertices = new LinkedHashMap<JobVertexID, JobVertex>();
 
-	/** The job configuration attached to this job. */
+	/** The job configuration attached to this job.
+	 *
+	 * 	job关联的配置
+	 * */
 	private final Configuration jobConfiguration = new Configuration();
 
-	/** ID of this job. May be set if specific job id is desired (e.g. session management) */
+	/** ID of this job. May be set if specific job id is desired (e.g. session management)
+	 *
+	 * 	job的id, 是个随机数
+	 * */
 	private final JobID jobID;
 
-	/** Name of this job. */
+	/** Name of this job.
+	 *
+	 * 	job名称, 我是wordcount
+	 * */
 	private final String jobName;
 
 	/** The number of seconds after which the corresponding ExecutionGraph is removed at the
 	 * job manager after it has been executed. */
 	private long sessionTimeout = 0;
 
-	/** flag to enable queued scheduling */
+	/** flag to enable queued scheduling
+	 *
+	 * 	开启队列调度的标记位
+	 * */
 	private boolean allowQueuedScheduling;
 
-	/** The mode in which the job is scheduled */
+	/** The mode in which the job is scheduled
+	 *
+	 * 	job的调度模式(stream与batch是不一样的)
+	 * */
 	private ScheduleMode scheduleMode = ScheduleMode.LAZY_FROM_SOURCES;
 
 	// --- checkpointing ---
 
-	/** Job specific execution config */
+	/** Job specific execution config
+	 *
+	 * 	job指定的执行配置项
+	 * */
 	private SerializedValue<ExecutionConfig> serializedExecutionConfig;
 
-	/** The settings for the job checkpoints */
+	/** The settings for the job checkpoints
+	 *
+	 * 	检查点的配置
+	 * */
 	private JobCheckpointingSettings snapshotSettings;
 
-	/** Savepoint restore settings. */
+	/** Savepoint restore settings.
+	 *
+	 * 	保存点恢复的配置
+	 * */
 	private SavepointRestoreSettings savepointRestoreSettings = SavepointRestoreSettings.none();
 
 	// --- attached resources ---
 
-	/** Set of JAR files required to run this job. */
+	/** Set of JAR files required to run this job.
+	 *
+	 * 	运行当前job所需要的jar文件集合
+	 * */
 	private final List<Path> userJars = new ArrayList<Path>();
 
-	/** Set of custom files required to run this job. */
+	/** Set of custom files required to run this job.
+	 *
+	 * 	个性化文件
+	 * */
 	private final Map<String, DistributedCache.DistributedCacheEntry> userArtifacts = new HashMap<>();
 
 	/** Set of blob keys identifying the JAR files required to run this job. */
 	private final List<PermanentBlobKey> userJarBlobKeys = new ArrayList<>();
 
-	/** List of classpaths required to run this job. */
+	/** List of classpaths required to run this job.
+	 *
+	 * 	classpath相关设置
+	 * */
 	private List<URL> classpaths = Collections.emptyList();
 
 	// --------------------------------------------------------------------------------------------

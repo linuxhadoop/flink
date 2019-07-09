@@ -69,6 +69,8 @@ import static org.apache.flink.configuration.ConfigOptions.key;
 /**
  * Tools for starting JobManager and TaskManager processes, including the
  * Actor Systems used to run the JobManager and TaskManager actors.
+ *
+ * 用来启动JobManager、TaskManager的工具类
  */
 public class BootstrapTools {
 	/**

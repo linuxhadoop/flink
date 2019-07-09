@@ -26,6 +26,8 @@ import java.io.IOException;
 /**
  * The connection manager manages physical connections for the (logical) remote
  * input channels at runtime.
+ *
+ * 连接管理器
  */
 public interface ConnectionManager {
 
@@ -34,11 +36,15 @@ public interface ConnectionManager {
 
 	/**
 	 * Creates a {@link PartitionRequestClient} instance for the given {@link ConnectionID}.
+	 *
+	 * 根据指定的ConnectionID生成一个PartitionRequestClient实例
 	 */
 	PartitionRequestClient createPartitionRequestClient(ConnectionID connectionId) throws IOException, InterruptedException;
 
 	/**
 	 * Closes opened ChannelConnections in case of a resource release.
+	 *
+	 * 在资源释放时, 关闭已经打开的ChannelConnections
 	 */
 	void closeOpenChannelConnections(ConnectionID connectionId);
 

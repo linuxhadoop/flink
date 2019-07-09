@@ -37,6 +37,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Task manager gateway interface to communicate with the task manager.
+ *
+ * taskManager网管接口, 用来与taskManager进行通讯
  */
 public interface TaskManagerGateway {
 

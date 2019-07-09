@@ -65,6 +65,8 @@ public class Configuration extends ExecutionConfig.GlobalJobParameters
 
 	/**
 	 * Creates a new empty configuration.
+	 *
+	 * 创建一个空的配置
 	 */
 	public Configuration() {
 		this.confData = new HashMap<>();

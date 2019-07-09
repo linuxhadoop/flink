@@ -28,6 +28,8 @@ import java.util.List;
 
 /**
  * Gives the URLClassLoader a nicer name for debugging purposes.
+ *
+ * flink用户代码类加载器
  */
 public class FlinkUserCodeClassLoaders {
 

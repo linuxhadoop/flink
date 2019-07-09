@@ -130,6 +130,8 @@ import java.util.stream.Collectors;
 
 /**
  * A {@link ClusterClient} implementation that communicates via HTTP REST requests.
+ *
+ * 实现了ClusterClient, 通过HTTP REST方式进行通讯
  */
 public class RestClusterClient<T> extends ClusterClient<T> implements NewClusterClient {
 
@@ -236,12 +238,17 @@ public class RestClusterClient<T> extends ClusterClient<T> implements NewCluster
 		}
 	}
 
+	/**
+	 * RemoteStreamEnvironment中的submitJob调用了这里
+	 * */
 	@Override
 	public JobSubmissionResult submitJob(JobGraph jobGraph, ClassLoader classLoader) throws ProgramInvocationException {
 		log.info("Submitting job {} (detached: {}).", jobGraph.getJobID(), isDetached());
 
+		// 提交jobGraph
 		final CompletableFuture<JobSubmissionResult> jobSubmissionFuture = submitJob(jobGraph);
 
+		// detached模式
 		if (isDetached()) {
 			try {
 				return jobSubmissionFuture.get();
@@ -308,6 +315,10 @@ public class RestClusterClient<T> extends ClusterClient<T> implements NewCluster
 	/**
 	 * Submits the given {@link JobGraph} to the dispatcher.
 	 *
+	 * 将jobGraph提交至分发器
+	 * 用来处理请求的是: DispatcherRestEndpoint中的jobSubmitHandler
+	 *
+	 *
 	 * @param jobGraph to submit
 	 * @return Future which is completed with the submission response
 	 */
@@ -362,6 +373,7 @@ public class RestClusterClient<T> extends ClusterClient<T> implements NewCluster
 				isConnectionProblemOrServiceUnavailable())
 		);
 
+		// 发送请求
 		submissionFuture
 			.thenCombine(jobGraphFileFuture, (ignored, jobGraphFile) -> jobGraphFile)
 			.thenAccept(jobGraphFile -> {
