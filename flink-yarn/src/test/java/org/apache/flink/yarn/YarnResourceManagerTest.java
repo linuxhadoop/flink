@@ -27,11 +27,9 @@ import org.apache.flink.runtime.clusterframework.types.AllocationID;
 import org.apache.flink.runtime.clusterframework.types.ResourceID;
 import org.apache.flink.runtime.clusterframework.types.ResourceProfile;
 import org.apache.flink.runtime.clusterframework.types.SlotID;
-import org.apache.flink.runtime.concurrent.ScheduledExecutor;
 import org.apache.flink.runtime.concurrent.ScheduledExecutorServiceAdapter;
 import org.apache.flink.runtime.entrypoint.ClusterInformation;
 import org.apache.flink.runtime.heartbeat.HeartbeatServices;
-import org.apache.flink.runtime.heartbeat.TestingHeartbeatServices;
 import org.apache.flink.runtime.highavailability.HighAvailabilityServices;
 import org.apache.flink.runtime.highavailability.TestingHighAvailabilityServices;
 import org.apache.flink.runtime.instance.HardwareDescription;
@@ -46,6 +44,7 @@ import org.apache.flink.runtime.resourcemanager.JobLeaderIdService;
 import org.apache.flink.runtime.resourcemanager.ResourceManagerGateway;
 import org.apache.flink.runtime.resourcemanager.SlotRequest;
 import org.apache.flink.runtime.resourcemanager.slotmanager.SlotManager;
+import org.apache.flink.runtime.resourcemanager.slotmanager.SlotManagerBuilder;
 import org.apache.flink.runtime.rpc.FatalErrorHandler;
 import org.apache.flink.runtime.rpc.RpcService;
 import org.apache.flink.runtime.rpc.TestingRpcService;
@@ -291,7 +290,6 @@ public class YarnResourceManagerTest extends TestLogger {
 		 */
 		class MockResourceManagerRuntimeServices {
 
-			private final ScheduledExecutor scheduledExecutor;
 			private final TestingHighAvailabilityServices highAvailabilityServices;
 			private final HeartbeatServices heartbeatServices;
 			private final MetricRegistry metricRegistry;
@@ -302,15 +300,17 @@ public class YarnResourceManagerTest extends TestLogger {
 			private UUID rmLeaderSessionId;
 
 			MockResourceManagerRuntimeServices() throws Exception {
-				scheduledExecutor = mock(ScheduledExecutor.class);
 				highAvailabilityServices = new TestingHighAvailabilityServices();
 				rmLeaderElectionService = new TestingLeaderElectionService();
 				highAvailabilityServices.setResourceManagerLeaderElectionService(rmLeaderElectionService);
-				heartbeatServices = new TestingHeartbeatServices(5L, 5L, scheduledExecutor);
+				heartbeatServices = new HeartbeatServices(5L, 5L);
 				metricRegistry = NoOpMetricRegistry.INSTANCE;
-				slotManager = new SlotManager(
-						new ScheduledExecutorServiceAdapter(new DirectScheduledExecutorService()),
-						Time.seconds(10), Time.seconds(10), Time.minutes(1));
+				slotManager = SlotManagerBuilder.newBuilder()
+					.setScheduledExecutor(new ScheduledExecutorServiceAdapter(new DirectScheduledExecutorService()))
+					.setTaskManagerRequestTimeout(Time.seconds(10))
+					.setSlotRequestTimeout(Time.seconds(10))
+					.setTaskManagerTimeout(Time.minutes(1))
+					.build();
 				jobLeaderIdService = new JobLeaderIdService(
 						highAvailabilityServices,
 						rpcService.getScheduledExecutor(),

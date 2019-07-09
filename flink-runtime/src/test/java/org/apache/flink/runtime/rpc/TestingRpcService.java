@@ -27,6 +27,7 @@ import org.apache.flink.runtime.rpc.akka.AkkaRpcService;
 import java.io.Serializable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
@@ -52,18 +53,22 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  */
 public class TestingRpcService extends AkkaRpcService {
 
-	/** Map of pre-registered connections */
+	private static final Function<RpcGateway, CompletableFuture<RpcGateway>> DEFAULT_RPC_GATEWAY_FUTURE_FUNCTION = CompletableFuture::completedFuture;
+
+	/** Map of pre-registered connections. */
 	private final ConcurrentHashMap<String, RpcGateway> registeredConnections;
 
+	private volatile Function<RpcGateway, CompletableFuture<RpcGateway>> rpcGatewayFutureFunction = DEFAULT_RPC_GATEWAY_FUTURE_FUNCTION;
+
 	/**
-	 * Creates a new {@code TestingRpcService}. 
+	 * Creates a new {@code TestingRpcService}.
 	 */
 	public TestingRpcService() {
 		this(new Configuration());
 	}
 
 	/**
-	 * Creates a new {@code TestingRpcService}, using the given configuration. 
+	 * Creates a new {@code TestingRpcService}, using the given configuration.
 	 */
 	public TestingRpcService(Configuration configuration) {
 		super(AkkaUtils.createLocalActorSystem(configuration), Time.seconds(10));
@@ -98,6 +103,11 @@ public class TestingRpcService extends AkkaRpcService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private <C extends RpcGateway> CompletableFuture<C> getRpcGatewayFuture(C gateway) {
+		return (CompletableFuture<C>) rpcGatewayFutureFunction.apply(gateway);
+	}
+
 	@Override
 	public <C extends RpcGateway> CompletableFuture<C> connect(String address, Class<C> clazz) {
 		RpcGateway gateway = registeredConnections.get(address);
@@ -106,7 +116,7 @@ public class TestingRpcService extends AkkaRpcService {
 			if (clazz.isAssignableFrom(gateway.getClass())) {
 				@SuppressWarnings("unchecked")
 				C typedGateway = (C) gateway;
-				return CompletableFuture.completedFuture(typedGateway);
+				return getRpcGatewayFuture(typedGateway);
 			} else {
 				return FutureUtils.completedExceptionally(new Exception("Gateway registered under " + address + " is not of type " + clazz));
 			}
@@ -126,7 +136,7 @@ public class TestingRpcService extends AkkaRpcService {
 			if (clazz.isAssignableFrom(gateway.getClass())) {
 				@SuppressWarnings("unchecked")
 				C typedGateway = (C) gateway;
-				return CompletableFuture.completedFuture(typedGateway);
+				return getRpcGatewayFuture(typedGateway);
 			} else {
 				return FutureUtils.completedExceptionally(new Exception("Gateway registered under " + address + " is not of type " + clazz));
 			}
@@ -137,5 +147,13 @@ public class TestingRpcService extends AkkaRpcService {
 
 	public void clearGateways() {
 		registeredConnections.clear();
+	}
+
+	public void resetRpcGatewayFutureFunction() {
+		rpcGatewayFutureFunction = DEFAULT_RPC_GATEWAY_FUTURE_FUNCTION;
+	}
+
+	public void setRpcGatewayFutureFunction(Function<RpcGateway, CompletableFuture<RpcGateway>> rpcGatewayFutureFunction) {
+		this.rpcGatewayFutureFunction = rpcGatewayFutureFunction;
 	}
 }

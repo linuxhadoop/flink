@@ -30,6 +30,7 @@ import org.apache.flink.runtime.concurrent.FutureUtils;
 import org.apache.flink.runtime.deployment.TaskDeploymentDescriptor;
 import org.apache.flink.runtime.executiongraph.ExecutionAttemptID;
 import org.apache.flink.runtime.executiongraph.PartitionInfo;
+import org.apache.flink.runtime.jobmaster.AllocatedSlotReport;
 import org.apache.flink.runtime.jobmaster.JobMasterId;
 import org.apache.flink.runtime.messages.Acknowledge;
 import org.apache.flink.runtime.messages.StackTraceSampleResponse;
@@ -42,6 +43,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Simple {@link TaskExecutorGateway} implementation for testing purposes.
@@ -52,7 +54,7 @@ public class TestingTaskExecutorGateway implements TaskExecutorGateway {
 
 	private final String hostname;
 
-	private final Consumer<ResourceID> heartbeatJobManagerConsumer;
+	private final BiConsumer<ResourceID, AllocatedSlotReport> heartbeatJobManagerConsumer;
 
 	private final BiConsumer<JobID, Throwable> disconnectJobManagerConsumer;
 
@@ -62,7 +64,22 @@ public class TestingTaskExecutorGateway implements TaskExecutorGateway {
 
 	private final BiFunction<AllocationID, Throwable, CompletableFuture<Acknowledge>> freeSlotFunction;
 
-	TestingTaskExecutorGateway(String address, String hostname, Consumer<ResourceID> heartbeatJobManagerConsumer, BiConsumer<JobID, Throwable> disconnectJobManagerConsumer, BiFunction<TaskDeploymentDescriptor, JobMasterId, CompletableFuture<Acknowledge>> submitTaskConsumer, Function<Tuple5<SlotID, JobID, AllocationID, String, ResourceManagerId>, CompletableFuture<Acknowledge>> requestSlotFunction, BiFunction<AllocationID, Throwable, CompletableFuture<Acknowledge>> freeSlotFunction) {
+	private final Supplier<Boolean> canBeReleasedSupplier;
+
+	private final Consumer<Exception> disconnectResourceManagerConsumer;
+
+	private final Consumer<ResourceID> heartbeatResourceManagerConsumer;
+
+	TestingTaskExecutorGateway(
+			String address,
+			String hostname,
+			BiConsumer<ResourceID, AllocatedSlotReport> heartbeatJobManagerConsumer,
+			BiConsumer<JobID, Throwable> disconnectJobManagerConsumer,
+			BiFunction<TaskDeploymentDescriptor, JobMasterId, CompletableFuture<Acknowledge>> submitTaskConsumer,
+			Function<Tuple5<SlotID, JobID, AllocationID, String, ResourceManagerId>, CompletableFuture<Acknowledge>> requestSlotFunction,
+			BiFunction<AllocationID, Throwable, CompletableFuture<Acknowledge>> freeSlotFunction,
+			Supplier<Boolean> canBeReleasedSupplier,
+			Consumer<Exception> disconnectResourceManagerConsumer, Consumer<ResourceID> heartbeatResourceManagerConsumer) {
 		this.address = Preconditions.checkNotNull(address);
 		this.hostname = Preconditions.checkNotNull(hostname);
 		this.heartbeatJobManagerConsumer = Preconditions.checkNotNull(heartbeatJobManagerConsumer);
@@ -70,6 +87,9 @@ public class TestingTaskExecutorGateway implements TaskExecutorGateway {
 		this.submitTaskConsumer = Preconditions.checkNotNull(submitTaskConsumer);
 		this.requestSlotFunction = Preconditions.checkNotNull(requestSlotFunction);
 		this.freeSlotFunction = Preconditions.checkNotNull(freeSlotFunction);
+		this.canBeReleasedSupplier = canBeReleasedSupplier;
+		this.disconnectResourceManagerConsumer = Preconditions.checkNotNull(disconnectResourceManagerConsumer);
+		this.heartbeatResourceManagerConsumer = Preconditions.checkNotNull(heartbeatResourceManagerConsumer);
 	}
 
 	@Override
@@ -124,13 +144,13 @@ public class TestingTaskExecutorGateway implements TaskExecutorGateway {
 	}
 
 	@Override
-	public void heartbeatFromJobManager(ResourceID heartbeatOrigin) {
-		heartbeatJobManagerConsumer.accept(heartbeatOrigin);
+	public void heartbeatFromJobManager(ResourceID heartbeatOrigin, AllocatedSlotReport allocatedSlotReport) {
+		heartbeatJobManagerConsumer.accept(heartbeatOrigin, allocatedSlotReport);
 	}
 
 	@Override
 	public void heartbeatFromResourceManager(ResourceID heartbeatOrigin) {
-		// noop
+		heartbeatResourceManagerConsumer.accept(heartbeatOrigin);
 	}
 
 	@Override
@@ -140,7 +160,7 @@ public class TestingTaskExecutorGateway implements TaskExecutorGateway {
 
 	@Override
 	public void disconnectResourceManager(Exception cause) {
-		// noop
+		disconnectResourceManagerConsumer.accept(cause);
 	}
 
 	@Override
@@ -156,6 +176,11 @@ public class TestingTaskExecutorGateway implements TaskExecutorGateway {
 	@Override
 	public CompletableFuture<SerializableOptional<String>> requestMetricQueryServiceAddress(Time timeout) {
 		return CompletableFuture.completedFuture(SerializableOptional.of(address));
+	}
+
+	@Override
+	public CompletableFuture<Boolean> canBeReleased() {
+		return CompletableFuture.completedFuture(canBeReleasedSupplier.get());
 	}
 
 	@Override
