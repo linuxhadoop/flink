@@ -97,6 +97,7 @@ import scala.concurrent.duration.FiniteDuration;
  * Encapsulates the functionality necessary to submit a program to a remote cluster.
  *
  * 封装了一些必要的功能, 用来向集群提交程序
+ * 可以参考: RestClusterClient实现类
  *
  * @param <T> type of the cluster id
  */
@@ -134,12 +135,21 @@ public abstract class ClusterClient<T> {
 	 * */
 	private final FiniteDuration lookupTimeout;
 
-	/** Service factory for high available. */
+	/**
+	 * Service factory for high available.
+	 *
+	 * 高可用服务工厂
+	 * */
 	protected final HighAvailabilityServices highAvailabilityServices;
 
+	// 是否共享高可用服务
 	private final boolean sharedHaServices;
 
-	/** Flag indicating whether to sysout print execution updates. */
+	/**
+	 * Flag indicating whether to sysout print execution updates.
+	 *
+	 * 是否在执行时打印状态
+	 * */
 	private boolean printStatusDuringExecution = true;
 
 	/**
@@ -989,10 +999,13 @@ public abstract class ClusterClient<T> {
 
 	// ------------------------------------------------------------------------
 	//  Abstract methods to be implemented by the cluster specific Client
+	//	需要实现的抽象方法
 	// ------------------------------------------------------------------------
 
 	/**
 	 * Blocks until the client has determined that the cluster is ready for Job submission.
+	 *
+	 *
 	 *
 	 * <p>This is delayed until right before job submission to report any other errors first
 	 * (e.g. invalid job definitions/errors in the user jar)
@@ -1001,11 +1014,15 @@ public abstract class ClusterClient<T> {
 
 	/**
 	 * Returns an URL (as a string) to the JobManager web interface.
+	 *
+	 * 返回jobManager web接口的url
 	 */
 	public abstract String getWebInterfaceURL();
 
 	/**
 	 * Returns the latest cluster status, with number of Taskmanagers and slots.
+	 *
+	 * 返回最近的集群信息, 主要包含 taskManager与slot的数量
 	 */
 	public abstract GetClusterStatusResponse getClusterStatus();
 
@@ -1018,12 +1035,17 @@ public abstract class ClusterClient<T> {
 	/**
 	 * Returns the cluster id identifying the cluster to which the client is connected.
 	 *
+	 * 返回客户端连接的集群的id
+	 *
 	 * @return cluster id of the connected cluster
 	 */
 	public abstract T getClusterId();
 
 	/**
 	 * Set the mode of this client (detached or blocking job execution).
+	 *
+	 * 设置客户端的连接模式
+	 *
 	 * @param isDetached If true, the client will submit programs detached via the {@code run} method
 	 */
 	public void setDetached(boolean isDetached) {
@@ -1032,6 +1054,9 @@ public abstract class ClusterClient<T> {
 
 	/**
 	 * A flag to indicate whether this clients submits jobs detached.
+	 *
+	 * 是否是detached模式
+	 *
 	 * @return True if the Client submits detached, false otherwise
 	 */
 	public boolean isDetached() {
@@ -1040,6 +1065,9 @@ public abstract class ClusterClient<T> {
 
 	/**
 	 * Return the Flink configuration object.
+	 *
+	 * 返回Flink配置对象
+	 *
 	 * @return The Flink configuration object
 	 */
 	public Configuration getFlinkConfiguration() {
@@ -1061,6 +1089,9 @@ public abstract class ClusterClient<T> {
 	/**
 	 * Calls the subclasses' submitJob method. It may decide to simply call one of the run methods or it may perform
 	 * some custom job submission logic.
+	 *
+	 * 调用子类的submitJob方法
+	 *
 	 * @param jobGraph The JobGraph to be submitted
 	 * @return JobSubmissionResult
 	 */
@@ -1070,6 +1101,8 @@ public abstract class ClusterClient<T> {
 	/**
 	 * Rescales the specified job such that it will have the new parallelism.
 	 *
+	 * 对指定job使用新的并行度 进行扩容
+	 *
 	 * @param jobId specifying the job to modify
 	 * @param newParallelism specifying the new parallelism of the rescaled job
 	 * @return Future which is completed once the rescaling has been completed
@@ -1078,6 +1111,9 @@ public abstract class ClusterClient<T> {
 		throw new UnsupportedOperationException("The " + getClass().getSimpleName() + " does not support rescaling.");
 	}
 
+	/**
+	 * 关闭集群
+	 * */
 	public void shutDownCluster() {
 		throw new UnsupportedOperationException("The " + getClass().getSimpleName() + " does not support shutDownCluster.");
 	}

@@ -29,6 +29,8 @@ import scala.concurrent.ExecutionContext;
 
 /**
  * Collection of {@link Executor} implementations.
+ *
+ * Executor的一组实现
  */
 public class Executors {
 

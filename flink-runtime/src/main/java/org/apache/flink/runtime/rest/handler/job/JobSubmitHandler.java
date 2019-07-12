@@ -55,7 +55,9 @@ import java.util.stream.Collectors;
 /**
  * This handler can be used to submit jobs to a Flink cluster.
  *
- * 用来将job提交至flink集群
+ * 用来将job提交至Flink集群
+ *
+ * 用来处理从RestClusterClient#submitJob#sendRetriableRequest发送过来的jobGraph信息
  */
 public final class JobSubmitHandler extends AbstractRestHandler<DispatcherGateway, JobSubmitRequestBody, JobSubmitResponseBody, EmptyMessageParameters> {
 
@@ -78,6 +80,11 @@ public final class JobSubmitHandler extends AbstractRestHandler<DispatcherGatewa
 		this.configuration = configuration;
 	}
 
+	/**
+	 * 处理请求
+	 *
+	 * 这里用于接收、处理客户端提交的jobGraph
+	 * */
 	@Override
 	protected CompletableFuture<JobSubmitResponseBody> handleRequest(@Nonnull HandlerRequest<JobSubmitRequestBody, EmptyMessageParameters> request, @Nonnull DispatcherGateway gateway) throws RestHandlerException {
 		final Collection<File> uploadedFiles = request.getUploadedFiles();
@@ -105,23 +112,31 @@ public final class JobSubmitHandler extends AbstractRestHandler<DispatcherGatewa
 				HttpResponseStatus.BAD_REQUEST);
 		}
 
+		// 加载jobGraph
 		CompletableFuture<JobGraph> jobGraphFuture = loadJobGraph(requestBody, nameToFile);
 
+		// 获取上传的jar文件
 		Collection<Path> jarFiles = getJarFilesToUpload(requestBody.jarFileNames, nameToFile);
 
 		Collection<Tuple2<String, Path>> artifacts = getArtifactFilesToUpload(requestBody.artifactFileNames, nameToFile);
 
+		// 将jobGraph文件上传至blob服务器
 		CompletableFuture<JobGraph> finalizedJobGraphFuture = uploadJobGraphFiles(gateway, jobGraphFuture, jarFiles, artifacts, configuration);
 
+		// 通过网关真正提交jobGraph, (处理逻辑 跳转到Dispatcher#submitJob)
 		CompletableFuture<Acknowledge> jobSubmissionFuture = finalizedJobGraphFuture.thenCompose(jobGraph -> gateway.submitJob(jobGraph, timeout));
 
 		return jobSubmissionFuture.thenCombine(jobGraphFuture,
 			(ack, jobGraph) -> new JobSubmitResponseBody("/jobs/" + jobGraph.getJobID()));
 	}
 
+	/**
+	 * 加载jobGraph
+	 * */
 	private CompletableFuture<JobGraph> loadJobGraph(JobSubmitRequestBody requestBody, Map<String, Path> nameToFile) throws MissingFileException {
 		final Path jobGraphFile = getPathAndAssertUpload(requestBody.jobGraphFileName, FILE_TYPE_JOB_GRAPH, nameToFile);
 
+		// 将请求包体 异步转换为 jobGraph
 		return CompletableFuture.supplyAsync(() -> {
 			JobGraph jobGraph;
 			try (ObjectInputStream objectIn = new ObjectInputStream(jobGraphFile.getFileSystem().open(jobGraphFile))) {
@@ -156,17 +171,24 @@ public final class JobSubmitHandler extends AbstractRestHandler<DispatcherGatewa
 		return artifacts;
 	}
 
+	/**
+	 * 将jobGraph文件上传至blob服务器
+	 * */
 	private CompletableFuture<JobGraph> uploadJobGraphFiles(
 			DispatcherGateway gateway,
 			CompletableFuture<JobGraph> jobGraphFuture,
 			Collection<Path> jarFiles,
 			Collection<Tuple2<String, Path>> artifacts,
 			Configuration configuration) {
+
+		// 获取blob服务器端口
 		CompletableFuture<Integer> blobServerPortFuture = gateway.getBlobServerPort(timeout);
 
 		return jobGraphFuture.thenCombine(blobServerPortFuture, (JobGraph jobGraph, Integer blobServerPort) -> {
+			// blobServer地址
 			final InetSocketAddress address = new InetSocketAddress(gateway.getHostname(), blobServerPort);
 			try {
+				// 文件上传至blob服务器
 				ClientUtils.uploadJobGraphFiles(jobGraph, jarFiles, artifacts, () -> new BlobClient(address, configuration));
 			} catch (FlinkException e) {
 				throw new CompletionException(new RestHandlerException(

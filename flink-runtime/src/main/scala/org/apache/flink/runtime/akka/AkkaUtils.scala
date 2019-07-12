@@ -111,6 +111,8 @@ object AkkaUtils {
 
   /**
    * Creates an actor system with the given akka config.
+    *
+    * 创建actor系统
    *
    * @param akkaConfig configuration for the actor system
    * @return created actor system
@@ -121,6 +123,8 @@ object AkkaUtils {
 
   /**
     * Creates an actor system with the given akka config.
+    *
+    * 创建actor系统
     *
     * @param akkaConfig configuration for the actor system
     * @return created actor system
@@ -159,6 +163,8 @@ object AkkaUtils {
 
   /**
     * Returns a remote Akka config for the given configuration values.
+    *
+    * 根据给定的值,返回一个远程akka配置
     *
     * @param configuration containing the user provided configuration values
     * @param hostname to bind against. If null, then the loopback interface is used

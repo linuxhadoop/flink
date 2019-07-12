@@ -35,20 +35,26 @@ import static org.apache.flink.runtime.minicluster.RpcServiceSharing.SHARED;
 
 /**
  * Configuration object for the {@link MiniCluster}.
+ *
+ * mini集群的配置对象
  */
 public class MiniClusterConfiguration {
 
+	// 不可修改的配置
 	private final UnmodifiableConfiguration configuration;
 
+	// taskManagers的数量
 	private final int numTaskManagers;
 
+	// 是否共享Rpc服务
 	private final RpcServiceSharing rpcServiceSharing;
 
+	// 绑定的地址
 	@Nullable
 	private final String commonBindAddress;
 
 	// ------------------------------------------------------------------------
-	//  Construction
+	//  Construction 构造器
 	// ------------------------------------------------------------------------
 
 	public MiniClusterConfiguration(
@@ -122,6 +128,8 @@ public class MiniClusterConfiguration {
 
 	/**
 	 * Builder for the MiniClusterConfiguration.
+	 *
+	 * mini集群配置构建器
 	 */
 	public static class Builder {
 		private Configuration configuration = new Configuration();

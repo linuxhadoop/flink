@@ -147,7 +147,11 @@ import static org.apache.flink.util.Preconditions.checkState;
  */
 public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMasterGateway {
 
-	/** Default names for Flink's distributed components. */
+	/**
+	 * Default names for Flink's distributed components.
+	 *
+	 *	Flink分布式组件的默认名称
+	 * */
 	public static final String JOB_MANAGER_NAME = "jobmanager";
 	public static final String ARCHIVE_NAME = "archive";
 
@@ -1130,6 +1134,9 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 			log);
 	}
 
+	/**
+	 * 分配执行图
+	 * */
 	private void assignExecutionGraph(
 			ExecutionGraph newExecutionGraph,
 			JobManagerJobMetricGroup newJobManagerJobMetricGroup) {
@@ -1154,6 +1161,8 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 		} else {
 			suspendAndClearExecutionGraphFields(new FlinkException("ExecutionGraph is being reset in order to be rescheduled."));
 			final JobManagerJobMetricGroup newJobManagerJobMetricGroup = jobMetricGroupFactory.create(jobGraph);
+
+			// 生成执行图
 			final ExecutionGraph newExecutionGraph = createAndRestoreExecutionGraph(newJobManagerJobMetricGroup);
 
 			executionGraphAssignedFuture = executionGraph.getTerminationFuture().handleAsync(
@@ -1167,6 +1176,9 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 		executionGraphAssignedFuture.thenRun(this::scheduleExecutionGraph);
 	}
 
+	/**
+	 * 调度执行图
+	 * */
 	private void scheduleExecutionGraph() {
 		checkState(jobStatusListener == null);
 		// register self as job status change listener
@@ -1174,6 +1186,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 		executionGraph.registerJobStatusListener(jobStatusListener);
 
 		try {
+			// 真正中到这里了
 			executionGraph.scheduleForExecution();
 		}
 		catch (Throwable t) {

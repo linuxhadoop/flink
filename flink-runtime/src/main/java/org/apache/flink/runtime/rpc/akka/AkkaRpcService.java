@@ -79,6 +79,9 @@ import static org.apache.flink.util.Preconditions.checkState;
 /**
  * Akka based {@link RpcService} implementation. The RPC service starts an Akka actor to receive
  * RPC invocations from a {@link RpcGateway}.
+ *
+ * 基于akka的Rpc服务实现类
+ * rpc服务启动一个akka actor, 用来接收来自rpc网关的调用
  */
 @ThreadSafe
 public class AkkaRpcService implements RpcService {
@@ -87,6 +90,7 @@ public class AkkaRpcService implements RpcService {
 
 	static final int VERSION = 1;
 
+	// 最大帧大小路径
 	static final String MAXIMUM_FRAME_SIZE_PATH = "akka.remote.netty.tcp.maximum-frame-size";
 
 	private final Object lock = new Object();
@@ -97,11 +101,13 @@ public class AkkaRpcService implements RpcService {
 	@GuardedBy("lock")
 	private final Map<ActorRef, RpcEndpoint> actors = new HashMap<>(4);
 
+	// 最大帧大小
 	private final long maximumFramesize;
 
 	private final String address;
 	private final int port;
 
+	// 内部调度executor
 	private final ScheduledExecutor internalScheduledExecutor;
 
 	private final CompletableFuture<Void> terminationFuture;

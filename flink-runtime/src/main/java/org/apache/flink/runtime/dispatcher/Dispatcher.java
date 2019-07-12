@@ -94,6 +94,10 @@ import java.util.stream.Collectors;
  * for receiving job submissions, persisting them, spawning JobManagers to execute
  * the jobs and to recover them in case of a master failure. Furthermore, it knows
  * about the state of the Flink session cluster.
+ *
+ * 调度器组件的基类
+ * 用于接收提交的job,持久化job, 触发jobManager来执行job, 当master失败时进行回收。
+ * 此外, 它也能够了解集群状态
  */
 public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> implements
 	DispatcherGateway, LeaderContender, SubmittedJobGraphStore.SubmittedJobGraphListener {
@@ -240,6 +244,11 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 	// RPCs
 	//------------------------------------------------------
 
+	/**
+	 * 提交job
+	 *
+	 * 由JobSubmitHandler#submitJob调用
+	 * */
 	@Override
 	public CompletableFuture<Acknowledge> submitJob(JobGraph jobGraph, Time timeout) {
 		final JobID jobId = jobGraph.getJobID();
@@ -248,15 +257,18 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 		final RunningJobsRegistry.JobSchedulingStatus jobSchedulingStatus;
 
 		try {
+			// 获取job的调度状态
 			jobSchedulingStatus = runningJobsRegistry.getJobSchedulingStatus(jobId);
 		} catch (IOException e) {
 			return FutureUtils.completedExceptionally(new FlinkException(String.format("Failed to retrieve job scheduling status for job %s.", jobId), e));
 		}
 
+		// 如果job已经执行完成 or jobManagerRunnerFutures已经包含jobId, 抛出异常。 主要是为了防止重复提交
 		if (jobSchedulingStatus == RunningJobsRegistry.JobSchedulingStatus.DONE || jobManagerRunnerFutures.containsKey(jobId)) {
 			return FutureUtils.completedExceptionally(
 				new JobSubmissionException(jobId, String.format("Job has already been submitted and is in state %s.", jobSchedulingStatus)));
 		} else {
+			// 调用persistAndRunJob
 			final CompletableFuture<Acknowledge> persistAndRunFuture = waitForTerminatingJobManager(jobId, jobGraph, this::persistAndRunJob)
 				.thenApply(ignored -> Acknowledge.get());
 
@@ -270,9 +282,14 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 		}
 	}
 
+	/**
+	 * 持久化jobGraph并运行job
+	 * */
 	private CompletableFuture<Void> persistAndRunJob(JobGraph jobGraph) throws Exception {
+		// 持久化jobGraph
 		submittedJobGraphStore.putJobGraph(new SubmittedJobGraph(jobGraph, null));
 
+		// 运行job
 		final CompletableFuture<Void> runJobFuture = runJob(jobGraph);
 
 		return runJobFuture.whenComplete(BiConsumerWithException.unchecked((Object ignored, Throwable throwable) -> {
@@ -288,6 +305,7 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 	private CompletableFuture<Void> runJob(JobGraph jobGraph) {
 		Preconditions.checkState(!jobManagerRunnerFutures.containsKey(jobGraph.getJobID()));
 
+		// 创建jobManagerRunner
 		final CompletableFuture<JobManagerRunner> jobManagerRunnerFuture = createJobManagerRunner(jobGraph);
 
 		jobManagerRunnerFutures.put(jobGraph.getJobID(), jobManagerRunnerFuture);
@@ -305,8 +323,9 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 
 	/**
 	 *
-	 * 创建jobManagerRunner, 在jobManagerRunner中创建JobMaster
+	 * 创建jobManagerRunner, 在jobManagerRunner中创建JobMaster, 并启动jobMaster
 	 *
+	 * jobManagerRunnerFactory是前期在miniCluster中创建Dispatcher时传递进来的
 	 * */
 	private CompletableFuture<JobManagerRunner> createJobManagerRunner(JobGraph jobGraph) {
 		final RpcService rpcService = getRpcService();
@@ -326,9 +345,15 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 					fatalErrorHandler)),
 			rpcService.getExecutor());
 
+		// 调用startJobManagerRunner
 		return jobManagerRunnerFuture.thenApply(FunctionUtils.uncheckedFunction(this::startJobManagerRunner));
 	}
 
+	/**
+	 * 启动jobMaster
+	 *
+	 * 主要还是看start方法
+	 * */
 	private JobManagerRunner startJobManagerRunner(JobManagerRunner jobManagerRunner) throws Exception {
 		final JobID jobId = jobManagerRunner.getJobGraph().getJobID();
 
@@ -885,6 +910,9 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 		}
 	}
 
+	/**
+	 * 等待关闭jobManager
+	 * */
 	private CompletableFuture<Void> waitForTerminatingJobManager(JobID jobId, JobGraph jobGraph, FunctionWithException<JobGraph, CompletableFuture<Void>, ?> action) {
 		final CompletableFuture<Void> jobManagerTerminationFuture = getJobTerminationFuture(jobId)
 			.exceptionally((Throwable throwable) -> {
@@ -1035,6 +1063,8 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 
 	/**
 	 * Factory for a {@link JobManagerRunner}.
+	 *
+	 * JobManagerRunner工厂类
 	 */
 	@FunctionalInterface
 	public interface JobManagerRunnerFactory {
@@ -1053,6 +1083,8 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 
 	/**
 	 * Singleton default factory for {@link JobManagerRunner}.
+	 *
+	 * 单例默认工厂
 	 */
 	public enum DefaultJobManagerRunnerFactory implements JobManagerRunnerFactory {
 		INSTANCE;

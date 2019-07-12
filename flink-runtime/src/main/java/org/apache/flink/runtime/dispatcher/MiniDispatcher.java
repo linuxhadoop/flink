@@ -99,6 +99,7 @@ public class MiniDispatcher extends Dispatcher {
 		return jobTerminationFuture;
 	}
 
+	//
 	@Override
 	public CompletableFuture<Acknowledge> submitJob(JobGraph jobGraph, Time timeout) {
 		final CompletableFuture<Acknowledge> acknowledgeCompletableFuture = super.submitJob(jobGraph, timeout);

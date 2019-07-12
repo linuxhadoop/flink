@@ -20,13 +20,18 @@ package org.apache.flink.runtime.checkpoint;
 
 /**
  *  The type of checkpoint to perform.
+ *
+ *  checkpoint类型
  */
 public enum CheckpointType {
 
-	/** A checkpoint, full or incremental. */
+	/** A checkpoint, full or incremental.
+	 *
+	 * 	检查点, 全量或增量
+	 * */
 	CHECKPOINT,
 
-	/** A savepoint. */
+	/** A savepoint. 保存点 */
 	SAVEPOINT;
 
 }

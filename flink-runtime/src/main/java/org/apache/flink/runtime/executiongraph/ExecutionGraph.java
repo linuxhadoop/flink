@@ -860,7 +860,13 @@ public class ExecutionGraph implements AccessExecutionGraph {
 		failoverStrategy.notifyNewVertices(newExecJobVertices);
 	}
 
-	// 执行调度
+	/**
+	 * 执行调度
+	 *
+	 * 分为:
+	 * 	lazy:针对批处理
+	 * 	eager:针对流式计算
+	 * */
 	public void scheduleForExecution() throws JobException {
 
 		final long currentGlobalModVersion = globalModVersion;
@@ -923,7 +929,7 @@ public class ExecutionGraph implements AccessExecutionGraph {
 	}
 
 	/**
-	 *
+	 *	对于流式计算, 会调用该方法进行调度
 	 *
 	 * @param slotProvider  The resource provider from which the slots are allocated
 	 * @param timeout       The maximum time that the deployment may take, before a
@@ -968,6 +974,7 @@ public class ExecutionGraph implements AccessExecutionGraph {
 				(Collection<Execution> executionsToDeploy) -> {
 					for (Execution execution : executionsToDeploy) {
 						try {
+							// 哈哈 开始调度了哦
 							execution.deploy();
 						} catch (Throwable t) {
 							throw new CompletionException(

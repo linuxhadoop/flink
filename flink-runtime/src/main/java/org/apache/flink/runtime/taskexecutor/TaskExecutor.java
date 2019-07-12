@@ -454,6 +454,9 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 	// Task lifecycle RPCs
 	// ----------------------------------------------------------------------
 
+	/**
+	 * 提交任务
+	 * */
 	@Override
 	public CompletableFuture<Acknowledge> submitTask(
 			TaskDeploymentDescriptor tdd,
@@ -548,6 +551,7 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 				taskRestore,
 				checkpointResponder);
 
+			// 生成任务
 			Task task = new Task(
 				jobInformation,
 				taskInformation,
@@ -585,6 +589,7 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 				throw new TaskSubmissionException("Could not submit task.", e);
 			}
 
+			// 开始执行task线程
 			if (taskAdded) {
 				task.startTaskThread();
 

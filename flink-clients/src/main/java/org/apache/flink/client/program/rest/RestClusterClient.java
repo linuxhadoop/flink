@@ -364,6 +364,7 @@ public class RestClusterClient<T> extends ClusterClient<T> implements NewCluster
 			return Tuple2.of(requestBody, Collections.unmodifiableCollection(filesToUpload));
 		});
 
+		// sendRetriableRequest发送请求。 请求发送后, 需要有handler来处理请求:JobSubmitHandler
 		final CompletableFuture<JobSubmitResponseBody> submissionFuture = requestFuture.thenCompose(
 			requestAndFileUploads -> sendRetriableRequest(
 				JobSubmitHeaders.getInstance(),
@@ -373,7 +374,6 @@ public class RestClusterClient<T> extends ClusterClient<T> implements NewCluster
 				isConnectionProblemOrServiceUnavailable())
 		);
 
-		// 发送请求
 		submissionFuture
 			.thenCombine(jobGraphFileFuture, (ignored, jobGraphFile) -> jobGraphFile)
 			.thenAccept(jobGraphFile -> {

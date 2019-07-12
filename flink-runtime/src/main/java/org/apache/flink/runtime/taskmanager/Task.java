@@ -533,6 +533,8 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 
 	/**
 	 * The core work method that bootstraps the task and executes its code.
+	 *
+	 * 核心方法, 用来启动、运行task
 	 */
 	@Override
 	public void run() {
@@ -724,7 +726,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			// make sure the user code classloader is accessible thread-locally
 			executingThread.setContextClassLoader(userCodeClassLoader);
 
-			// run the invokable
+			// run the invokable  真正调用用户方法的入口
 			invokable.invoke();
 
 			// make sure, we enter the catch block if the task leaves the invoke() method due
@@ -1385,13 +1387,15 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	 * Instantiates the given task invokable class, passing the given environment (and possibly
 	 * the initial task state) to the task's constructor.
 	 *
+	 * 实例化task
+	 *
 	 * <p>The method will first try to instantiate the task via a constructor accepting both
 	 * the Environment and the TaskStateSnapshot. If no such constructor exists, and there is
 	 * no initial state, the method will fall back to the stateless convenience constructor that
 	 * accepts only the Environment.
 	 *
 	 * @param classLoader The classloader to load the class through.
-	 * @param className The name of the class to load.
+	 * @param className The name of the class to load. 需要加载的类型, 就是用户的代码类
 	 * @param environment The task environment.
 	 *
 	 * @return The instantiated invokable task object.
@@ -1420,7 +1424,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			throw new FlinkException("Task misses proper constructor", ee);
 		}
 
-		// instantiate the class
+		// instantiate the class 实例化用户类
 		try {
 			//noinspection ConstantConditions  --> cannot happen
 			return statelessCtor.newInstance(environment);

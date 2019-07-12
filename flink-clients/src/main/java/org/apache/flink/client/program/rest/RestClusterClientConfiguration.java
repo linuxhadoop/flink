@@ -28,15 +28,20 @@ import static org.apache.flink.util.Preconditions.checkArgument;
 
 /**
  * A configuration object for {@link RestClusterClient}s.
+ *
+ * Rest集群客户端的配置对象
  */
 public final class RestClusterClientConfiguration {
 
+	// rest客户端配置对象
 	private final RestClientConfiguration restClientConfiguration;
 
 	private final long awaitLeaderTimeout;
 
+	// 最打尝试次数
 	private final int retryMaxAttempts;
 
+	// 重试延迟
 	private final long retryDelay;
 
 	private RestClusterClientConfiguration(

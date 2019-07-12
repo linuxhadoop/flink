@@ -39,16 +39,27 @@ public interface RunningJobsRegistry {
 
 	/**
 	 * The scheduling status of a job, as maintained by the {@code RunningJobsRegistry}.
+	 *
+	 * job的调度状态
 	 */
 	enum JobSchedulingStatus {
 
-		/** Job has not been scheduled, yet. */
+		/** Job has not been scheduled, yet.
+		 *
+		 * 	job还未被调度
+		 * */
 		PENDING,
 
-		/** Job has been scheduled and is not yet finished. */
+		/** Job has been scheduled and is not yet finished.
+		 *
+		 *	job已经被调度且还未结束
+		 **/
 		RUNNING,
 
-		/** Job has been finished, successfully or unsuccessfully. */
+		/** Job has been finished, successfully or unsuccessfully.
+		 *
+		 * 	job已经执行完成, 成功or失败
+		 * */
 		DONE;
 	}
 

@@ -57,6 +57,9 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * The runner for the job manager. It deals with job level leader election and make underlying job manager
  * properly reacted.
+ *
+ * job manager的执行器
+ * 用来处理job级别的leader选举
  */
 public class JobManagerRunner implements LeaderContender, OnCompletionActions, AutoCloseableAsync {
 
@@ -78,6 +81,9 @@ public class JobManagerRunner implements LeaderContender, OnCompletionActions, A
 
 	private final JobManagerSharedServices jobManagerSharedServices;
 
+	/**
+	 * 这个才是重点
+	 * */
 	private final JobMaster jobMaster;
 
 	private final FatalErrorHandler fatalErrorHandler;
@@ -153,7 +159,7 @@ public class JobManagerRunner implements LeaderContender, OnCompletionActions, A
 				configuration,
 				rpcService);
 
-			// now start the JobManager
+			// now start the JobManager 创建新的jobManager(FLIP6 使用的是JobMaster)
 			this.jobMaster = new JobMaster(
 				rpcService,
 				jobMasterConfiguration,
@@ -300,9 +306,12 @@ public class JobManagerRunner implements LeaderContender, OnCompletionActions, A
 	}
 
 	//----------------------------------------------------------------------------------------------
-	// Leadership methods
+	// Leadership methods 选举
 	//----------------------------------------------------------------------------------------------
 
+	/**
+	 * 选举成为leader后, 就可以进行调度。 接着就可以执行jobMaster.start(), 从而可以真正提供服务
+	 * */
 	@Override
 	public void grantLeadership(final UUID leaderSessionID) {
 		synchronized (lock) {

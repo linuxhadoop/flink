@@ -63,6 +63,8 @@ public interface DispatcherGateway extends FencedRpcGateway<DispatcherId>, Restf
 	/**
 	 * Returns the port of the blob server.
 	 *
+	 * 获取blob服务器端口
+	 *
 	 * @param timeout of the operation
 	 * @return A future integer of the blob server port
 	 */

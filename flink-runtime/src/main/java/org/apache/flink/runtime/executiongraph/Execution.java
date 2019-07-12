@@ -553,6 +553,8 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 	/**
 	 * Deploys the execution to the previously assigned resource.
 	 *
+	 * 部署执行
+	 *
 	 * @throws JobException if the execution cannot be deployed to the assigned resource
 	 */
 	public void deploy() throws JobException {
@@ -600,6 +602,7 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 						attemptNumber, getAssignedResourceLocation().getHostname()));
 			}
 
+			// 生成task部署描述符
 			final TaskDeploymentDescriptor deployment = vertex.createDeploymentDescriptor(
 				attemptId,
 				slot,
@@ -611,6 +614,7 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 
 			final TaskManagerGateway taskManagerGateway = slot.getTaskManagerGateway();
 
+			// 通过taskManagerGateway将task desc提交至taskManager
 			final CompletableFuture<Acknowledge> submitResultFuture = taskManagerGateway.submitTask(deployment, rpcTimeout);
 
 			submitResultFuture.whenCompleteAsync(

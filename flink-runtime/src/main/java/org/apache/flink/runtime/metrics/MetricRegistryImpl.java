@@ -91,8 +91,12 @@ public class MetricRegistryImpl implements MetricRegistry {
 
 	/**
 	 * Creates a new MetricRegistry and starts the configured reporter.
+	 *
+	 * 创建一个新的MetricRegistry 并启动已配置的reporter
 	 */
 	public MetricRegistryImpl(MetricRegistryConfiguration config) {
+
+		// 查询服务消息大小
 		this.maximumFramesize = config.getQueryServiceMessageSizeLimit();
 		this.scopeFormats = config.getScopeFormats();
 		this.globalDelimiter = config.getDelimiter();

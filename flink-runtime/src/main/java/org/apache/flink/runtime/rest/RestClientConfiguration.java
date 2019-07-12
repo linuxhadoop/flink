@@ -32,6 +32,8 @@ import static org.apache.flink.util.Preconditions.checkArgument;
 
 /**
  * A configuration object for {@link RestClient}s.
+ *
+ * Rest客户端配置对象
  */
 public final class RestClientConfiguration {
 

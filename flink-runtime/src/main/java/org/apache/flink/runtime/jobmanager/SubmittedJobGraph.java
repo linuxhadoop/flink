@@ -29,12 +29,17 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
  * A recoverable {@link JobGraph} and {@link JobInfo}.
+ *
+ * 可恢复的jobGraph 与 jobInfo
  */
 public class SubmittedJobGraph implements Serializable {
 
 	private static final long serialVersionUID = 2836099271734771825L;
 
-	/** The submitted {@link JobGraph} */
+	/** The submitted {@link JobGraph}
+	 *
+	 * 	已经提交的jobGraph
+	 * */
 	private final JobGraph jobGraph;
 
 	/** The {@link JobInfo}. */

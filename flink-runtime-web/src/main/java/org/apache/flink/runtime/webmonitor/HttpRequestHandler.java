@@ -66,16 +66,26 @@ import java.util.UUID;
 @ChannelHandler.Sharable
 public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpObject> {
 
+	// 默认编码字符集UTF_8
 	private static final Charset ENCODING = ConfigConstants.DEFAULT_CHARSET;
 
-	/** A decoder factory that always stores POST chunks on disk. */
+	/**
+	 * A decoder factory that always stores POST chunks on disk.
+	 *
+	 * 一个加码器工厂, 可将POST块保存在磁盘上
+	 * */
 	private static final HttpDataFactory DATA_FACTORY = new DefaultHttpDataFactory(true);
 
+	// 临时目录
 	private final File tmpDir;
 
+	// 当前请求
 	private HttpRequest currentRequest;
 
+	// 当前解码器
 	private HttpPostRequestDecoder currentDecoder;
+
+	// 当前请求路径
 	private String currentRequestPath;
 
 	public HttpRequestHandler(File tmpDir) {
@@ -89,9 +99,13 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpObject> 
 		}
 	}
 
+	/**
+	 * 这里是请求的主要入口, 可参考Netty文档
+	 * */
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) {
 		try {
+			// 如果是一个http请求
 			if (msg instanceof HttpRequest) {
 				currentRequest = (HttpRequest) msg;
 				currentRequestPath = null;
@@ -101,6 +115,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpObject> 
 					currentDecoder = null;
 				}
 
+				// 对于get、delete请求, 直接代理至router
 				if (currentRequest.getMethod() == HttpMethod.GET || currentRequest.getMethod() == HttpMethod.DELETE) {
 					// directly delegate to the router
 					ctx.fireChannelRead(currentRequest);

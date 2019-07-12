@@ -267,7 +267,7 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 				// bring up all the RPC services
 				LOG.info("Starting RPC Service(s)");
 
-				// we always need the 'commonRpcService' for auxiliary calls
+				// we always need the 'commonRpcService' for auxiliary calls 通常需要一个commonRpcService作为辅助
 				commonRpcService = createRpcService(configuration, rpcTimeout, false, null);
 
 				// TODO: Temporary hack until the metric query service is ported to the RpcEndpoint
@@ -277,6 +277,7 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 					LOG);
 				metricRegistry.startQueryService(metricQueryServiceActorSystem, null);
 
+				// 共享rpc服务, 所有的rpc都是用commonRpcService
 				if (useSingleRpcService) {
 					for (int i = 0; i < numTaskManagers; i++) {
 						taskManagerRpcServices[i] = commonRpcService;
@@ -291,6 +292,7 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 				}
 				else {
 					// start a new service per component, possibly with custom bind addresses
+					// 为每一个组件启动一个新服务, 可能会绑定自定义的地址
 					final String jobManagerBindAddress = miniClusterConfiguration.getJobManagerBindAddress();
 					final String taskManagerBindAddress = miniClusterConfiguration.getTaskManagerBindAddress();
 					final String resourceManagerBindAddress = miniClusterConfiguration.getResourceManagerBindAddress();
@@ -308,7 +310,7 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 					this.resourceManagerRpcService = resourceManagerRpcService;
 				}
 
-				// create the high-availability services
+				// create the high-availability services 创建高可用服务
 				LOG.info("Starting high-availability services");
 				ioExecutor = Executors.newFixedThreadPool(
 					Hardware.getNumberCPUCores(),
@@ -322,7 +324,7 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 
 				heartbeatServices = HeartbeatServices.fromConfiguration(configuration);
 
-				// bring up the ResourceManager(s)
+				// bring up the ResourceManager(s) 启动资源管理器
 				LOG.info("Starting ResourceManger");
 				resourceManagerRunner = startResourceManager(
 					configuration,
@@ -337,7 +339,7 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 					configuration, haServices.createBlobStore(), new InetSocketAddress(InetAddress.getLocalHost(), blobServer.getPort())
 				);
 
-				// bring up the TaskManager(s) for the mini cluster
+				// bring up the TaskManager(s) for the mini cluster 启动taskManager
 				LOG.info("Starting {} TaskManger(s)", numTaskManagers);
 				taskManagers = startTaskManagers(
 					configuration,
@@ -348,7 +350,7 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 					numTaskManagers,
 					taskManagerRpcServices);
 
-				// starting the dispatcher rest endpoint
+				// starting the dispatcher rest endpoint 启动dispatcher endpoint
 				LOG.info("Starting dispatcher rest endpoint.");
 
 				dispatcherGatewayRetriever = new RpcGatewayRetriever<>(
@@ -385,7 +387,7 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 
 				restAddressURI = new URI(dispatcherRestEndpoint.getRestBaseUrl());
 
-				// bring up the dispatcher that launches JobManagers when jobs submitted
+				// bring up the dispatcher that launches JobManagers when jobs submitted 当提交job后 为jobManager启动dispatcher
 				LOG.info("Starting job dispatcher(s) for JobManger");
 
 				final HistoryServerArchivist historyServerArchivist = HistoryServerArchivist.createHistoryServerArchivist(configuration, dispatcherRestEndpoint);
@@ -741,6 +743,8 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 	/**
 	 * Factory method to create the metric registry for the mini cluster.
 	 *
+	 * 用来创建metric注册的工厂方法
+	 *
 	 * @param config The configuration of the mini cluster
 	 */
 	protected MetricRegistryImpl createMetricRegistry(Configuration config) {
@@ -750,14 +754,16 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 	/**
 	 * Factory method to instantiate the RPC service.
 	 *
+	 * 用来实例化Rpc服务的工厂方法
+	 *
 	 * @param configuration
-	 *            The configuration of the mini cluster
+	 *            The configuration of the mini cluster 配置
 	 * @param askTimeout
-	 *            The default RPC timeout for asynchronous "ask" requests.
+	 *            The default RPC timeout for asynchronous "ask" requests. 异步请求超时时间
 	 * @param remoteEnabled
-	 *            True, if the RPC service should be reachable from other (remote) RPC services.
+	 *            True, if the RPC service should be reachable from other (remote) RPC services. 远程是否可达到
 	 * @param bindAddress
-	 *            The address to bind the RPC service to. Only relevant when "remoteEnabled" is true.
+	 *            The address to bind the RPC service to. Only relevant when "remoteEnabled" is true. rpc服务的绑定地址
 	 *
 	 * @return The instantiated RPC service
 	 */

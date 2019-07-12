@@ -70,6 +70,8 @@ public final class BlobClient implements Closeable {
 	/**
 	 * Instantiates a new BLOB client.
 	 *
+	 * 实例化blob客户端
+	 *
 	 * @param serverAddress
 	 *        the network address of the BLOB server
 	 * @param clientConfig

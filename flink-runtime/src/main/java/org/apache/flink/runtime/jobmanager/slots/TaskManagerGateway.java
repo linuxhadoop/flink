@@ -38,7 +38,9 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Task manager gateway interface to communicate with the task manager.
  *
- * taskManager网管接口, 用来与taskManager进行通讯
+ * taskManager网关接口, 用来与taskManager进行通讯
+ *
+ * 比如: Execution中调用submitTask来提交任务
  */
 public interface TaskManagerGateway {
 
@@ -94,6 +96,10 @@ public interface TaskManagerGateway {
 
 	/**
 	 * Submit a task to the task manager.
+	 *
+	 * 提交任务
+	 *
+	 * 该方法在Execution中被调用
 	 *
 	 * @param tdd describing the task to submit
 	 * @param timeout of the submit operation

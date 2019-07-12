@@ -32,6 +32,8 @@ public interface LeaderContender {
 	 * Callback method which is called by the {@link LeaderElectionService} upon selecting this
 	 * instance as the new leader. The method is called with the new leader session ID.
 	 *
+	 * 执行该方法是会调用jobMasterRunner#verifyJobSchedulingStatusAndStartJobManager 此时jobMaster.start
+	 *
 	 * @param leaderSessionID New leader session ID
 	 */
 	void grantLeadership(UUID leaderSessionID);
