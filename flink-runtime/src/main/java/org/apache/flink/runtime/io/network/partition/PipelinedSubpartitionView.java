@@ -31,12 +31,20 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  */
 class PipelinedSubpartitionView implements ResultSubpartitionView {
 
-	/** The subpartition this view belongs to. */
+	/**
+	 * The subpartition this view belongs to.
+	 *
+	 * 子分区所属的ResultPartition
+	 * */
 	private final PipelinedSubpartition parent;
 
 	private final BufferAvailabilityListener availabilityListener;
 
-	/** Flag indicating whether this view has been released. */
+	/**
+	 * Flag indicating whether this view has been released.
+	 *
+	 * 当前view是否已经被释放
+	 * */
 	private final AtomicBoolean isReleased;
 
 	PipelinedSubpartitionView(PipelinedSubpartition parent, BufferAvailabilityListener listener) {

@@ -62,6 +62,8 @@ import static org.apache.flink.util.Preconditions.checkState;
 /**
  * An input gate consumes one or more partitions of a single produced intermediate result.
  *
+ * 用来消费单独一个intermediate result的一个或多个分区
+ *
  * <p>Each intermediate result is partitioned over its producing parallel subtasks; each of these
  * partitions is furthermore partitioned into one or more subpartitions.
  *
@@ -115,7 +117,11 @@ public class SingleInputGate implements InputGate {
 	 * */
 	private final String owningTaskName;
 
-	/** The job ID of the owning task. */
+	/**
+	 * The job ID of the owning task.
+	 *
+	 * 任务所属的jobId
+	 * */
 	private final JobID jobId;
 
 	/**
@@ -409,6 +415,8 @@ public class SingleInputGate implements InputGate {
 
 	/**
 	 * Retriggers a partition request.
+	 *
+	 * 重新触发分区请求
 	 */
 	public void retriggerPartitionRequest(IntermediateResultPartitionID partitionId) throws IOException, InterruptedException {
 		synchronized (requestLock) {

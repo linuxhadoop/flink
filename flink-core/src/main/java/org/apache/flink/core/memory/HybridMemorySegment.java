@@ -424,6 +424,7 @@ public final class HybridMemorySegment extends MemorySegment {
 		}
 	}
 
+	// 获取direct buffer的地址
 	private static long checkBufferAndGetAddress(ByteBuffer buffer) {
 		if (buffer == null) {
 			throw new NullPointerException("buffer is null");

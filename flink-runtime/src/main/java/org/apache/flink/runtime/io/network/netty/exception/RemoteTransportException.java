@@ -20,6 +20,9 @@ package org.apache.flink.runtime.io.network.netty.exception;
 
 import java.net.SocketAddress;
 
+/**
+ * 远程传输异常
+ * */
 public class RemoteTransportException extends TransportException {
 
 	private static final long serialVersionUID = 4373615529545893089L;

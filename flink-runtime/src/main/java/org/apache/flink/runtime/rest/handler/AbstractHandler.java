@@ -76,6 +76,8 @@ public abstract class AbstractHandler<T extends RestfulGateway, R extends Reques
 
 	/**
 	 * Used to ensure that the handler is not closed while there are still in-flight requests.
+	 *
+	 * 当还有in-flight请求时, 用来保证一个handler没有被关闭
 	 */
 	private final InFlightRequestTracker inFlightRequestTracker;
 

@@ -27,6 +27,8 @@ import java.io.IOException;
 
 /**
  * Channel handler to read and write network messages on client side.
+ *
+ * 在客户端 读、写网络消息
  */
 public interface NetworkClientHandler extends ChannelHandler {
 

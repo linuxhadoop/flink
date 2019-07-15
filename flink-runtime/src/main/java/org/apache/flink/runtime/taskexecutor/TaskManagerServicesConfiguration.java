@@ -52,37 +52,52 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * Configuration for the task manager services such as the network environment, the memory manager,
  * the io manager and the metric registry.
+ *
+ * taskManager服务的配置。 例如:网络环境、内存管理器、io管理器、metric注册
  */
 public class TaskManagerServicesConfiguration {
 	private static final Logger LOG = LoggerFactory.getLogger(TaskManagerServicesConfiguration.class);
 
+	// taskManager的地址
 	private final InetAddress taskManagerAddress;
 
+	// 临时文件夹
 	private final String[] tmpDirPaths;
 
+	// 本地状态恢复根目录
 	private final String[] localRecoveryStateRootDirectories;
 
+	// slot数量
 	private final int numberOfSlots;
 
+	// 网络环境配置
 	private final NetworkEnvironmentConfiguration networkConfig;
 
+	// 可查询状态 配置
 	private final QueryableStateConfiguration queryableStateConfig;
 
 	/**
 	 * Managed memory (in megabytes).
 	 *
+	 * 管理的内存
+	 *
 	 * @see TaskManagerOptions#MANAGED_MEMORY_SIZE
 	 */
 	private final long configuredMemory;
 
+	// 内存类型
 	private final MemoryType memoryType;
 
+	// 预分配内存
 	private final boolean preAllocateMemory;
 
+	// 内存占比
 	private final float memoryFraction;
 
+	// 定时器服务关闭超时时间
 	private final long timerServiceShutdownTimeout;
 
+	// 本地恢复是否开启
 	private final boolean localRecoveryEnabled;
 
 	private Optional<Time> systemResourceMetricsProbingInterval;

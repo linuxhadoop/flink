@@ -23,18 +23,25 @@ import org.apache.flink.runtime.operators.shipping.ShipStrategyType;
 
 /**
  * Defines how the data exchange between two specific operators happens.
+ *
+ * 定义算子之间数据交换的模式
  */
 public enum DataExchangeMode {
 
 	/**
 	 * The data exchange is streamed, sender and receiver are online at the same time,
 	 * and the receiver back-pressures the sender.
+	 *
+	 * 流式数据按照这种类型, 发送者与接收者都是同时在线的,并且接收者会反压发送者
 	 */
 	PIPELINED,
 
 	/**
 	 * The data exchange is decoupled. The sender first produces its entire result and finishes.
 	 * After that, the receiver is started and may consume the data.
+	 *
+	 * 数据交换是解耦的。
+	 * 发送者首先 生产完所有数据。 之后,接收者才启动并开始消费数据
 	 */
 	BATCH,
 

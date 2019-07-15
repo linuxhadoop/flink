@@ -164,7 +164,7 @@ public class RemoteInputChannel extends InputChannel implements BufferRecycler, 
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Requests a remote subpartition. 请求与远程子分区
+	 * Requests a remote subpartition. 请求一个远程子分区
 	 */
 	@VisibleForTesting
 	@Override

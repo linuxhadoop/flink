@@ -34,13 +34,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * The facade for the provided I/O manager services.
+ *
+ * IO管理器
  */
 public abstract class IOManager {
 
+	/**
+	 * IO模式
+	 * 	SYNC 同步
+	 * 	ASYNC 异步
+	 * */
 	public enum IOMode {
 
 		SYNC(true), ASYNC(false);
 
+		// 是否同步
 		private final boolean isSynchronous;
 
 		IOMode(boolean isSynchronous) {

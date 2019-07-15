@@ -25,6 +25,8 @@ import java.nio.ByteOrder;
 
 /**
  * Utility class for memory operations.
+ *
+ * 内存操作工具类
  */
 @Internal
 public class MemoryUtils {
@@ -55,6 +57,6 @@ public class MemoryUtils {
 		}
 	}
 
-	/** Should not be instantiated. */
+	/** Should not be instantiated. 不能被实例化 */
 	private MemoryUtils() {}
 }

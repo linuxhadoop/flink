@@ -95,6 +95,8 @@ public class PartitionRequestClient {
 	/**
 	 * Requests a remote intermediate result partition queue.
 	 *
+	 * 请求一个远程intermediate结果分区队列
+	 *
 	 * <p>The request goes to the remote producer, for which this partition
 	 * request client instance has been created.
 	 */
@@ -149,6 +151,9 @@ public class PartitionRequestClient {
 
 	/**
 	 * Sends a task event backwards to an intermediate result partition producer.
+	 *
+	 * 发送一个任务事件 至 intermediate result分区生产者
+	 *
 	 * <p>
 	 * Backwards task events flow between readers and writers and therefore
 	 * will only work when both are running at the same time, which is only

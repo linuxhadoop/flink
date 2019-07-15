@@ -245,6 +245,7 @@ class CreditBasedPartitionRequestClientHandler extends ChannelInboundHandlerAdap
 		final Class<?> msgClazz = msg.getClass();
 
 		// ---- Buffer --------------------------------------------------------
+		// 数据是从PartitionRequestQueue#writeAndFlushNextMessageIfPossible方法中 发送的
 		if (msgClazz == NettyMessage.BufferResponse.class) {
 			NettyMessage.BufferResponse bufferOrEvent = (NettyMessage.BufferResponse) msg;
 
@@ -289,12 +290,13 @@ class CreditBasedPartitionRequestClientHandler extends ChannelInboundHandlerAdap
 		}
 	}
 
+	// 解码
 	private void decodeBufferOrEvent(RemoteInputChannel inputChannel, NettyMessage.BufferResponse bufferOrEvent) throws Throwable {
 		try {
 			ByteBuf nettyBuffer = bufferOrEvent.getNettyBuffer();
 			final int receivedSize = nettyBuffer.readableBytes();
 			if (bufferOrEvent.isBuffer()) {
-				// ---- Buffer ------------------------------------------------
+				// ---- Buffer 数据 ------------------------------------------------
 
 				// Early return for empty buffers. Otherwise Netty's readBytes() throws an
 				// IndexOutOfBoundsException.
@@ -314,7 +316,7 @@ class CreditBasedPartitionRequestClientHandler extends ChannelInboundHandlerAdap
 					throw new IllegalStateException("No buffer available in credit-based input channel.");
 				}
 			} else {
-				// ---- Event -------------------------------------------------
+				// ---- Event 事件-------------------------------------------------
 				// TODO We can just keep the serialized data in the Netty buffer and release it later at the reader
 				byte[] byteArray = new byte[receivedSize];
 				nettyBuffer.readBytes(byteArray);

@@ -31,6 +31,8 @@ import java.nio.ReadOnlyBufferException;
  * This class represents a piece of memory managed by Flink.
  * The segment may be backed by heap memory (byte array) or by off-heap memory.
  *
+ * 该类表示了一块由Flink管理的内存
+ *
  * <p>The methods for individual memory access are specialized in the classes
  * {@link org.apache.flink.core.memory.HeapMemorySegment} and
  * {@link org.apache.flink.core.memory.HybridMemorySegment}.
@@ -98,12 +100,16 @@ public abstract class MemorySegment {
 
 	/**
 	 * The unsafe handle for transparent memory copied (heap / off-heap).
+	 *
+	 * 内存拷贝(不安全)
 	 */
 	@SuppressWarnings("restriction")
 	protected static final sun.misc.Unsafe UNSAFE = MemoryUtils.UNSAFE;
 
 	/**
 	 * The beginning of the byte array contents, relative to the byte array object.
+	 *
+	 * 开始的字节数组内容, 与字节数组对象有关
 	 */
 	@SuppressWarnings("restriction")
 	protected static final long BYTE_ARRAY_BASE_OFFSET = UNSAFE.arrayBaseOffset(byte[].class);

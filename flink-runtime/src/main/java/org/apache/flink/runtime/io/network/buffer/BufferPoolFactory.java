@@ -23,6 +23,8 @@ import java.util.Optional;
 
 /**
  * A factory for buffer pools.
+ *
+ * buffer池工厂
  */
 public interface BufferPoolFactory {
 

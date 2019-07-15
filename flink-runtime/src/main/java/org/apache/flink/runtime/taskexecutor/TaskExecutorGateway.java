@@ -43,11 +43,15 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * {@link TaskExecutor} RPC gateway interface.
+ *
+ * taskExecutor rpc网关接口
  */
 public interface TaskExecutorGateway extends RpcGateway {
 
 	/**
 	 * Requests a slot from the TaskManager.
+	 *
+	 * 从taskManager请求一个slot
 	 *
 	 * @param slotId slot id for the request
 	 * @param jobId for which to request a slot
@@ -76,6 +80,8 @@ public interface TaskExecutorGateway extends RpcGateway {
 	/**
 	 * Submit a {@link Task} to the {@link TaskExecutor}.
 	 *
+	 * 提交一个任务至TaskExecutor
+	 *
 	 * @param tdd describing the task to submit
 	 * @param jobMasterId identifying the submitting JobMaster
 	 * @param timeout of the submit operation
@@ -101,6 +107,8 @@ public interface TaskExecutorGateway extends RpcGateway {
 
 	/**
 	 * Fail all intermediate result partitions of the given task.
+	 *
+	 * 将给定的task的所有intermediate result partitions设置为失败
 	 *
 	 * @param executionAttemptID identifying the task
 	 */

@@ -50,6 +50,8 @@ public class TerminationModeQueryParameter extends MessageQueryParameter<Termina
 
 	/**
 	 * Supported termination modes.
+	 *
+	 * 目前支持的终结模式
 	 */
 	public enum TerminationMode {
 		CANCEL,

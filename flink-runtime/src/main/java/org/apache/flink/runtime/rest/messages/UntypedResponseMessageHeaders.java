@@ -23,6 +23,8 @@ import org.apache.flink.runtime.rest.handler.RestHandlerSpecification;
 /**
  * Message headers for a web handler request.
  *
+ * 一个web handler请求的消息头
+ *
  * @param <R> type of the request
  * @param <M> type of the message message parameters
  */

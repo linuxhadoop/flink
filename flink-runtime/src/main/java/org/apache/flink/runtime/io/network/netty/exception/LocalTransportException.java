@@ -20,6 +20,9 @@ package org.apache.flink.runtime.io.network.netty.exception;
 
 import java.net.SocketAddress;
 
+/**
+ * 本地传输异常
+ * */
 public class LocalTransportException extends TransportException {
 
 	private static final long serialVersionUID = 2366708881288640674L;

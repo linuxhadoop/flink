@@ -375,7 +375,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 	}
 
 	//----------------------------------------------------------------------------------------------
-	// RPC methods
+	// RPC methods rpc方法
 	//----------------------------------------------------------------------------------------------
 
 	@Override
@@ -621,6 +621,11 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 		}
 	}
 
+	/**
+	 * 用来通知消费者来消费ResultPartition中的数据
+	 *
+	 * 该方法由RpcResultPartitionConsumableNotifier#notifyPartitionConsumable调用
+	 * */
 	@Override
 	public CompletableFuture<Acknowledge> scheduleOrUpdateConsumers(
 			final ResultPartitionID partitionID,

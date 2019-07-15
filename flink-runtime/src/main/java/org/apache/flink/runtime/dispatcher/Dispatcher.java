@@ -413,6 +413,11 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 			jobManagerSharedServices.getScheduledExecutorService());
 	}
 
+	/**
+	 * 取消job
+	 *
+	 * 实际提交到jobMaster
+	 * */
 	@Override
 	public CompletableFuture<Acknowledge> cancelJob(JobID jobId, Time timeout) {
 		final CompletableFuture<JobMasterGateway> jobMasterGatewayFuture = getJobMasterGatewayFuture(jobId);
@@ -420,6 +425,9 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 		return jobMasterGatewayFuture.thenCompose((JobMasterGateway jobMasterGateway) -> jobMasterGateway.cancel(timeout));
 	}
 
+	/**
+	 * 停止job
+	 * */
 	@Override
 	public CompletableFuture<Acknowledge> stopJob(JobID jobId, Time timeout) {
 		final CompletableFuture<JobMasterGateway> jobMasterGatewayFuture = getJobMasterGatewayFuture(jobId);

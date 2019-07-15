@@ -50,6 +50,9 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * Network I/O components of each {@link TaskManager} instance. The network environment contains
  * the data structures that keep track of all intermediate results and all data exchanges.
+ *
+ * 是每一个taskManager实例的网络io组件.
+ * NE中包含了追踪所有intermediate results与数据交换的数据结构
  */
 public class NetworkEnvironment {
 
@@ -61,6 +64,7 @@ public class NetworkEnvironment {
 
 	private final ConnectionManager connectionManager;
 
+	// 结果分区管理器
 	private final ResultPartitionManager resultPartitionManager;
 
 	private final TaskEventDispatcher taskEventDispatcher;

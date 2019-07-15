@@ -26,6 +26,8 @@ import org.apache.flink.shaded.netty4.io.netty.channel.ChannelHandler;
 
 /**
  * Defines the server and client channel handlers, i.e. the protocol, used by netty.
+ *
+ * 定义服务器与客户端channel handler.
  */
 public class NettyProtocol {
 

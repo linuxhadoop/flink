@@ -61,6 +61,8 @@ public interface RestfulGateway extends RpcGateway {
 	/**
 	 * Stop the given job.
 	 *
+	 * 停止job
+	 *
 	 * @param jobId identifying the job to stop
 	 * @param timeout of the operation
 	 * @return A future acknowledge if the stopping succeeded

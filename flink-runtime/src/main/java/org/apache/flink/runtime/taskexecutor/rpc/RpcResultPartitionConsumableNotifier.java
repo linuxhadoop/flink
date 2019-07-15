@@ -32,6 +32,12 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+/**
+ * 给当前RP的consumers发送一个通知
+ *
+ * 在ResultPartition#notifyPipelinedConsumers中调用这里的notifyPartitionConsumable方法
+ * 将消息通过jobMasterGateway发送给jobMaster
+ * */
 public class RpcResultPartitionConsumableNotifier implements ResultPartitionConsumableNotifier {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RpcResultPartitionConsumableNotifier.class);

@@ -295,16 +295,24 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 	/**
 	 * Finishes the result partition.
 	 *
+	 * 结果分区生产完成
+	 *
 	 * <p>After this operation, it is not possible to add further data to the result partition.
 	 *
+	 * 在此操做之后, 新数据再不能加入到结果分区
+	 *
 	 * <p>For BLOCKING results, this will trigger the deployment of consuming tasks.
+	 *
+	 * 针对BLOCKING结果, 该操作会触发消费任务的部署
 	 */
 	public void finish() throws IOException {
 		boolean success = false;
 
 		try {
+			// 检查分区是否已经完成
 			checkInProduceState();
 
+			// 将数据自分区 也标记为完成. ResultSubpartition有2个子类PipelinedSubpartition、SpillableSubpartition
 			for (ResultSubpartition subpartition : subpartitions) {
 				subpartition.finish();
 			}
@@ -357,6 +365,8 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 
 	/**
 	 * Returns the requested subpartition.
+	 *
+	 * 返回请求的子分区
 	 */
 	public ResultSubpartitionView createSubpartitionView(int index, BufferAvailabilityListener availabilityListener) throws IOException {
 		int refCnt = pendingReferences.get();
@@ -470,6 +480,7 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 
 	// ------------------------------------------------------------------------
 
+	// 检查分区是否已经完成
 	private void checkInProduceState() throws IllegalStateException {
 		checkState(!isFinished, "Partition already finished.");
 	}

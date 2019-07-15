@@ -79,7 +79,7 @@ class PartitionRequestServerHandler extends SimpleChannelInboundHandler<NettyMes
 			Class<?> msgClazz = msg.getClass();
 
 			// ----------------------------------------------------------------
-			// Intermediate result partition requests
+			// Intermediate result partition requests 该消息从PartitionRequestClient请求
 			// ----------------------------------------------------------------
 			if (msgClazz == PartitionRequest.class) {
 				PartitionRequest request = (PartitionRequest) msg;

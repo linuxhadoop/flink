@@ -27,6 +27,8 @@ import java.io.IOException;
 
 /**
  * A view to consume a {@link ResultSubpartition} instance.
+ *
+ * 用来消费一个结果子分区实例的视图
  */
 public interface ResultSubpartitionView {
 

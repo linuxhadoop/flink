@@ -47,6 +47,8 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Request handler for the cancel and stop request.
+ *
+ * 取消、停止job
  */
 public class JobTerminationHandler extends AbstractRestHandler<RestfulGateway, EmptyRequestBody, EmptyResponseBody, JobTerminationMessageParameters> {
 
@@ -66,6 +68,8 @@ public class JobTerminationHandler extends AbstractRestHandler<RestfulGateway, E
 
 	@Override
 	public CompletableFuture<EmptyResponseBody> handleRequest(HandlerRequest<EmptyRequestBody, JobTerminationMessageParameters> request, RestfulGateway gateway) {
+
+		// 从request中获取前端传递过来的jobId
 		final JobID jobId = request.getPathParameter(JobIDPathParameter.class);
 		final List<TerminationModeQueryParameter.TerminationMode> terminationModes = request.getQueryParameter(TerminationModeQueryParameter.class);
 		final TerminationModeQueryParameter.TerminationMode terminationMode;

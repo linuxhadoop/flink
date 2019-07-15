@@ -70,6 +70,9 @@ import static org.apache.flink.util.MathUtils.checkedDownCast;
  * Container for {@link TaskExecutor} services such as the {@link MemoryManager}, {@link IOManager},
  * {@link NetworkEnvironment}. All services are exclusive to a single {@link TaskExecutor}.
  * Consequently, the respective {@link TaskExecutor} is responsible for closing them.
+ *
+ * taskManager中包含了: MemoryManager, IOManager, NetWorkEnvironment等
+ * 每个taskManager负责关闭各自的先关组件
  */
 public class TaskManagerServices {
 	private static final Logger LOG = LoggerFactory.getLogger(TaskManagerServices.class);
@@ -77,7 +80,11 @@ public class TaskManagerServices {
 	@VisibleForTesting
 	public static final String LOCAL_STATE_SUB_DIRECTORY_ROOT = "localState";
 
-	/** TaskManager services. */
+	/**
+	 * TaskManager services.
+	 *
+	 * taskManager提供的服务
+	 * */
 	private final TaskManagerLocation taskManagerLocation;
 	private final MemoryManager memoryManager;
 	private final IOManager ioManager;
@@ -208,6 +215,8 @@ public class TaskManagerServices {
 
 	/**
 	 * Creates and returns the task manager services.
+	 *
+	 * 创建并返回taskManager服务
 	 *
 	 * @param resourceID resource ID of the task manager
 	 * @param taskManagerServicesConfiguration task manager configuration

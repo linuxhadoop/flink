@@ -143,6 +143,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Rest endpoint which serves the web frontend REST calls.
  *
+ * 为web前端调用提供服务
+ *
  * @param <T> type of the leader gateway
  */
 public class WebMonitorEndpoint<T extends RestfulGateway> extends RestServerEndpoint implements LeaderContender, JsonArchivist {

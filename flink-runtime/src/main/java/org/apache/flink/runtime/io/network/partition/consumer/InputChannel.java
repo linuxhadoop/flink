@@ -35,7 +35,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * An input channel consumes a single {@link ResultSubpartitionView}.
  *
- * 一个输入通道 消费一个ResultSubpartitionView
+ * 消费一个ResultSubpartitionView的input channel
  *
  * <p>For each channel, the consumption life cycle is as follows:
  * <ol>

@@ -18,10 +18,17 @@
 
 package org.apache.flink.runtime.executiongraph;
 
+/**
+ * 执行边
+ *
+ * 从IntermediateResultPartition消费数据
+ * */
 public class ExecutionEdge {
 
+	// 数据来源
 	private final IntermediateResultPartition source;
 
+	// 目标
 	private final ExecutionVertex target;
 
 	private final int inputNum;

@@ -38,9 +38,13 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * Deployment descriptor for a single input channel instance.
  *
+ * 一个单独input channel实例的部署描述符
+ *
  * <p>Each input channel consumes a single subpartition. The index of the subpartition to consume
  * is part of the {@link InputGateDeploymentDescriptor} as it is the same for each input channel of
  * the respective input gate.
+ *
+ * 每一个input channel消费一个子分区
  *
  * @see InputChannel
  * @see SingleInputGate
@@ -49,10 +53,18 @@ public class InputChannelDeploymentDescriptor implements Serializable {
 
 	private static final long serialVersionUID = 373711381640454080L;
 
-	/** The ID of the partition the input channel is going to consume. */
+	/**
+	 * The ID of the partition the input channel is going to consume.
+	 *
+	 * input channel将要消费的partition的ID
+	 * */
 	private final ResultPartitionID consumedPartitionId;
 
-	/** The location of the partition the input channel is going to consume. */
+	/**
+	 * The location of the partition the input channel is going to consume.
+	 *
+	 * 将要消费的partition的位置。 就是去哪里找这个分区
+	 * */
 	private final ResultPartitionLocation consumedPartitionLocation;
 
 	public InputChannelDeploymentDescriptor(
@@ -82,6 +94,8 @@ public class InputChannelDeploymentDescriptor implements Serializable {
 
 	/**
 	 * Creates an input channel deployment descriptor for each partition.
+	 *
+	 * 为每一个分区创建一个input channel部署描述符
 	 */
 	public static InputChannelDeploymentDescriptor[] fromEdges(
 			ExecutionEdge[] edges,

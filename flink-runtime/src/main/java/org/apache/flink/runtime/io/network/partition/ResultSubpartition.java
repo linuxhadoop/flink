@@ -31,6 +31,8 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
  * A single subpartition of a {@link ResultPartition} instance.
+ *
+ * 一个结果分区中的单个子分区
  */
 public abstract class ResultSubpartition {
 

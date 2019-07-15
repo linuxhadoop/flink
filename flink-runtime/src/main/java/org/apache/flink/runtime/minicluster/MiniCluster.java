@@ -366,6 +366,7 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 					20,
 					Time.milliseconds(20L));
 
+				// 该endpoint中 初始化了JobSubmitHandler,用来处理客户端提交的jobGraph
 				this.dispatcherRestEndpoint = new DispatcherRestEndpoint(
 					RestServerEndpointConfiguration.fromConfiguration(configuration),
 					dispatcherGatewayRetriever,
@@ -644,6 +645,8 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 	 * This method runs a job in blocking mode. The method returns only after the job
 	 * completed successfully, or after it failed terminally.
 	 *
+	 * 以阻塞模式运行一个job
+	 *
 	 * @param job  The Flink job to execute
 	 * @return The result of the job execution
 	 *
@@ -674,6 +677,11 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 		}
 	}
 
+	/**
+	 * 提交job
+	 *
+	 * 实际提交job至Dispatcher
+	 * */
 	public CompletableFuture<JobSubmissionResult> submitJob(JobGraph jobGraph) {
 		final DispatcherGateway dispatcherGateway;
 		try {
@@ -691,6 +699,7 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 
 		final CompletableFuture<Void> jarUploadFuture = uploadAndSetJobFiles(blobServerAddressFuture, jobGraph);
 
+		// Dispatcher#submitJob
 		final CompletableFuture<Acknowledge> acknowledgeCompletableFuture = jarUploadFuture.thenCompose(
 			(Void ack) -> dispatcherGateway.submitJob(jobGraph, rpcTimeout));
 
@@ -813,6 +822,9 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 		return resourceManagerRunner;
 	}
 
+	/**
+	 * 启动taskManager
+	 * */
 	protected TaskExecutor[] startTaskManagers(
 			Configuration configuration,
 			HighAvailabilityServices haServices,
@@ -823,8 +835,11 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 			RpcService[] taskManagerRpcServices) throws Exception {
 
 		final TaskExecutor[] taskExecutors = new TaskExecutor[numTaskManagers];
+
+		// 如果taskManager个数为1, 则为本地通讯
 		final boolean localCommunication = numTaskManagers == 1;
 
+		// 创建新的taskManager并启动
 		for (int i = 0; i < numTaskManagers; i++) {
 			taskExecutors[i] = TaskManagerRunner.startTaskManager(
 				configuration,

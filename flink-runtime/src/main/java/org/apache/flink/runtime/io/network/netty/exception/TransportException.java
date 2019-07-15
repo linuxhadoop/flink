@@ -21,6 +21,9 @@ package org.apache.flink.runtime.io.network.netty.exception;
 import java.io.IOException;
 import java.net.SocketAddress;
 
+/**
+ * 传输异常
+ * */
 public abstract class TransportException extends IOException {
 
 	private static final long serialVersionUID = 3637820720589866570L;

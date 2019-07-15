@@ -333,9 +333,12 @@ public class TaskManagerRunner implements FatalErrorHandler, AutoCloseableAsync 
 	}
 
 	// --------------------------------------------------------------------------------------------
-	//  Static utilities
+	//  Static utilities 静态方法
 	// --------------------------------------------------------------------------------------------
 
+	/**
+	 * 启动taskManager
+	 * */
 	public static TaskExecutor startTaskManager(
 			Configuration configuration,
 			ResourceID resourceID,

@@ -1007,6 +1007,9 @@ public class ExecutionGraph implements AccessExecutionGraph {
 		return currentSchedulingFuture;
 	}
 
+	/**
+	 * 取消job
+	 * */
 	public void cancel() {
 		while (true) {
 			JobStatus current = state;

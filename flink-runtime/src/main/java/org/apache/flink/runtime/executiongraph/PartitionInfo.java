@@ -28,6 +28,8 @@ import java.io.Serializable;
  * Contains information where to find a partition. The partition is defined by the
  * {@link IntermediateDataSetID} and the partition location is specified by
  * {@link InputChannelDeploymentDescriptor}.
+ *
+ * 包含了从哪里可以查找到一个Partition的信息。
  */
 public class PartitionInfo implements Serializable {
 

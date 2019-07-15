@@ -646,9 +646,14 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 	}
 
 	// ----------------------------------------------------------------------
-	// Partition lifecycle RPCs
+	// Partition lifecycle RPCs 分区生命周期rpc
 	// ----------------------------------------------------------------------
 
+	/**
+	 * 更新分区信息
+	 *
+	 * 由Execution#sendUpdatePartitionInfoRpcCall 调用
+	 * */
 	@Override
 	public CompletableFuture<Acknowledge> updatePartitions(
 			final ExecutionAttemptID executionAttemptID,
@@ -725,6 +730,11 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 	// Checkpointing RPCs
 	// ----------------------------------------------------------------------
 
+	/**
+	 * 触发checkpoint
+	 *
+	 * 由Execution#triggerCheckpoint调用
+	 * */
 	@Override
 	public CompletableFuture<Acknowledge> triggerCheckpoint(
 			ExecutionAttemptID executionAttemptID,

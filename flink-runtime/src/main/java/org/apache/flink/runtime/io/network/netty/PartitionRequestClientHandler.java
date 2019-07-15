@@ -237,6 +237,7 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 		final Class<?> msgClazz = msg.getClass();
 
 		// ---- Buffer --------------------------------------------------------
+		// 数据是从PartitionRequestQueue#writeAndFlushNextMessageIfPossible方法中 发送的
 		if (msgClazz == NettyMessage.BufferResponse.class) {
 			NettyMessage.BufferResponse bufferOrEvent = (NettyMessage.BufferResponse) msg;
 

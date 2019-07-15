@@ -385,6 +385,8 @@ public class CheckpointCoordinator {
 	 * Triggers a new standard checkpoint and uses the given timestamp as the checkpoint
 	 * timestamp.
 	 *
+	 * 触发一个新的标准的checkpoint, 使用给定的时间戳作为checkpoint的时间戳
+	 *
 	 * @param timestamp The timestamp for the checkpoint.
 	 * @param isPeriodic Flag indicating whether this triggered checkpoint is
 	 * periodic. If this flag is true, but the periodic scheduler is disabled,
@@ -623,7 +625,7 @@ public class CheckpointCoordinator {
 						props.getCheckpointType(),
 						checkpointStorageLocation.getLocationReference());
 
-				// send the messages to the tasks that trigger their checkpoint
+				// send the messages to the tasks that trigger their checkpoint 给task发送消息, 触发它们进行checkpoint
 				for (Execution execution: executions) {
 					execution.triggerCheckpoint(checkpointID, timestamp, checkpointOptions);
 				}
@@ -1166,16 +1168,17 @@ public class CheckpointCoordinator {
 	}
 
 	// --------------------------------------------------------------------------------------------
-	//  Periodic scheduling of checkpoints
+	//  Periodic scheduling of checkpoints 周期性调度checkpoints
 	// --------------------------------------------------------------------------------------------
 
 	public void startCheckpointScheduler() {
 		synchronized (lock) {
+			// 是否已经关闭
 			if (shutdown) {
 				throw new IllegalArgumentException("Checkpoint coordinator is shut down");
 			}
 
-			// make sure all prior timers are cancelled
+			// make sure all prior timers are cancelled 确保之前所有的time都已取消
 			stopCheckpointScheduler();
 
 			periodicScheduling = true;
@@ -1225,6 +1228,7 @@ public class CheckpointCoordinator {
 
 	// ------------------------------------------------------------------------
 
+	// 调度触发器
 	private final class ScheduledTrigger implements Runnable {
 
 		@Override

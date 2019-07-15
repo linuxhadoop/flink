@@ -25,14 +25,21 @@ import org.apache.flink.runtime.io.network.partition.ResultPartitionProvider;
 
 import java.io.IOException;
 
+/**
+ * 基于netty的连接管理器
+ **/
 public class NettyConnectionManager implements ConnectionManager {
 
+	// 服务器
 	private final NettyServer server;
 
+	// 客户端
 	private final NettyClient client;
 
+	// netty缓冲池
 	private final NettyBufferPool bufferPool;
 
+	// 分区请求客户端 工厂类
 	private final PartitionRequestClientFactory partitionRequestClientFactory;
 
 	public NettyConnectionManager(NettyConfig nettyConfig) {
@@ -43,6 +50,11 @@ public class NettyConnectionManager implements ConnectionManager {
 		this.partitionRequestClientFactory = new PartitionRequestClientFactory(client);
 	}
 
+	/**
+	 * 启动
+	 *
+	 * 初始化 服务端、客户端
+	 * */
 	@Override
 	public void start(ResultPartitionProvider partitionProvider, TaskEventDispatcher taskEventDispatcher) throws IOException {
 		NettyProtocol partitionRequestProtocol = new NettyProtocol(
@@ -54,17 +66,26 @@ public class NettyConnectionManager implements ConnectionManager {
 		server.init(partitionRequestProtocol, bufferPool);
 	}
 
+	/**
+	 * 创建分区请求客户端
+	 * */
 	@Override
 	public PartitionRequestClient createPartitionRequestClient(ConnectionID connectionId)
 			throws IOException, InterruptedException {
 		return partitionRequestClientFactory.createPartitionRequestClient(connectionId);
 	}
 
+	/**
+	 * 关闭打开的channel连接
+	 * */
 	@Override
 	public void closeOpenChannelConnections(ConnectionID connectionId) {
 		partitionRequestClientFactory.closeOpenChannelConnections(connectionId);
 	}
 
+	/**
+	 * 获取有效连接数量
+	 * */
 	@Override
 	public int getNumberOfActiveConnections() {
 		return partitionRequestClientFactory.getNumberOfActiveClients();

@@ -35,6 +35,8 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Factory for {@link PartitionRequestClient} instances.
  *
+ * 分区请求客户端 工厂类
+ *
  * <p>Instances of partition requests clients are shared among several {@link RemoteInputChannel}
  * instances.
  */

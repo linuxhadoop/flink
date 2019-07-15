@@ -158,7 +158,7 @@ public abstract class NettyMessage {
 	}
 
 	// ------------------------------------------------------------------------
-	// Generic NettyMessage encoder and decoder
+	// Generic NettyMessage encoder and decoder 通用netty消息编码、解码器
 	// ------------------------------------------------------------------------
 
 	@ChannelHandler.Sharable
@@ -475,9 +475,10 @@ public abstract class NettyMessage {
 	}
 
 	// ------------------------------------------------------------------------
-	// Client requests
+	// Client requests 客户端请求
 	// ------------------------------------------------------------------------
 
+	// 分区请求
 	static class PartitionRequest extends NettyMessage {
 
 		private static final byte ID = 2;

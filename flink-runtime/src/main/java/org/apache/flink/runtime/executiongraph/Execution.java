@@ -737,11 +737,13 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 		}
 
 		for (ExecutionEdge edge : allConsumers.get(0)) {
+			// 目标
 			final ExecutionVertex consumerVertex = edge.getTarget();
 
 			final Execution consumer = consumerVertex.getCurrentExecutionAttempt();
 			final ExecutionState consumerState = consumer.getState();
 
+			// 数据源
 			final IntermediateResultPartition partition = edge.getSource();
 
 			// ----------------------------------------------------------------
@@ -787,7 +789,7 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 				}
 			}
 			// ----------------------------------------------------------------
-			// Consumer is running => send update message now
+			// Consumer is running => send update message now 如果消费者在运行中, 则发送更新消息
 			// ----------------------------------------------------------------
 			else {
 				if (consumerState == RUNNING) {
@@ -808,12 +810,13 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 
 					final ResultPartitionLocation partitionLocation;
 
+					// 生产者与消费者 在同一台机器上
 					if (consumerTaskManager.equals(partitionTaskManager)) {
 						// Consuming task is deployed to the same instance as the partition => local
 						partitionLocation = ResultPartitionLocation.createLocal();
 					}
 					else {
-						// Different instances => remote
+						// Different instances => remote 不是同一实例, 使用远程通讯
 						final ConnectionID connectionId = new ConnectionID(
 								partitionTaskManagerLocation,
 								partition.getIntermediateResult().getConnectionIndex());
@@ -916,6 +919,8 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 
 	/**
 	 * Trigger a new checkpoint on the task of this execution.
+	 *
+	 * 触发task的checkpoint
 	 *
 	 * @param checkpointId of th checkpoint to trigger
 	 * @param timestamp of the checkpoint to trigger
@@ -1238,6 +1243,8 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 
 	/**
 	 * Update the partition infos on the assigned resource.
+	 *
+	 * 在已分配的资源上 更新分区信息
 	 *
 	 * @param partitionInfos for the remote task
 	 */

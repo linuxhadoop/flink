@@ -161,7 +161,11 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	/** TaskInfo object for this task. */
 	private final TaskInfo taskInfo;
 
-	/** The name of the task, including subtask indexes. */
+	/**
+	 * The name of the task, including subtask indexes.
+	 *
+	 * 任务的名称, 包含子任务的索引
+	 * */
 	private final String taskNameWithSubtask;
 
 	/** The job-wide configuration object. */
@@ -170,13 +174,25 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	/** The task-specific configuration. */
 	private final Configuration taskConfiguration;
 
-	/** The jar files used by this task. */
+	/**
+	 * The jar files used by this task.
+	 *
+	 * 当前task用到的jar文件
+	 * */
 	private final Collection<PermanentBlobKey> requiredJarFiles;
 
-	/** The classpaths used by this task. */
+	/**
+	 * The classpaths used by this task.
+	 *
+	 * 当前task用到的classpath
+	 * */
 	private final Collection<URL> requiredClasspaths;
 
-	/** The name of the class that holds the invokable code. */
+	/**
+	 * The name of the class that holds the invokable code.
+	 *
+	 * 可以被调用的类名。 实际上就是用户的udf(重要)
+	 * */
 	private final String nameOfInvokableClass;
 
 	/** Access to task manager configuration and host names. */
@@ -200,6 +216,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	// 生产数据的 结果分区数组
 	private final ResultPartition[] producedPartitions;
 
+	// 这是一个消费者, 用来消费一个intermediate result的一个或多个分区
 	private final SingleInputGate[] inputGates;
 
 	private final Map<IntermediateDataSetID, SingleInputGate> inputGatesById;
@@ -222,7 +239,11 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	/** The cache for user-defined files that the invokable requires. */
 	private final FileCache fileCache;
 
-	/** The gateway to the network stack, which handles inputs and produced results. */
+	/**
+	 * The gateway to the network stack, which handles inputs and produced results.
+	 *
+	 * 用来处理输入和产生结果
+	 * */
 	private final NetworkEnvironment network;
 
 	/** The registry of this task which enables live reporting of accumulators. */
@@ -240,7 +261,11 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	/** Partition producer state checker to request partition states from. */
 	private final PartitionProducerStateChecker partitionProducerStateChecker;
 
-	/** Executor to run future callbacks. */
+	/**
+	 * Executor to run future callbacks.
+	 *
+	 * 用来执行回调
+	 * */
 	private final Executor executor;
 
 	// ------------------------------------------------------------------------
@@ -636,7 +661,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			// add metrics for buffers
 			this.metrics.getIOMetricGroup().initializeBufferMetrics(this);
 
-			// register detailed network metrics, if configured
+			// register detailed network metrics, if configured 注册详细的网络metrics
 			if (taskManagerConfig.getConfiguration().getBoolean(TaskManagerOptions.NETWORK_DETAILED_METRICS)) {
 				// similar to MetricUtils.instantiateNetworkMetrics() but inside this IOMetricGroup
 				MetricGroup networkGroup = this.metrics.getIOMetricGroup().addGroup("Network");
@@ -716,14 +741,15 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			this.invokable = invokable;
 
 			// switch to the RUNNING state, if that fails, we have been canceled/failed in the meantime
+			// 状态转换 部署->运行
 			if (!transitionState(ExecutionState.DEPLOYING, ExecutionState.RUNNING)) {
 				throw new CancelTaskException();
 			}
 
-			// notify everyone that we switched to running
+			// notify everyone that we switched to running 通知所有的taskManager, 已经切换到运行状态了
 			taskManagerActions.updateTaskExecutionState(new TaskExecutionState(jobId, executionId, ExecutionState.RUNNING));
 
-			// make sure the user code classloader is accessible thread-locally
+			// make sure the user code classloader is accessible thread-locally 确保用户代码类加载器可以被本地线程访问
 			executingThread.setContextClassLoader(userCodeClassLoader);
 
 			// run the invokable  真正调用用户方法的入口
@@ -746,8 +772,8 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 				}
 			}
 
-			// try to mark the task as finished
-			// if that fails, the task was canceled/failed in the meantime
+			// try to mark the task as finished 尝试将task标记为finished
+			// if that fails, the task was canceled/failed in the meantime 如果失败, task则为canceled/faliled
 			if (!transitionState(ExecutionState.RUNNING, ExecutionState.FINISHED)) {
 				throw new CancelTaskException();
 			}
