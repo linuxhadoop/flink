@@ -53,16 +53,21 @@ import java.util.concurrent.atomic.AtomicReference;
  * Channel handler to read the messages of buffer response or error response from the
  * producer.
  *
+ * 从生产者读取buffer响应信息或错误信息
+ *
  * <p>It is used in the old network mode.
  */
 class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter implements NetworkClientHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PartitionRequestClientHandler.class);
 
+	// inputChannel集合, 用来保存于其他机器通讯的RemoteInputChannel
 	private final ConcurrentMap<InputChannelID, RemoteInputChannel> inputChannels = new ConcurrentHashMap<InputChannelID, RemoteInputChannel>();
 
+	// channel错误
 	private final AtomicReference<Throwable> channelError = new AtomicReference<Throwable>();
 
+	// buffer监听器
 	private final BufferListenerTask bufferListener = new BufferListenerTask();
 
 	private final Queue<Object> stagedMessages = new ArrayDeque<Object>();
@@ -72,9 +77,12 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 	/**
 	 * Set of cancelled partition requests. A request is cancelled iff an input channel is cleared
 	 * while data is still coming in for this channel.
+	 *
+	 * 已取消的分区请求的集合
 	 */
 	private final ConcurrentMap<InputChannelID, InputChannelID> cancelled = Maps.newConcurrentMap();
 
+	// channelHandler上线文
 	private volatile ChannelHandlerContext ctx;
 
 	// ------------------------------------------------------------------------
@@ -109,7 +117,7 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 	}
 
 	// ------------------------------------------------------------------------
-	// Network events
+	// Network events 网络事件
 	// ------------------------------------------------------------------------
 
 	@Override
@@ -173,10 +181,14 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 		}
 	}
 
+	/**
+	 * 从PartitionRequestQueue#writeAndFlushNextMessageIfPossible发送的数据
+	 * */
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		try {
 			if (!bufferListener.hasStagedBufferOrEvent() && stagedMessages.isEmpty()) {
+				// 消息处理
 				decodeMsg(msg, false);
 			}
 			else {
@@ -285,6 +297,9 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 		return true;
 	}
 
+	/**
+	 * 解码buffer或event
+	 * */
 	private boolean decodeBufferOrEvent(RemoteInputChannel inputChannel, NettyMessage.BufferResponse bufferOrEvent, boolean isStagedBuffer) throws Throwable {
 		boolean releaseNettyBuffer = true;
 
@@ -310,9 +325,11 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 				}
 
 				while (true) {
+					// 直接从provider返回一个buffer实例
 					Buffer buffer = bufferProvider.requestBuffer();
 
 					if (buffer != null) {
+						// 将接收到的数据写入buffer
 						nettyBuffer.readBytes(buffer.asByteBuf(), receivedSize);
 
 						inputChannel.onBuffer(buffer, bufferOrEvent.sequenceNumber, -1);

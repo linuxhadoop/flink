@@ -22,6 +22,8 @@ import org.apache.flink.util.AbstractID;
 
 /**
  * A class for statistically unique operator IDs.
+ *
+ * 算子ID
  */
 public class OperatorID extends AbstractID {
 

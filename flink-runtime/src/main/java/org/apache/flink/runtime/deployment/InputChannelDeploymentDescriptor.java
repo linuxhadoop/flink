@@ -104,32 +104,43 @@ public class InputChannelDeploymentDescriptor implements Serializable {
 
 		final InputChannelDeploymentDescriptor[] icdd = new InputChannelDeploymentDescriptor[edges.length];
 
-		// Each edge is connected to a different result partition
+		// Each edge is connected to a different result partition 每一条边连接到不同的结果分区
 		for (int i = 0; i < edges.length; i++) {
+			// edge的源头, 表示需要消费的分区数据
 			final IntermediateResultPartition consumedPartition = edges[i].getSource();
+
+			// 数据的生产者
 			final Execution producer = consumedPartition.getProducer().getCurrentExecutionAttempt();
 
+			// 生产者的状态
 			final ExecutionState producerState = producer.getState();
+
+			// 生产者分配的资源
 			final LogicalSlot producerSlot = producer.getAssignedResource();
 
+			// 分区数据所在的位置
 			final ResultPartitionLocation partitionLocation;
 
 			// The producing task needs to be RUNNING or already FINISHED
+			// 生产者的任务需要是RUNNING或者FINISHED状态
+			// 当前分区数据是否可以消费, 自否已经分配资源...
 			if (consumedPartition.isConsumable() && producerSlot != null &&
 					(producerState == ExecutionState.RUNNING ||
 						producerState == ExecutionState.FINISHED ||
 						producerState == ExecutionState.SCHEDULED ||
 						producerState == ExecutionState.DEPLOYING)) {
 
+				// 获取分区数据所在的taskManager位置
 				final TaskManagerLocation partitionTaskManagerLocation = producerSlot.getTaskManagerLocation();
 				final ResourceID partitionTaskManager = partitionTaskManagerLocation.getResourceID();
 
+				// 两者相等,说明在同一台机器上。 LocationType为LOCAL
 				if (partitionTaskManager.equals(consumerResourceId)) {
 					// Consuming task is deployed to the same TaskManager as the partition => local
 					partitionLocation = ResultPartitionLocation.createLocal();
 				}
 				else {
-					// Different instances => remote
+					// Different instances => remote 否则创建远程类型的ResultPartitionLocation
 					final ConnectionID connectionId = new ConnectionID(
 							partitionTaskManagerLocation,
 							consumedPartition.getIntermediateResult().getConnectionIndex());
@@ -138,7 +149,7 @@ public class InputChannelDeploymentDescriptor implements Serializable {
 				}
 			}
 			else if (allowLazyDeployment) {
-				// The producing task might not have registered the partition yet
+				// The producing task might not have registered the partition yet 生产任务或许还未在分区上进行注册
 				partitionLocation = ResultPartitionLocation.createUnknown();
 			}
 			else if (producerState == ExecutionState.CANCELING
@@ -157,9 +168,11 @@ public class InputChannelDeploymentDescriptor implements Serializable {
 				throw new ExecutionGraphException(msg);
 			}
 
+			// ResultPartitionID = 要消费分区的ID + 生产该分区的子任务ID
 			final ResultPartitionID consumedPartitionId = new ResultPartitionID(
 					consumedPartition.getPartitionId(), producer.getAttemptId());
 
+			// 生成InputChannel描述符(从哪个taskManager上消费哪个分区)
 			icdd[i] = new InputChannelDeploymentDescriptor(
 					consumedPartitionId, partitionLocation);
 		}

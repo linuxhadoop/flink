@@ -68,6 +68,9 @@ public class ResultPartitionManager implements ResultPartitionProvider {
 		}
 	}
 
+	/**
+	 * 创建子分区View
+	 * */
 	@Override
 	public ResultSubpartitionView createSubpartitionView(
 			ResultPartitionID partitionId,

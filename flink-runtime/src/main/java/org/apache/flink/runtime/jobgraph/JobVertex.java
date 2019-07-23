@@ -137,7 +137,7 @@ public class JobVertex implements java.io.Serializable {
 	/** The name of the vertex. This will be shown in runtime logs and will be in the runtime environment
 	 *
 	 * 	顶点的名称
-	 * 	会出现在运行时日志 与 环境中
+	 * 	会出现在运行时日志 与 运行时环境中
 	 * */
 	private String name;
 

@@ -22,6 +22,8 @@ import org.apache.flink.runtime.executiongraph.ExecutionAttemptID;
 
 /**
  * Interface for the communication of the {@link Task} with the {@link TaskManager}.
+ *
+ * task与taskManager通讯的接口
  */
 public interface TaskManagerActions {
 
@@ -43,6 +45,8 @@ public interface TaskManagerActions {
 
 	/**
 	 * Notifies the task manager about the task execution state update.
+	 *
+	 * 通知taskManager 更新任务执行状态
 	 *
 	 * @param taskExecutionState Task execution state update
 	 */

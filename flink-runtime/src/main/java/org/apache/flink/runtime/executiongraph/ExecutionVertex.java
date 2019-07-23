@@ -76,6 +76,11 @@ import static org.apache.flink.runtime.execution.ExecutionState.FINISHED;
 /**
  * The ExecutionVertex is a parallel subtask of the execution. It may be executed once, or several times, each of
  * which time it spawns an {@link Execution}.
+ *
+ * 用来表示一个execution的并行子任务。
+ * 可能会被执行一次或多次, 每次执行都会生成一个Execution
+ *
+ * 该类对应一个子任务
  */
 public class ExecutionVertex implements AccessExecutionVertex, Archiveable<ArchivedExecutionVertex> {
 
@@ -85,30 +90,44 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 
 	// --------------------------------------------------------------------------------------------
 
+	// 所属的ExecutionJobVertex
 	private final ExecutionJobVertex jobVertex;
 
+	// 结果分区
 	private final Map<IntermediateResultPartitionID, IntermediateResultPartition> resultPartitions;
 
+	// 输入边二维数组
 	private final ExecutionEdge[][] inputEdges;
 
+	// 子任务的索引值
 	private final int subTaskIndex;
 
 	private final EvictingBoundedList<ArchivedExecution> priorExecutions;
 
 	private final Time timeout;
 
-	/** The name in the format "myTask (2/7)", cached to avoid frequent string concatenations. */
+	/**
+	 * The name in the format "myTask (2/7)", cached to avoid frequent string concatenations.
+	 *
+	 * 任务名称, 其中包含了子任务的索引值
+	 * */
 	private final String taskNameWithSubtask;
 
 	private volatile CoLocationConstraint locationConstraint;
 
-	/** The current or latest execution attempt of this vertex's task. */
-	private volatile Execution currentExecution;	// this field must never be null
+	/**
+	 * The current or latest execution attempt of this vertex's task.
+	 *
+	 * 当前顶点的任务
+	 * */
+	private volatile Execution currentExecution;	// this field must never be null 不能为空
 
 	// --------------------------------------------------------------------------------------------
 
 	/**
 	 * Convenience constructor for tests. Sets various fields to default values.
+	 *
+	 * 用于测试。 各值都为默认值
 	 */
 	@VisibleForTesting
 	ExecutionVertex(
@@ -153,6 +172,7 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 		this.taskNameWithSubtask = String.format("%s (%d/%d)",
 				jobVertex.getJobVertex().getName(), subTaskIndex + 1, jobVertex.getParallelism());
 
+		// 结果分区集合
 		this.resultPartitions = new LinkedHashMap<>(producedDataSets.length, 1);
 
 		for (IntermediateResult result : producedDataSets) {
@@ -772,36 +792,42 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 			@Nullable JobManagerTaskRestore taskRestore,
 			int attemptNumber) throws ExecutionGraphException {
 
-		// Produced intermediate results
+		// Produced intermediate results 生成的中间结果分区
 		List<ResultPartitionDeploymentDescriptor> producedPartitions = new ArrayList<>(resultPartitions.size());
 
-		// Consumed intermediate results
+		// Consumed intermediate results 消费的中间结果分区
 		List<InputGateDeploymentDescriptor> consumedPartitions = new ArrayList<>(inputEdges.length);
 
 		boolean lazyScheduling = getExecutionGraph().getScheduleMode().allowLazyDeployment();
 
 		for (IntermediateResultPartition partition : resultPartitions.values()) {
-
+			// 分区消费者
 			List<List<ExecutionEdge>> consumers = partition.getConsumers();
 
+			// 消费者为空
 			if (consumers.isEmpty()) {
 				//TODO this case only exists for test, currently there has to be exactly one consumer in real jobs!
+				// 只能用于测试, 因为真实情况下肯定有消费者
 				producedPartitions.add(ResultPartitionDeploymentDescriptor.from(
 						partition,
 						KeyGroupRangeAssignment.UPPER_BOUND_MAX_PARALLELISM,
 						lazyScheduling));
 			} else {
+				// 判断消费者的个数, 目前只支持1个
 				Preconditions.checkState(1 == consumers.size(),
 						"Only one consumer supported in the current implementation! Found: " + consumers.size());
 
 				List<ExecutionEdge> consumer = consumers.get(0);
 				ExecutionJobVertex vertex = consumer.get(0).getTarget().getJobVertex();
 				int maxParallelism = vertex.getMaxParallelism();
+
+				// 生成结果分区描述符(从哪个分区来的, 并行度是多少)
 				producedPartitions.add(ResultPartitionDeploymentDescriptor.from(partition, maxParallelism, lazyScheduling));
 			}
 		}
 
 		for (ExecutionEdge[] edges : inputEdges) {
+			// 为每一个分区创建一个input channel部署描述符(从哪个TaskManager消费哪个分区的数据)
 			InputChannelDeploymentDescriptor[] partitions = InputChannelDeploymentDescriptor.fromEdges(
 				edges,
 				targetSlot.getTaskManagerLocation().getResourceID(),

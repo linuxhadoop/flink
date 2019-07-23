@@ -25,11 +25,15 @@ import java.io.IOException;
 
 /**
  * Interface for turning sequences of memory segments into records.
+ *
+ * 将memory segment中的数据反序列化
  */
 public interface RecordDeserializer<T extends IOReadableWritable> {
 
 	/**
 	 * Status of the deserialization result.
+	 *
+	 * 反序列化结果的状态
 	 */
 	enum DeserializationResult {
 		PARTIAL_RECORD(false, true),

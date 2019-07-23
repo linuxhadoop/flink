@@ -612,6 +612,7 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 			// null taskRestore to let it be GC'ed
 			taskRestore = null;
 
+			// 获取taskManager网关
 			final TaskManagerGateway taskManagerGateway = slot.getTaskManagerGateway();
 
 			// 通过taskManagerGateway将task desc提交至taskManager
@@ -723,6 +724,8 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 	}
 
 	/**
+	 * 该函数由Execution#markFinished调用
+	 *
 	 * 上游ResultPartition生产完成数据后,会通知下游来消费数据。
 	 * 上游ResultPartition -> jobManager -> ExecutionGraph#scheduleOrUpdateConsumers -> ExecutionVertex#scheduleOrUpdateConsumers
 	 * */
@@ -741,6 +744,8 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 			final ExecutionVertex consumerVertex = edge.getTarget();
 
 			final Execution consumer = consumerVertex.getCurrentExecutionAttempt();
+
+			// 获取消费者的状态
 			final ExecutionState consumerState = consumer.getState();
 
 			// 数据源
@@ -800,8 +805,10 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 						continue;
 					}
 
+					// 分区生产者的位置
 					final TaskManagerLocation partitionTaskManagerLocation = partition.getProducer()
 							.getCurrentAssignedResource().getTaskManagerLocation();
+
 					final ResourceID partitionTaskManager = partitionTaskManagerLocation.getResourceID();
 
 					final ResourceID consumerTaskManager = consumerSlot.getTaskManagerLocation().getResourceID();
@@ -824,6 +831,7 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 						partitionLocation = ResultPartitionLocation.createRemote(connectionId);
 					}
 
+					// inputChannel描述符, 告知消费者去哪里消费数据
 					final InputChannelDeploymentDescriptor descriptor = new InputChannelDeploymentDescriptor(
 							partitionId, partitionLocation);
 
@@ -970,14 +978,17 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 
 			if (current == RUNNING || current == DEPLOYING) {
 
+				// task执行完成
 				if (transitionState(current, FINISHED)) {
 					try {
+						// 所有已经完成的分区
 						for (IntermediateResultPartition finishedPartition
 								: getVertex().finishAllBlockingPartitions()) {
 
 							IntermediateResultPartition[] allPartitions = finishedPartition
 									.getIntermediateResult().getPartitions();
 
+							// 通知已完成分区的消费者 可以开饭了
 							for (IntermediateResultPartition partition : allPartitions) {
 								scheduleOrUpdateConsumers(partition.getConsumers());
 							}
@@ -1257,6 +1268,7 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 			final TaskManagerGateway taskManagerGateway = slot.getTaskManagerGateway();
 			final TaskManagerLocation taskManagerLocation = slot.getTaskManagerLocation();
 
+			// 更新分区信息
 			CompletableFuture<Acknowledge> updatePartitionsResultFuture = taskManagerGateway.updatePartitions(attemptId, partitionInfos, rpcTimeout);
 
 			updatePartitionsResultFuture.whenCompleteAsync(

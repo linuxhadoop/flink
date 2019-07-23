@@ -146,9 +146,11 @@ public class ExecutionGraphBuilder {
 		final String jobName = jobGraph.getName();
 		final JobID jobId = jobGraph.getJobID();
 
+		// Failover策略工厂
 		final FailoverStrategy.Factory failoverStrategy =
 				FailoverStrategyLoader.loadFailoverStrategy(jobManagerConfig, log);
 
+		// job信息
 		final JobInformation jobInformation = new JobInformation(
 			jobId,
 			jobName,
@@ -157,9 +159,10 @@ public class ExecutionGraphBuilder {
 			jobGraph.getUserJarBlobKeys(),
 			jobGraph.getClasspaths());
 
-		// create a new execution graph, if none exists so far
+		// create a new execution graph, if none exists so far 如果当前不存在,则创建一个新的执行图
 		final ExecutionGraph executionGraph;
 		try {
+			// 创建执行图,初始化内部变量
 			executionGraph = (prior != null) ? prior :
 				new ExecutionGraph(
 					jobInformation,
@@ -176,8 +179,9 @@ public class ExecutionGraphBuilder {
 			throw new JobException("Could not create the ExecutionGraph.", e);
 		}
 
-		// set the basic properties
+		// set the basic properties 设置基本属性
 
+		// 设置调度模式
 		executionGraph.setScheduleMode(jobGraph.getScheduleMode());
 		executionGraph.setQueuedSchedulingAllowed(jobGraph.getAllowQueuedScheduling());
 
@@ -197,12 +201,14 @@ public class ExecutionGraphBuilder {
 		log.info("Running initialization on master for job {} ({}).", jobName, jobId);
 
 		for (JobVertex vertex : jobGraph.getVertices()) {
+			// 真正要执行的用户类
 			String executableClass = vertex.getInvokableClassName();
 			if (executableClass == null || executableClass.isEmpty()) {
 				throw new JobSubmissionException(jobId,
 						"The vertex " + vertex.getID() + " (" + vertex.getName() + ") has no invokable class.");
 			}
 
+			// 顶点的并行度是否等于Integer.MAX_VALUE
 			if (vertex.getParallelism() == ExecutionConfig.PARALLELISM_AUTO_MAX) {
 				if (parallelismForAutoMax < 0) {
 					throw new JobSubmissionException(

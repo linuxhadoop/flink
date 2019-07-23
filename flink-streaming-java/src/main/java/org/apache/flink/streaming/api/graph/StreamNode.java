@@ -67,9 +67,13 @@ public class StreamNode implements Serializable {
 	private TypeSerializer<?> typeSerializerIn2;
 	private TypeSerializer<?> typeSerializerOut;
 
+	// 入边
 	private List<StreamEdge> inEdges = new ArrayList<StreamEdge>();
+
+	// 出边
 	private List<StreamEdge> outEdges = new ArrayList<StreamEdge>();
 
+	// 任务中真正要执行的用户类
 	private final Class<? extends AbstractInvokable> jobVertexClass;
 
 	private InputFormat<?, ?> inputFormat;

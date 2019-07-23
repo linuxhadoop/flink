@@ -22,10 +22,15 @@ import java.util.Objects;
 
 /**
  * An ID for physical instance of the operator.
+ *
+ * 算子实例ID, 用于物理执行图中
  */
 public class OperatorInstanceID  {
 
+	// 子任务ID
 	private final int subtaskId;
+
+	// 算子ID
 	private final OperatorID operatorId;
 
 	public static OperatorInstanceID of(int subtaskId, OperatorID operatorID) {

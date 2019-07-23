@@ -43,7 +43,10 @@ public enum ResultPartitionType {
 	/** Can the partition be consumed while being produced? */
 	private final boolean isPipelined;
 
-	/** Does the partition produce back pressure when not consumed? */
+	/** Does the partition produce back pressure when not consumed?
+	 *
+	 * 当分区中数据未被消费时, 是否会产生反压
+	 * */
 	private final boolean hasBackPressure;
 
 	/** Does this partition use a limited number of (network) buffers? */

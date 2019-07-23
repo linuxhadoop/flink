@@ -117,6 +117,9 @@ import static org.apache.flink.util.Preconditions.checkState;
  * execution of a data flow. It keeps representations of each parallel task, each
  * intermediate stream, and the communication between them.
  *
+ * 执行图是一个数据流中用来协调分布式执行的核心数据结构。
+ * 它保存了每一个并行的任务、中间流 以及他们中间的通讯
+ *
  * <p>The execution graph consists of the following constructs:
  * <ul>
  *     <li>The {@link ExecutionJobVertex} represents one vertex from the JobGraph (usually one operation like

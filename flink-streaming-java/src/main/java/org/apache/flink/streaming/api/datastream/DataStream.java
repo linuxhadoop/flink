@@ -613,6 +613,7 @@ public class DataStream<T> {
 	 */
 	public <R> SingleOutputStreamOperator<R> flatMap(FlatMapFunction<T, R> flatMapper) {
 
+		// 使用反射拿到了flatMap算子的输出类型
 		TypeInformation<R> outType = TypeExtractor.getFlatMapReturnTypes(clean(flatMapper),
 				getType(), Utils.getCallLocationName(), true);
 

@@ -49,7 +49,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * <p>This client is shared by all remote input channels, which request a partition
  * from the same {@link ConnectionID}.
  *
- * 该client被所有远程input channel共享
+ * 该客户端被所有远程input channel共享, 它请求一个来自相同ConnectionID的分区
  */
 public class PartitionRequestClient {
 
@@ -113,9 +113,11 @@ public class PartitionRequestClient {
 
 		clientHandler.addInputChannel(inputChannel);
 
+		// 分区请求对象, 由客户端发送
 		final PartitionRequest request = new PartitionRequest(
 				partitionId, subpartitionIndex, inputChannel.getInputChannelId(), inputChannel.getInitialCredit());
 
+		// ChannelFuture监听器。那么在消息发送完成后会进行回调，比如处理关闭连接、错误处理等
 		final ChannelFutureListener listener = new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
@@ -131,12 +133,16 @@ public class PartitionRequestClient {
 			}
 		};
 
+		// 无需等待,立即发送请求
 		if (delayMs == 0) {
 			ChannelFuture f = tcpChannel.writeAndFlush(request);
 			f.addListener(listener);
 			return f;
 		} else {
+			// 延迟发送请求
 			final ChannelFuture[] f = new ChannelFuture[1];
+
+			// 将请求通过tcpChannel发送出去。 消费发送到了PartitionRequestServerHandler#channelRead0
 			tcpChannel.eventLoop().schedule(new Runnable() {
 				@Override
 				public void run() {
@@ -152,7 +158,7 @@ public class PartitionRequestClient {
 	/**
 	 * Sends a task event backwards to an intermediate result partition producer.
 	 *
-	 * 发送一个任务事件 至 intermediate result分区生产者
+	 * 发送一个任务事件至intermediate result分区生产者
 	 *
 	 * <p>
 	 * Backwards task events flow between readers and writers and therefore

@@ -60,13 +60,16 @@ public class NetworkEnvironment {
 
 	private final Object lock = new Object();
 
+	// 网络缓冲池
 	private final NetworkBufferPool networkBufferPool;
 
+	// 连接管理器
 	private final ConnectionManager connectionManager;
 
 	// 结果分区管理器
 	private final ResultPartitionManager resultPartitionManager;
 
+	// 任务事件分发器
 	private final TaskEventDispatcher taskEventDispatcher;
 
 	/** Server for {@link InternalKvState} requests. */
@@ -78,6 +81,7 @@ public class NetworkEnvironment {
 	/** Registry for {@link InternalKvState} instances. */
 	private final KvStateRegistry kvStateRegistry;
 
+	// IO模式(同步、异步)
 	private final IOManager.IOMode defaultIOMode;
 
 	private final int partitionRequestInitialBackoff;
@@ -211,6 +215,8 @@ public class NetworkEnvironment {
 	// --------------------------------------------------------------------------------------------
 
 	public void registerTask(Task task) throws IOException {
+
+		// 当前任务的结果分区数组
 		final ResultPartition[] producedPartitions = task.getProducedPartitions();
 
 		synchronized (lock) {
@@ -235,6 +241,7 @@ public class NetworkEnvironment {
 		BufferPool bufferPool = null;
 
 		try {
+			// memorySegment的最大数量
 			int maxNumberOfMemorySegments = partition.getPartitionType().isBounded() ?
 				partition.getNumberOfSubpartitions() * networkBuffersPerChannel +
 					extraNetworkBuffersPerGate : Integer.MAX_VALUE;

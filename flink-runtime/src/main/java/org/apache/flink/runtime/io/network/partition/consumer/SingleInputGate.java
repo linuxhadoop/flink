@@ -159,6 +159,8 @@ public class SingleInputGate implements InputGate {
 	/**
 	 * Input channels. There is a one input channel for each consumed intermediate result partition.
 	 * We store this in a map for runtime updates of single channels.
+	 *
+	 * 对于每一个消费的intermediate结果分区 都有一个inputChannel
 	 */
 	private final Map<IntermediateResultPartitionID, InputChannel> inputChannels;
 
@@ -358,6 +360,9 @@ public class SingleInputGate implements InputGate {
 		}
 	}
 
+	/**
+	 * 更新inputChannel,开始请求分区数据
+	 * */
 	public void updateInputChannel(InputChannelDeploymentDescriptor icdd) throws IOException, InterruptedException {
 		synchronized (requestLock) {
 			if (isReleased) {
@@ -398,6 +403,7 @@ public class SingleInputGate implements InputGate {
 
 				inputChannels.put(partitionId, newChannel);
 
+				// 请求分区数据
 				if (requestedPartitionsFlag) {
 					newChannel.requestSubpartition(consumedSubpartitionIndex);
 				}
@@ -427,10 +433,12 @@ public class SingleInputGate implements InputGate {
 
 				LOG.debug("{}: Retriggering partition request {}:{}.", owningTaskName, ch.partitionId, consumedSubpartitionIndex);
 
+				// 远程inputChannel
 				if (ch.getClass() == RemoteInputChannel.class) {
 					final RemoteInputChannel rch = (RemoteInputChannel) ch;
 					rch.retriggerSubpartitionRequest(consumedSubpartitionIndex);
 				}
+				// 本地inputChannel
 				else if (ch.getClass() == LocalInputChannel.class) {
 					final LocalInputChannel ich = (LocalInputChannel) ch;
 
@@ -684,6 +692,8 @@ public class SingleInputGate implements InputGate {
 
 	/**
 	 * Creates an input gate and all of its input channels.
+	 *
+	 * 创建一个inputGate 以及它或包含的input channel
 	 */
 	public static SingleInputGate create(
 		String owningTaskName,
@@ -707,6 +717,7 @@ public class SingleInputGate implements InputGate {
 			icdd.length, taskActions, metrics, networkEnvironment.isCreditBased());
 
 		// Create the input channels. There is one input channel for each consumed partition.
+		// 创建一个input channel。每一个消费分区对应一个input channel
 		final InputChannel[] inputChannels = new InputChannel[icdd.length];
 
 		int numLocalChannels = 0;
@@ -717,6 +728,7 @@ public class SingleInputGate implements InputGate {
 			final ResultPartitionID partitionId = icdd[i].getConsumedPartitionId();
 			final ResultPartitionLocation partitionLocation = icdd[i].getConsumedPartitionLocation();
 
+			// 创建本地inputChannel
 			if (partitionLocation.isLocal()) {
 				inputChannels[i] = new LocalInputChannel(inputGate, i, partitionId,
 					networkEnvironment.getResultPartitionManager(),
@@ -728,6 +740,7 @@ public class SingleInputGate implements InputGate {
 
 				numLocalChannels++;
 			}
+			// 远程inputChannel
 			else if (partitionLocation.isRemote()) {
 				inputChannels[i] = new RemoteInputChannel(inputGate, i, partitionId,
 					partitionLocation.getConnectionId(),

@@ -51,7 +51,11 @@ public class LocalInputChannel extends InputChannel implements BufferAvailabilit
 
 	private final Object requestLock = new Object();
 
-	/** The local partition manager. */
+	/**
+	 * The local partition manager.
+	 *
+	 * 本地结果分区管理器 用来追踪 一个taskManager的所有当前生产/消费分区
+	 * */
 	private final ResultPartitionManager partitionManager;
 
 	/** Task event dispatcher for backwards events. */
@@ -94,7 +98,7 @@ public class LocalInputChannel extends InputChannel implements BufferAvailabilit
 	// Consume 消费
 	// ------------------------------------------------------------------------
 
-	// 请求子分区
+	// 请求子分区数据
 	@Override
 	void requestSubpartition(int subpartitionIndex) throws IOException, InterruptedException {
 
@@ -104,6 +108,7 @@ public class LocalInputChannel extends InputChannel implements BufferAvailabilit
 		synchronized (requestLock) {
 			checkState(!isReleased, "LocalInputChannel has been released already");
 
+			// 请求哪个分区的哪个子分区
 			if (subpartitionView == null) {
 				LOG.debug("{}: Requesting LOCAL subpartition {} of partition {}.",
 					this, subpartitionIndex, partitionId);
@@ -116,7 +121,7 @@ public class LocalInputChannel extends InputChannel implements BufferAvailabilit
 						throw new IOException("Error requesting subpartition.");
 					}
 
-					// make the subpartition view visible
+					// make the subpartition view visible 是自分区view可见
 					this.subpartitionView = subpartitionView;
 
 					// check if the channel was released in the meantime

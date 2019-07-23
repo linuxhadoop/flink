@@ -57,6 +57,13 @@ public class NettyConnectionManager implements ConnectionManager {
 	 * */
 	@Override
 	public void start(ResultPartitionProvider partitionProvider, TaskEventDispatcher taskEventDispatcher) throws IOException {
+
+		/**
+		 * 定义服务器与客户端channel handler.
+		 *
+		 * partitionProvider就是一个ResultPartitionManager
+		 * client.getConfig().isCreditBasedEnabled() 是否是credit-based
+		 * */
 		NettyProtocol partitionRequestProtocol = new NettyProtocol(
 			partitionProvider,
 			taskEventDispatcher,

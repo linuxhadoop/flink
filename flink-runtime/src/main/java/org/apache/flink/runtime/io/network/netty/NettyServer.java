@@ -64,6 +64,9 @@ class NettyServer {
 		localAddress = null;
 	}
 
+	/**
+	 * 初始化服务端
+	 * */
 	void init(final NettyProtocol protocol, NettyBufferPool nettyBufferPool) throws IOException {
 		checkState(bootstrap == null, "Netty server has already been initialized.");
 
@@ -99,7 +102,7 @@ class NettyServer {
 		// Configuration
 		// --------------------------------------------------------------------
 
-		// Server bind address
+		// Server bind address 服务端地址绑定
 		bootstrap.localAddress(config.getServerAddress(), config.getServerPort());
 
 		// Pooled allocators for Netty's ByteBuf instances
@@ -110,7 +113,7 @@ class NettyServer {
 			bootstrap.option(ChannelOption.SO_BACKLOG, config.getServerConnectBacklog());
 		}
 
-		// Receive and send buffer size
+		// Receive and send buffer size 接收与发送buffer大小
 		int receiveAndSendBufferSize = config.getSendAndReceiveBufferSize();
 		if (receiveAndSendBufferSize > 0) {
 			bootstrap.childOption(ChannelOption.SO_SNDBUF, receiveAndSendBufferSize);
@@ -150,6 +153,7 @@ class NettyServer {
 					channel.pipeline().addLast("ssl", sslHandlerFactory.createNettySSLHandler());
 				}
 
+				// 在pipeline中添加ServerChannelHandler
 				channel.pipeline().addLast(protocol.getServerChannelHandlers());
 			}
 		});

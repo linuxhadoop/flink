@@ -137,7 +137,7 @@ public class StreamingJobGraphGenerator {
 
 	private JobGraph createJobGraph() {
 
-		// make sure that all vertices start immediately
+		// make sure that all vertices start immediately 确保所有节点立即启动
 		jobGraph.setScheduleMode(ScheduleMode.EAGER);
 
 		// Generate deterministic hashes for the nodes in order to identify them across

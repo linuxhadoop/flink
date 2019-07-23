@@ -22,22 +22,38 @@ import org.apache.flink.annotation.Internal;
 /**
  * One value in a data stream. This stores the value and an optional associated timestamp.
  *
+ * 数据流中的一个值。
+ * 存储了值与一个时间戳(可选)
+ *
  * @param <T> The type encapsulated with the stream record.
  */
 @Internal
 public final class StreamRecord<T> extends StreamElement {
 
-	/** The actual value held by this record. */
+	/**
+	 * The actual value held by this record.
+	 *
+	 * 当前记录包含的真实值
+	 * */
 	private T value;
 
-	/** The timestamp of the record. */
+	/**
+	 * The timestamp of the record.
+	 *
+	 * 记录的时间戳
+	 * */
 	private long timestamp;
 
-	/** Flag whether the timestamp is actually set. */
+	/** Flag whether the timestamp is actually set.
+	 *
+	 * 时间戳是否被赋值
+	 * */
 	private boolean hasTimestamp;
 
 	/**
 	 * Creates a new StreamRecord. The record does not have a timestamp.
+	 *
+	 * 创建一个不包含时间戳的StreamRecord
 	 */
 	public StreamRecord(T value) {
 		this.value = value;
@@ -46,6 +62,8 @@ public final class StreamRecord<T> extends StreamElement {
 	/**
 	 * Creates a new StreamRecord wrapping the given value. The timestamp is set to the
 	 * given timestamp.
+	 *
+	 * 根据给定的value与时间戳,创建一个新的StreamRecord
 	 *
 	 * @param value The value to wrap in this {@link StreamRecord}
 	 * @param timestamp The timestamp in milliseconds

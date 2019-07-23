@@ -170,7 +170,7 @@ public class RemoteInputChannel extends InputChannel implements BufferRecycler, 
 	@Override
 	public void requestSubpartition(int subpartitionIndex) throws IOException, InterruptedException {
 		if (partitionRequestClient == null) {
-			// Create a client and request the partition
+			// Create a client and request the partition 创建一个远程分区请求客户端
 			partitionRequestClient = connectionManager
 				.createPartitionRequestClient(connectionId);
 
@@ -506,6 +506,10 @@ public class RemoteInputChannel extends InputChannel implements BufferRecycler, 
 		}
 	}
 
+	/**
+	 * 接收到了数据
+	 * 数据已经从Netty Buffer转换为了Flink Buffer
+	 * */
 	public void onBuffer(Buffer buffer, int sequenceNumber, int backlog) throws IOException {
 		boolean recycleBuffer = true;
 

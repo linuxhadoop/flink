@@ -77,6 +77,9 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
 		super.channelRegistered(ctx);
 	}
 
+	/**
+	 * 通知reader有数据
+	 * */
 	void notifyReaderNonEmpty(final NetworkSequenceViewReader reader) {
 		// The notification might come from the same thread. For the initial writes this
 		// might happen before the reader has set its reference to the view, because
@@ -87,6 +90,8 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
 		// TODO This could potentially have a bad performance impact as in the
 		// worst case (network consumes faster than the producer) each buffer
 		// will trigger a separate event loop task being scheduled.
+
+		// 调用了userEventTriggered
 		ctx.executor().execute(() -> ctx.pipeline().fireUserEventTriggered(reader));
 	}
 
@@ -204,6 +209,11 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
 		writeAndFlushNextMessageIfPossible(ctx.channel());
 	}
 
+	/**
+	 * 真正开始传输分区数据了
+	 *
+	 * 数据发送到了PartitionRequestClientHandler#channelRead
+	 * */
 	private void writeAndFlushNextMessageIfPossible(final Channel channel) throws IOException {
 		if (fatalError || !channel.isWritable()) {
 			return;

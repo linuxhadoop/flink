@@ -523,6 +523,8 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 	/**
 	 * Updates the task execution state for a given task.
 	 *
+	 * 该消息由TaskExecutor发送过来
+	 *
 	 * @param taskExecutionState New task execution state for a given task
 	 * @return Acknowledge the task execution state update
 	 */

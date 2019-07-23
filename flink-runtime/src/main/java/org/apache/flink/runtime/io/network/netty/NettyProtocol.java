@@ -34,9 +34,13 @@ public class NettyProtocol {
 	private final NettyMessage.NettyMessageEncoder
 		messageEncoder = new NettyMessage.NettyMessageEncoder();
 
+	// 结果分区提供者, 就是一个ResultPartitionManager
 	private final ResultPartitionProvider partitionProvider;
+
+	// 任务事件分发器
 	private final TaskEventDispatcher taskEventDispatcher;
 
+	// 是否开启了credit
 	private final boolean creditBasedEnabled;
 
 	NettyProtocol(ResultPartitionProvider partitionProvider, TaskEventDispatcher taskEventDispatcher, boolean creditBasedEnabled) {

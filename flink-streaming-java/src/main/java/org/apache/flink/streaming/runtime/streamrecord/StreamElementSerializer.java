@@ -42,8 +42,13 @@ import static java.util.Objects.requireNonNull;
  * Serializer for {@link StreamRecord}, {@link Watermark}, {@link LatencyMarker}, and
  * {@link StreamStatus}.
  *
+ * 用于StreamRecord、Watermark、LatencyMarker、StreamStatus的序列化器
+ *
  * <p>This does not behave like a normal {@link TypeSerializer}, instead, this is only used at the
  * stream task/operator level for transmitting StreamRecords and Watermarks.
+ *
+ * 该类的作用不同于TypeSerializer, 它仅用于流式任务或算子层面, 用于传输StreamRecord与Watermark
+ *
  *
  * @param <T> The type of value in the StreamRecord
  */

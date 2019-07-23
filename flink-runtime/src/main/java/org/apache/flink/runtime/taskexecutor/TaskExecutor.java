@@ -465,8 +465,11 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 
 		try {
 			final JobID jobId = tdd.getJobId();
+
+			// 获取一个与jobManager通讯的连接
 			final JobManagerConnection jobManagerConnection = jobManagerTable.get(jobId);
 
+			// 无法与jobManager进行连接
 			if (jobManagerConnection == null) {
 				final String message = "Could not submit task because there is no JobManager " +
 					"associated for the job " + jobId + '.';
@@ -475,6 +478,7 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 				throw new TaskSubmissionException(message);
 			}
 
+			// 判断当前的jobMaster是否是leader
 			if (!Objects.equals(jobManagerConnection.getJobMasterId(), jobMasterId)) {
 				final String message = "Rejecting the task submission because the job manager leader id " +
 					jobMasterId + " does not match the expected job manager leader id " +
@@ -484,6 +488,7 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 				throw new TaskSubmissionException(message);
 			}
 
+			// 将slot标记为active
 			if (!taskSlotTable.tryMarkSlotActive(jobId, tdd.getAllocationId())) {
 				final String message = "No task slot allocated for job ID " + jobId +
 					" and allocation ID " + tdd.getAllocationId() + '.';
@@ -498,7 +503,7 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 				throw new TaskSubmissionException("Could not re-integrate offloaded TaskDeploymentDescriptor data.", e);
 			}
 
-			// deserialize the pre-serialized information
+			// deserialize the pre-serialized information 反序列话job、task信息
 			final JobInformation jobInformation;
 			final TaskInformation taskInformation;
 			try {
@@ -529,11 +534,15 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 				tdd.getExecutionAttemptId(),
 				taskManagerConfiguration.getTimeout());
 
+			// 用来task与taskManager通讯
 			TaskManagerActions taskManagerActions = jobManagerConnection.getTaskManagerActions();
 			CheckpointResponder checkpointResponder = jobManagerConnection.getCheckpointResponder();
 
 			LibraryCacheManager libraryCache = jobManagerConnection.getLibraryCacheManager();
+
+			// 可消费分区的通知接口
 			ResultPartitionConsumableNotifier resultPartitionConsumableNotifier = jobManagerConnection.getResultPartitionConsumableNotifier();
+
 			PartitionProducerStateChecker partitionStateChecker = jobManagerConnection.getPartitionStateChecker();
 
 			final TaskLocalStateStore localStateStore = localStateStoresManager.localStateStoreForSubtask(
@@ -1365,6 +1374,9 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 		}
 	}
 
+	/**
+	 * 将信息告知jobMaster
+	 * */
 	private void updateTaskExecutionState(
 			final JobMasterGateway jobMasterGateway,
 			final TaskExecutionState taskExecutionState) {
@@ -1670,6 +1682,9 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 		}
 	}
 
+	/**
+	 * Task类中 调用了TaskManagerActions#updateTaskExecutionState
+	 * */
 	private final class TaskManagerActionsImpl implements TaskManagerActions {
 		private final JobMasterGateway jobMasterGateway;
 
@@ -1692,11 +1707,15 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 			runAsync(() -> TaskExecutor.this.failTask(executionAttemptID, cause));
 		}
 
+		/**
+		 * 由Task#taskManagerActions.updateTaskExecutionState(new TaskExecutionState(jobId, executionId, ExecutionState.RUNNING));调用
+		 * */
 		@Override
 		public void updateTaskExecutionState(final TaskExecutionState taskExecutionState) {
 			if (taskExecutionState.getExecutionState().isTerminal()) {
 				runAsync(() -> unregisterTaskAndNotifyFinalState(jobMasterGateway, taskExecutionState.getID()));
 			} else {
+				// 将信息告知jobMaster
 				TaskExecutor.this.updateTaskExecutionState(jobMasterGateway, taskExecutionState);
 			}
 		}

@@ -294,7 +294,7 @@ public abstract class NettyMessage {
 	}
 
 	// ------------------------------------------------------------------------
-	// Server responses
+	// Server responses 服务器端响应
 	// ------------------------------------------------------------------------
 
 	static class BufferResponse extends NettyMessage {
@@ -303,6 +303,7 @@ public abstract class NettyMessage {
 
 		final ByteBuf buffer;
 
+		// 接收者Id
 		final InputChannelID receiverId;
 
 		final int sequenceNumber;

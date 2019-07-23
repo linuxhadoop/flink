@@ -616,7 +616,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			//  check for canceling as a shortcut
 			// ----------------------------
 
-			// activate safety net for task thread
+			// activate safety net for task thread 为任务线程激活安全网络
 			LOG.info("Creating FileSystem stream leak safety net for task {}", this);
 			FileSystemSafetyNet.initializeSafetyNetForThread();
 
@@ -652,6 +652,9 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			// this operation may fail if the system does not have enough
 			// memory to run the necessary data exchanges
 			// the registration must also strictly be undone
+			//
+			// 将当前任务与networkEnvironment进行关联
+			// 当系统没有足够内存进行必要的数据交换时,该操作会失败
 			// ----------------------------------------------------------------
 
 			LOG.info("Registering task at network: {}.", this);
@@ -746,7 +749,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 				throw new CancelTaskException();
 			}
 
-			// notify everyone that we switched to running 通知所有的taskManager, 已经切换到运行状态了
+			// notify everyone that we switched to running 通知所有的taskManager, 已经切换到运行状态了.实际调用的是TaskManagerActionsImpl
 			taskManagerActions.updateTaskExecutionState(new TaskExecutionState(jobId, executionId, ExecutionState.RUNNING));
 
 			// make sure the user code classloader is accessible thread-locally 确保用户代码类加载器可以被本地线程访问

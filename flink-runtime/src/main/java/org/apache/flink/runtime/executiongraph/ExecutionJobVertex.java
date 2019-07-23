@@ -73,8 +73,12 @@ import java.util.concurrent.CompletableFuture;
  * An {@code ExecutionJobVertex} is part of the {@link ExecutionGraph}, and the peer
  * to the {@link JobVertex}.
  *
+ * ExecutionJobVertex是执行图的一部分,对应了JobGraph中的JobVertex
+ *
  * <p>The {@code ExecutionJobVertex} corresponds to a parallelized operation. It
  * contains an {@link ExecutionVertex} for each parallel instance of that operation.
+ *
+ * 它是一个并行化的操作。包含了一个ExecutionVertex对应的所有并行实例
  */
 public class ExecutionJobVertex implements AccessExecutionJobVertex, Archiveable<ArchivedExecutionJobVertex> {
 
@@ -85,18 +89,25 @@ public class ExecutionJobVertex implements AccessExecutionJobVertex, Archiveable
 
 	private final Object stateMonitor = new Object();
 
+	// 该节点所属的执行图
 	private final ExecutionGraph graph;
 
+	// 对应的jobGraph中的顶点
 	private final JobVertex jobVertex;
 
 	/**
 	 * The IDs of all operators contained in this execution job vertex.
+	 *
+	 * 当前job执行顶点中包含的所有的算子ID
 	 *
 	 * <p>The ID's are stored depth-first post-order; for the forking chain below the ID's would be stored as [D, E, B, C, A].
 	 *  A - B - D
 	 *   \    \
 	 *    C    E
 	 * This is the same order that operators are stored in the {@code StreamTask}.
+	 *
+	 * ID是以深度优先进后序排列的
+	 * 这个顺序与存储在StreamTask中的算子顺序是一致的
 	 */
 	private final List<OperatorID> operatorIDs;
 

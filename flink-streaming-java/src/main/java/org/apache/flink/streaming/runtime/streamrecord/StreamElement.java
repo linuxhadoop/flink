@@ -24,12 +24,18 @@ import org.apache.flink.streaming.runtime.streamstatus.StreamStatus;
 
 /**
  * An element in a data stream. Can be a record or a Watermark.
+ *
+ * 数据流中的一个元素。
+ * 可以是一条记录或者watermark
  */
 @Internal
 public abstract class StreamElement {
 
 	/**
 	 * Checks whether this element is a watermark.
+	 *
+	 * 检测当前元素是否是一个水印
+	 *
 	 * @return True, if this element is a watermark, false otherwise.
 	 */
 	public final boolean isWatermark() {
@@ -38,6 +44,9 @@ public abstract class StreamElement {
 
 	/**
 	 * Checks whether this element is a stream status.
+	 *
+	 * 检测当前元素是否是一个流的状态
+	 *
 	 * @return True, if this element is a stream status, false otherwise.
 	 */
 	public final boolean isStreamStatus() {
@@ -46,6 +55,9 @@ public abstract class StreamElement {
 
 	/**
 	 * Checks whether this element is a record.
+	 *
+	 * 检测当前元素是否是一条记录
+	 *
 	 * @return True, if this element is a record, false otherwise.
 	 */
 	public final boolean isRecord() {
@@ -62,6 +74,9 @@ public abstract class StreamElement {
 
 	/**
 	 * Casts this element into a StreamRecord.
+	 *
+	 * 将当前元素转换成StreamRecord
+	 *
 	 * @return This element as a stream record.
 	 * @throws java.lang.ClassCastException Thrown, if this element is actually not a stream record.
 	 */
@@ -72,6 +87,9 @@ public abstract class StreamElement {
 
 	/**
 	 * Casts this element into a Watermark.
+	 *
+	 * 将当前元素转换成水印
+	 *
 	 * @return This element as a Watermark.
 	 * @throws java.lang.ClassCastException Thrown, if this element is actually not a Watermark.
 	 */
@@ -81,6 +99,9 @@ public abstract class StreamElement {
 
 	/**
 	 * Casts this element into a StreamStatus.
+	 *
+	 * 将当前元素转换成StreamStatus
+	 *
 	 * @return This element as a StreamStatus.
 	 * @throws java.lang.ClassCastException Thrown, if this element is actually not a Stream Status.
 	 */

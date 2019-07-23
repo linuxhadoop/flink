@@ -45,6 +45,8 @@ public class FailoverStrategyLoader {
 
 	/**
 	 * Loads a FailoverStrategy Factory from the given configuration.
+	 *
+	 * 根据配置加载Failover策略工厂
 	 */
 	public static FailoverStrategy.Factory loadFailoverStrategy(Configuration config, @Nullable Logger logger) {
 		final String strategyParam = config.getString(JobManagerOptions.EXECUTION_FAILOVER_STRATEGY);

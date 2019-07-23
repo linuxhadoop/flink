@@ -23,6 +23,8 @@ import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 
 /**
  * A {@link StreamOperator} for executing {@link FlatMapFunction FlatMapFunctions}.
+ *
+ * 一个StreamOperator用来执行FlatMapFunction
  */
 @Internal
 public class StreamFlatMap<IN, OUT>

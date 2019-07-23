@@ -38,6 +38,8 @@ import static org.apache.flink.runtime.io.network.netty.NettyMessage.TaskEventRe
 
 /**
  * Channel handler to initiate data transfers and dispatch backwards flowing task events.
+ *
+ * 用来初始化数据传输 与 分发反向流式任务事件
  */
 class PartitionRequestServerHandler extends SimpleChannelInboundHandler<NettyMessage> {
 
@@ -84,10 +86,13 @@ class PartitionRequestServerHandler extends SimpleChannelInboundHandler<NettyMes
 			if (msgClazz == PartitionRequest.class) {
 				PartitionRequest request = (PartitionRequest) msg;
 
+				// 记录远程请求
 				LOG.debug("Read channel on {}: {}.", ctx.channel().localAddress(), request);
 
 				try {
 					NetworkSequenceViewReader reader;
+
+					// 是否开启credit
 					if (creditBasedEnabled) {
 						reader = new CreditBasedSequenceNumberingViewReader(
 							request.receiverId,
@@ -99,6 +104,7 @@ class PartitionRequestServerHandler extends SimpleChannelInboundHandler<NettyMes
 							outboundQueue);
 					}
 
+					// partitionProvider就是一个ResultPartitionManager
 					reader.requestSubpartitionView(
 						partitionProvider,
 						request.partitionId,
@@ -110,7 +116,7 @@ class PartitionRequestServerHandler extends SimpleChannelInboundHandler<NettyMes
 				}
 			}
 			// ----------------------------------------------------------------
-			// Task events
+			// Task events 任务事件
 			// ----------------------------------------------------------------
 			else if (msgClazz == TaskEventRequest.class) {
 				TaskEventRequest request = (TaskEventRequest) msg;
