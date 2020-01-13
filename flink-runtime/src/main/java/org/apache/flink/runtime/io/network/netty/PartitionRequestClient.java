@@ -55,15 +55,19 @@ public class PartitionRequestClient {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PartitionRequestClient.class);
 
+	// 提供基本的IO操作
 	private final Channel tcpChannel;
 
+	// 用于处理来自网络的读、写请求
 	private final NetworkClientHandler clientHandler;
 
 	private final ConnectionID connectionId;
 
 	private final PartitionRequestClientFactory clientFactory;
 
-	/** If zero, the underlying TCP channel can be safely closed. */
+	/** If zero, the underlying TCP channel can be safely closed.
+	 *  引用计数，如果为0 表示最底层的TCP channel可以安全关闭
+	 * */
 	private final AtomicDisposableReferenceCounter closeReferenceCounter = new AtomicDisposableReferenceCounter();
 
 	PartitionRequestClient(

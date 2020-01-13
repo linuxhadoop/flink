@@ -119,8 +119,12 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 	 * */
 	private final ResultSubpartition[] subpartitions;
 
+	/**
+	 * 结果分区管理器。 用来追踪 一个taskManager的所有当前生产/消费分区
+	 * */
 	private final ResultPartitionManager partitionManager;
 
+	// 可消费分区的通知接口 (通知消费者 可以进行消费了)
 	private final ResultPartitionConsumableNotifier partitionConsumableNotifier;
 
 	public final int numTargetKeyGroups;
@@ -170,8 +174,9 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 		this.partitionConsumableNotifier = checkNotNull(partitionConsumableNotifier);
 		this.sendScheduleOrUpdateConsumersMessage = sendScheduleOrUpdateConsumersMessage;
 
-		// Create the subpartitions.
+		// Create the subpartitions. 创建对应类型的子分区
 		switch (partitionType) {
+			// 用于批处理
 			case BLOCKING:
 				for (int i = 0; i < subpartitions.length; i++) {
 					subpartitions[i] = new SpillableSubpartition(i, this, ioManager);
@@ -191,7 +196,7 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 				throw new IllegalArgumentException("Unsupported result partition type.");
 		}
 
-		// Initially, partitions should be consumed once before release.
+		// Initially, partitions should be consumed once before release. 在分区在释放之前, 应该被消费一次
 		pin();
 
 		LOG.debug("{}: Initialized {}", owningTaskName, this);
@@ -253,6 +258,8 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 	/**
 	 * Returns the type of this result partition.
 	 *
+	 * 返回结果分区的类型
+	 *
 	 * @return result partition type
 	 */
 	public ResultPartitionType getPartitionType() {
@@ -261,6 +268,9 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 
 	// ------------------------------------------------------------------------
 
+	/**
+	 * 添加buffer消费者
+	 * */
 	@Override
 	public void addBufferConsumer(BufferConsumer bufferConsumer, int subpartitionIndex) throws IOException {
 		checkNotNull(bufferConsumer);
@@ -275,6 +285,7 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 			throw ex;
 		}
 
+		// 通知消费者
 		if (subpartition.add(bufferConsumer)) {
 			notifyPipelinedConsumers();
 		}

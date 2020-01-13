@@ -1297,6 +1297,7 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 			taskManagerConfiguration.getClassLoaderResolveOrder(),
 			taskManagerConfiguration.getAlwaysParentFirstLoaderPatterns());
 
+		// 结果分区可消费通知
 		ResultPartitionConsumableNotifier resultPartitionConsumableNotifier = new RpcResultPartitionConsumableNotifier(
 			jobMasterGateway,
 			getRpcService().getExecutor(),

@@ -27,6 +27,8 @@ import org.apache.flink.shaded.guava18.com.google.common.collect.Multimap;
 /**
  * The event handler manages {@link EventListener} instances and allows to
  * to publish events to them.
+ *
+ * 用来管理事件监听器实例,并且能够向监听器发布消息
  */
 public class TaskEventHandler {
 

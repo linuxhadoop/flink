@@ -104,6 +104,7 @@ class PartitionRequestServerHandler extends SimpleChannelInboundHandler<NettyMes
 							outboundQueue);
 					}
 
+					// 请求一个结果分区的子分区。执行完成后, 数据就已经在reader里面的subpartitionView字段了
 					// partitionProvider就是一个ResultPartitionManager
 					reader.requestSubpartitionView(
 						partitionProvider,

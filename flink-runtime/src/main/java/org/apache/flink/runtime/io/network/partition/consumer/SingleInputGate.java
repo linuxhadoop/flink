@@ -361,7 +361,9 @@ public class SingleInputGate implements InputGate {
 	}
 
 	/**
-	 * 更新inputChannel,开始请求分区数据
+	 * 更新inputChannel,开始请求分区数据。
+	 *
+	 * 我是消费者, 我要开始读取分区数据了
 	 * */
 	public void updateInputChannel(InputChannelDeploymentDescriptor icdd) throws IOException, InterruptedException {
 		synchronized (requestLock) {

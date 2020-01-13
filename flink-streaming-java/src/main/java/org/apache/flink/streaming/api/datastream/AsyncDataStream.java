@@ -43,6 +43,8 @@ public class AsyncDataStream {
 
 	/**
 	 * Output mode for asynchronous operations.
+	 *
+	 * 异步操作的输出模式:有序、无序
 	 */
 	public enum OutputMode { ORDERED, UNORDERED }
 
@@ -50,6 +52,8 @@ public class AsyncDataStream {
 
 	/**
 	 * Add an AsyncWaitOperator.
+	 *
+	 * 添加一个 异步等待算子
 	 *
 	 * @param in The {@link DataStream} where the {@link AsyncWaitOperator} will be added.
 	 * @param func {@link AsyncFunction} wrapped inside {@link AsyncWaitOperator}.
@@ -67,6 +71,7 @@ public class AsyncDataStream {
 			int bufSize,
 			OutputMode mode) {
 
+		// 输出类型
 		TypeInformation<OUT> outTypeInfo = TypeExtractor.getUnaryOperatorReturnType(
 			func,
 			AsyncFunction.class,
@@ -77,7 +82,7 @@ public class AsyncDataStream {
 			Utils.getCallLocationName(),
 			true);
 
-		// create transform
+		// create transform 创建transform
 		AsyncWaitOperator<IN, OUT> operator = new AsyncWaitOperator<>(
 			in.getExecutionEnvironment().clean(func),
 			timeout,

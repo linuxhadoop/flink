@@ -35,7 +35,7 @@ public abstract class AbstractRichFunction implements RichFunction, Serializable
 	private static final long serialVersionUID = 1L;
 
 	// --------------------------------------------------------------------------------------------
-	//  Runtime context access
+	//  Runtime context access 运行时上下文访问
 	// --------------------------------------------------------------------------------------------
 
 	private transient RuntimeContext runtimeContext;

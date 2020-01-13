@@ -34,11 +34,19 @@ import java.io.Serializable;
  * A {@code Trigger} determines when a pane of a window should be evaluated to emit the
  * results for that part of the window.
  *
+ * 一个trigger决定什么时间一个window的pane 应该被评估 来发送结果
+ *
  * <p>A pane is the bucket of elements that have the same key (assigned by the
  * {@link org.apache.flink.api.java.functions.KeySelector}) and same {@link Window}. An element can
  * be in multiple panes if it was assigned to multiple windows by the
  * {@link org.apache.flink.streaming.api.windowing.assigners.WindowAssigner}. These panes all
  * have their own instance of the {@code Trigger}.
+ *
+ * 一个pane是 拥有相同键值和window的元素bucket
+ *
+ * 一个可以同时拥有多个pane,如果它被assigner分配到多个window。
+ *
+ * 所有的pane都独自包含trigger的实例
  *
  * <p>Triggers must not maintain state internally since they can be re-created or reused for
  * different keys. All necessary state should be persisted using the state abstraction
@@ -59,6 +67,9 @@ public abstract class Trigger<T, W extends Window> implements Serializable {
 	/**
 	 * Called for every element that gets added to a pane. The result of this will determine
 	 * whether the pane is evaluated to emit results.
+	 *
+	 * 每个元素都需要加入到一个pane中。
+	 * 返回结果用来判定是否一个pane应该被评估 进行发送数据
 	 *
 	 * @param element The element that arrived.
 	 * @param timestamp The timestamp of the element that arrived.

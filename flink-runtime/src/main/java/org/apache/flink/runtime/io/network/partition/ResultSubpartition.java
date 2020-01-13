@@ -36,25 +36,49 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  */
 public abstract class ResultSubpartition {
 
-	/** The index of the subpartition at the parent partition. */
+	/**
+	 * The index of the subpartition at the parent partition.
+	 *
+	 * 子分区的索引值(一个分区包含多个子分区)
+	 * */
 	protected final int index;
 
-	/** The parent partition this subpartition belongs to. */
+	/**
+	 * The parent partition this subpartition belongs to.
+	 *
+	 * 当前子分区属于哪一个分区
+	 * */
 	protected final ResultPartition parent;
 
-	/** All buffers of this subpartition. Access to the buffers is synchronized on this object. */
+	/**
+	 * All buffers of this subpartition. Access to the buffers is synchronized on this object.
+	 *
+	 * 当前子分区的所有buffer。 该对象上是同步访问buffer的
+	 * */
 	protected final ArrayDeque<BufferConsumer> buffers = new ArrayDeque<>();
 
-	/** The number of non-event buffers currently in this subpartition. */
+	/**
+	 * The number of non-event buffers currently in this subpartition.
+	 *
+	 * 当前子分区中non-event buffer的数量
+	 * */
 	@GuardedBy("buffers")
 	private int buffersInBacklog;
 
 	// - Statistics ----------------------------------------------------------
 
-	/** The total number of buffers (both data and event buffers). */
+	/**
+	 * The total number of buffers (both data and event buffers).
+	 *
+	 * buffer总数量 = data + event
+	 * */
 	private long totalNumberOfBuffers;
 
-	/** The total number of bytes (both data and event buffers). */
+	/**
+	 * The total number of bytes (both data and event buffers).
+	 *
+	 * buffer空间大小
+	 * */
 	private long totalNumberOfBytes;
 
 	public ResultSubpartition(int index, ResultPartition parent) {

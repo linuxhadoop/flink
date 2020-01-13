@@ -38,10 +38,13 @@ import java.util.Set;
 /**
  * A {@link Window} that represents a time interval from {@code start} (inclusive) to
  * {@code end} (exclusive).
+ *
+ * 用来表示一个时间间隔, 左开右闭[start, end)
  */
 @PublicEvolving
 public class TimeWindow extends Window {
 
+	// window的开始、结束 时间戳
 	private final long start;
 	private final long end;
 
@@ -72,6 +75,8 @@ public class TimeWindow extends Window {
 
 	/**
 	 * Gets the largest timestamp that still belongs to this window.
+	 *
+	 * 获取属于该window的最大时间戳。 时间戳= end - 1
 	 *
 	 * <p>This timestamp is identical to {@code getEnd() - 1}.
 	 *
@@ -113,6 +118,8 @@ public class TimeWindow extends Window {
 
 	/**
 	 * Returns {@code true} if this window intersects the given window.
+	 *
+	 * 判断2个window是否相交
 	 */
 	public boolean intersects(TimeWindow other) {
 		return this.start <= other.end && this.end >= other.start;
@@ -120,13 +127,17 @@ public class TimeWindow extends Window {
 
 	/**
 	 * Returns the minimal window covers both this window and the given window.
+	 *
+	 * 返回包含2个window的最小window
+	 *
+	 * 就是取并集: start取两者较小的, end取两者较大的
 	 */
 	public TimeWindow cover(TimeWindow other) {
 		return new TimeWindow(Math.min(start, other.start), Math.max(end, other.end));
 	}
 
 	// ------------------------------------------------------------------------
-	// Serializer
+	// Serializer 序列化
 	// ------------------------------------------------------------------------
 
 	/**
@@ -197,6 +208,8 @@ public class TimeWindow extends Window {
 	/**
 	 * Merge overlapping {@link TimeWindow}s. For use by merging
 	 * {@link org.apache.flink.streaming.api.windowing.assigners.WindowAssigner WindowAssigners}.
+	 *
+	 * 合并重叠的window
 	 */
 	public static void mergeWindows(Collection<TimeWindow> windows, MergingWindowAssigner.MergeCallback<TimeWindow> c) {
 

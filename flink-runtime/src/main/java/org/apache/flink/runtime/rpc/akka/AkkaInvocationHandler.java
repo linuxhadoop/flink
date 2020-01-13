@@ -86,6 +86,7 @@ class AkkaInvocationHandler implements InvocationHandler, AkkaBasedEndpoint, Rpc
 	// default timeout for asks 默认ask的超时时间
 	private final Time timeout;
 
+	// 最大帧大小
 	private final long maximumFramesize;
 
 	// null if gateway; otherwise non-null
@@ -187,6 +188,8 @@ class AkkaInvocationHandler implements InvocationHandler, AkkaBasedEndpoint, Rpc
 
 	/**
 	 * Invokes a RPC method by sending the RPC invocation details to the rpc endpoint.
+	 *
+	 * 通过向rpc endpoint发送调用详细信息 来调用rpc方法
 	 *
 	 * @param method to call
 	 * @param args of the method call

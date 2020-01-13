@@ -43,6 +43,11 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * Base class for RPC endpoints. Distributed components which offer remote procedure calls have to
  * extend the RPC endpoint base class. An RPC endpoint is backed by an {@link RpcService}.
  *
+ * RPC endpoints的基类
+ * 分布式组件如果要向外提供RPC服务,则需扩展该类
+ *
+ * 它背后的大哥是RpcService
+ *
  * <h1>Endpoint and Gateway</h1>
  * To be done...
  * <h1>Single Threaded Endpoint Execution </h1>

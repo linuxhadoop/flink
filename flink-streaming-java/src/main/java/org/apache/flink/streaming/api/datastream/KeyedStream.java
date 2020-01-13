@@ -601,6 +601,8 @@ public class KeyedStream<T, KEY> extends DataStream<T> {
 	/**
 	 * Windows this {@code KeyedStream} into tumbling time windows.
 	 *
+	 * KeyedStream的滚动时间窗口
+	 *
 	 * <p>This is a shortcut for either {@code .window(TumblingEventTimeWindows.of(size))} or
 	 * {@code .window(TumblingProcessingTimeWindows.of(size))} depending on the time characteristic
 	 * set using

@@ -61,10 +61,19 @@ import java.util.concurrent.TimeUnit;
  * collector has been completed, the result is emitted by the operator's emitter to downstream
  * operators.
  *
+ * 异步等待算子允许异步地处理接收到的流式记录。
+ * 该算子创建一个ResultFuture,并将该future传递给AsyncFunction。
+ *
+ * 在asyncFunction内部 用户可以自由的完成异步Collector。
+ * 当异步collector完成时, 结果就会被发送给下游的算子
+ *
  * <p>The operator offers different output modes depending on the chosen
  * {@link OutputMode}. In order to give exactly once processing guarantees, the
  * operator stores all currently in-flight {@link StreamElement} in it's operator state. Upon
  * recovery the recorded set of stream elements is replayed.
+ *
+ * 该算子可提供不同的输出模式。
+ * 为了保证精准一次, 该算子在state中保存了所有当前in-flight的StreamElement, 当恢复记录集合时, 可以进行回放
  *
  * <p>In case of chaining of this operator, it has to be made sure that the operators in the chain are
  * opened tail to head. The reason for this is that an opened {@link AsyncWaitOperator} starts
@@ -79,29 +88,61 @@ public class AsyncWaitOperator<IN, OUT>
 		implements OneInputStreamOperator<IN, OUT>, OperatorActions {
 	private static final long serialVersionUID = 1L;
 
+	// state名字
 	private static final String STATE_NAME = "_async_wait_operator_state_";
 
-	/** Capacity of the stream element queue. */
+	/**
+	 * Capacity of the stream element queue.
+	 *
+	 * 流式元素队列长度
+	 * */
 	private final int capacity;
 
-	/** Output mode for this operator. */
+	/**
+	 * Output mode for this operator.
+	 *
+	 * 当前算子的输出模式
+	 * */
 	private final AsyncDataStream.OutputMode outputMode;
 
-	/** Timeout for the async collectors. */
+	/**
+	 * Timeout for the async collectors.
+	 *
+	 * 异步collector的超时时间
+	 * */
 	private final long timeout;
 
+	/**
+	 * checkpoint锁
+	 * */
 	protected transient Object checkpointingLock;
 
-	/** {@link TypeSerializer} for inputs while making snapshots. */
+	/**
+	 * {@link TypeSerializer} for inputs while making snapshots.
+	 *
+	 * 进行快照时的类型序列化器
+	 * */
 	private transient StreamElementSerializer<IN> inStreamElementSerializer;
 
-	/** Recovered input stream elements. */
+	/**
+	 * Recovered input stream elements.
+	 *
+	 * 恢复的输入流式元素
+	 * */
 	private transient ListState<StreamElement> recoveredStreamElements;
 
-	/** Queue to store the currently in-flight stream elements into. */
+	/**
+	 * Queue to store the currently in-flight stream elements into.
+	 *
+	 * 用来保存in-flight元素
+	 * */
 	private transient StreamElementQueue queue;
 
-	/** Pending stream element which could not yet added to the queue. */
+	/**
+	 * Pending stream element which could not yet added to the queue.
+	 *
+	 * pending的元素, 还未加入到queue中
+	 * */
 	private transient StreamElementQueueEntry<?> pendingStreamElementQueueEntry;
 
 	private transient ExecutorService executor;

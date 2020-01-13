@@ -34,7 +34,7 @@ class PipelinedSubpartitionView implements ResultSubpartitionView {
 	/**
 	 * The subpartition this view belongs to.
 	 *
-	 * 子分区所属的ResultPartition
+	 * 当前view所属的子分区
 	 * */
 	private final PipelinedSubpartition parent;
 

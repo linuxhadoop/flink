@@ -50,6 +50,8 @@ import java.util.Map;
  * of the function will have a context through which it can access static contextual information (such as
  * the current parallelism) and other constructs like accumulators and broadcast variables.
  *
+ * 每一个function的并行实例 都会包含一个上线文环境, 通过它就可以访问静态上线文环境信息(例如当前并行度)
+ *
  * <p>A function can, during runtime, obtain the RuntimeContext via a call to
  * {@link AbstractRichFunction#getRuntimeContext()}.
  */
@@ -68,6 +70,8 @@ public interface RuntimeContext {
 	/**
 	 * Returns the metric group for this parallel subtask.
 	 *
+	 * 返回当前并行子任务的metric组
+	 *
 	 * @return The metric group for this parallel subtask.
 	 */
 	@PublicEvolving
@@ -75,6 +79,8 @@ public interface RuntimeContext {
 
 	/**
 	 * Gets the parallelism with which the parallel task runs.
+	 *
+	 * 返回当前任务的并行度
 	 *
 	 * @return The parallelism with which the parallel task runs.
 	 */

@@ -29,6 +29,8 @@ public interface SlotContext extends SlotInfo {
 
 	/**
 	 * Gets the actor gateway that can be used to send messages to the TaskManager.
+	 *
+	 * 获取actor网关, 可以用它与taskManager通讯
 	 * <p>
 	 * This method should be removed once the new interface-based RPC abstraction is in place
 	 *

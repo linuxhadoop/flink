@@ -45,6 +45,7 @@ class CreditBasedSequenceNumberingViewReader implements BufferAvailabilityListen
 
 	private final PartitionRequestQueue requestQueue;
 
+	// 子分区(包含了真实数据)
 	private volatile ResultSubpartitionView subpartitionView;
 
 	/**
@@ -192,6 +193,9 @@ class CreditBasedSequenceNumberingViewReader implements BufferAvailabilityListen
 		subpartitionView.releaseAllResources();
 	}
 
+	/**
+	 * 由PipelineSubpartition调用, 通知已经有数据可用
+	 * */
 	@Override
 	public void notifyDataAvailable() {
 		requestQueue.notifyReaderNonEmpty(this);

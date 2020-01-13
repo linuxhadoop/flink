@@ -22,11 +22,15 @@ import java.io.Closeable;
 
 /**
  * A simple store and retrieve binary large objects (BLOBs).
+ *
+ * 一个简单的存储与获取二进制大对象的服务
  */
 public interface BlobService extends Closeable {
 
 	/**
 	 * Returns a BLOB service for accessing permanent BLOBs.
+	 *
+	 * 返回永久性blob
 	 *
 	 * @return BLOB service
 	 */
@@ -35,12 +39,16 @@ public interface BlobService extends Closeable {
 	/**
 	 * Returns a BLOB service for accessing transient BLOBs.
 	 *
+	 * 返回临时性blob
+	 *
 	 * @return BLOB service
 	 */
 	TransientBlobService getTransientBlobService();
 
 	/**
 	 * Returns the port of the BLOB server that this BLOB service is working with.
+	 *
+	 * 返回blobServer服务端口
 	 *
 	 * @return the port the blob server.
 	 */

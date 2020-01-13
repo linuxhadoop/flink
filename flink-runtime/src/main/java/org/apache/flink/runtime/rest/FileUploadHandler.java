@@ -63,6 +63,8 @@ import static org.apache.flink.util.Preconditions.checkState;
 /**
  * Writes multipart/form-data to disk. Delegates all other requests to the next
  * {@link ChannelInboundHandler} in the {@link ChannelPipeline}.
+ *
+ * 文件写磁盘
  */
 public class FileUploadHandler extends SimpleChannelInboundHandler<HttpObject> {
 
@@ -94,6 +96,8 @@ public class FileUploadHandler extends SimpleChannelInboundHandler<HttpObject> {
 			if (msg instanceof HttpRequest) {
 				final HttpRequest httpRequest = (HttpRequest) msg;
 				LOG.trace("Received request. URL:{} Method:{}", httpRequest.getUri(), httpRequest.getMethod());
+
+				// post且是文件类型
 				if (httpRequest.getMethod().equals(HttpMethod.POST)) {
 					if (HttpPostRequestDecoder.isMultipart(httpRequest)) {
 						LOG.trace("Initializing multipart file upload.");

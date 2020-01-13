@@ -108,7 +108,11 @@ public abstract class StreamExecutionEnvironment {
 	/** The default name to use for a streaming job if no other name has been specified. */
 	public static final String DEFAULT_JOB_NAME = "Flink Streaming Job";
 
-	/** The time characteristic that is used if none other is set. */
+	/**
+	 * The time characteristic that is used if none other is set.
+	 *
+	 * 默认时间处理类型
+	 * */
 	private static final TimeCharacteristic DEFAULT_TIME_CHARACTERISTIC = TimeCharacteristic.ProcessingTime;
 
 	/** The default buffer timeout (max delay of records in the network stack). */

@@ -37,6 +37,8 @@ import static org.apache.flink.util.Preconditions.checkState;
 /**
  * A pipelined in-memory only subpartition, which can be consumed once.
  *
+ * 基于内存的子分区, 只能被消费一次
+ *
  * <p>Whenever {@link #add(BufferConsumer)} adds a finished {@link BufferConsumer} or a second
  * {@link BufferConsumer} (in which case we will assume the first one finished), we will
  * {@link PipelinedSubpartitionView#notifyDataAvailable() notify} a read view created via
@@ -56,16 +58,28 @@ class PipelinedSubpartition extends ResultSubpartition {
 
 	// ------------------------------------------------------------------------
 
-	/** The read view to consume this subpartition. */
+	/**
+	 * The read view to consume this subpartition.
+	 *
+	 * 消费当前子分区的read view
+	 * */
 	private PipelinedSubpartitionView readView;
 
-	/** Flag indicating whether the subpartition has been finished. */
+	/**
+	 * Flag indicating whether the subpartition has been finished.
+	 *
+	 * 当前子分区是否已经完成(是否数据已写入)
+	 * */
 	private boolean isFinished;
 
 	@GuardedBy("buffers")
 	private boolean flushRequested;
 
-	/** Flag indicating whether the subpartition has been released. */
+	/**
+	 * Flag indicating whether the subpartition has been released.
+	 *
+	 * 当前子分区是否已经被释放
+	 * */
 	private volatile boolean isReleased;
 
 	// ------------------------------------------------------------------------
@@ -85,6 +99,9 @@ class PipelinedSubpartition extends ResultSubpartition {
 		LOG.debug("{}: Finished {}.", parent.getOwningTaskName(), this);
 	}
 
+	/**
+	 *
+	 * */
 	private boolean add(BufferConsumer bufferConsumer, boolean finish) {
 		checkNotNull(bufferConsumer);
 
@@ -233,6 +250,8 @@ class PipelinedSubpartition extends ResultSubpartition {
 			readView = new PipelinedSubpartitionView(this, availabilityListener);
 			notifyDataAvailable = !buffers.isEmpty();
 		}
+
+		// 通知数据已经可用
 		if (notifyDataAvailable) {
 			notifyDataAvailable();
 		}

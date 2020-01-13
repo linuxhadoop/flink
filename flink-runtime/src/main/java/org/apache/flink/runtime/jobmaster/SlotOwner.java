@@ -28,6 +28,8 @@ public interface SlotOwner {
 	/**
 	 * Return the given slot to the slot owner.
 	 *
+	 * 返回slot所有者
+	 *
 	 * @param logicalSlot to return
 	 * @return Future which is completed with true if the slot could be returned, otherwise with false
 	 */

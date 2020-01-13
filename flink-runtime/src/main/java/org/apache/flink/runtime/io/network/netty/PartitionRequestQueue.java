@@ -59,7 +59,11 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
 	/** The readers which are already enqueued available for transferring data. */
 	private final ArrayDeque<NetworkSequenceViewReader> availableReaders = new ArrayDeque<>();
 
-	/** All the readers created for the consumers' partition requests. */
+	/**
+	 * All the readers created for the consumers' partition requests.
+	 *
+	 * 包含了所有消费者分区请求 所创建的reader
+	 * */
 	private final ConcurrentMap<InputChannelID, NetworkSequenceViewReader> allReaders = new ConcurrentHashMap<>();
 
 	private final Set<InputChannelID> released = Sets.newHashSet();
@@ -129,6 +133,9 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
 		return availableReaders;
 	}
 
+	/**
+	 * 通知reader已被创建
+	 * */
 	public void notifyReaderCreated(final NetworkSequenceViewReader reader) {
 		allReaders.put(reader.getReceiverId(), reader);
 	}
@@ -256,6 +263,7 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
 						registerAvailableReader(reader);
 					}
 
+					// 将响应消息发个给客户端
 					BufferResponse msg = new BufferResponse(
 						next.buffer(),
 						reader.getSequenceNumber(),

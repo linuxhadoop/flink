@@ -28,20 +28,27 @@ import java.util.Objects;
 
 /**
  * A hardware description describes the resources available to a task manager.
+ *
+ * 硬件描述符：用来描述TM上可用的资源
  */
 public final class HardwareDescription implements Serializable {
 
 	private static final long serialVersionUID = 3380016608300325361L;
 
+	// cup核数
 	public static final String FIELD_NAME_CPU_CORES = "cpuCores";
 
+	// 物理内存
 	public static final String FIELD_NAME_SIZE_PHYSICAL_MEMORY = "physicalMemory";
 
+	// 可用内存
 	public static final String FIELD_NAME_SIZE_JVM_HEAP = "freeMemory";
 
 	public static final String FIELD_NAME_SIZE_MANAGED_MEMORY = "managedMemory";
 
-	/** The number of CPU cores available to the JVM on the compute node. */
+	/** The number of CPU cores available to the JVM on the compute node.
+	 * 	所在计算节点的JVM可用核数
+	 * */
 	@JsonProperty(FIELD_NAME_CPU_CORES)
 	private final int numberOfCPUCores;
 

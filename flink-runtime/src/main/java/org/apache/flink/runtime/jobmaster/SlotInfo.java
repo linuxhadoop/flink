@@ -23,12 +23,16 @@ import org.apache.flink.runtime.taskmanager.TaskManagerLocation;
 
 /**
  * Interface that provides basic information in the context of a slot.
+ *
+ * 一个slot 在上下文中提供基础信息的接口
  */
 public interface SlotInfo {
 
 	/**
 	 * Gets the id under which the slot has been allocated on the TaskManager. This id uniquely identifies the
 	 * physical slot.
+	 *
+	 *	slot的ID
 	 *
 	 * @return The id under which the slot has been allocated on the TaskManager
 	 */
@@ -37,12 +41,16 @@ public interface SlotInfo {
 	/**
 	 * Gets the location info of the TaskManager that offers this slot.
 	 *
+	 * 说明这个slot在哪一个taskManager上
+	 *
 	 * @return The location info of the TaskManager that offers this slot
 	 */
 	TaskManagerLocation getTaskManagerLocation();
 
 	/**
 	 * Gets the number of the slot.
+	 *
+	 * 获取slot的数量
 	 *
 	 * @return The number of the slot on the TaskManager.
 	 */

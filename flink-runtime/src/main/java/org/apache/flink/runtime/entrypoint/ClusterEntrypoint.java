@@ -93,6 +93,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Base class for the Flink cluster entry points.
  *
+ * Flink集群入口基础类
+ *
  * <p>Specialization of this class can be used for the session mode and the per-job mode
  */
 public abstract class ClusterEntrypoint implements AutoCloseableAsync, FatalErrorHandler {
