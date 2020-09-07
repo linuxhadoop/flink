@@ -254,6 +254,7 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 			NettyMessage.BufferResponse bufferOrEvent = (NettyMessage.BufferResponse) msg;
 
 			RemoteInputChannel inputChannel = inputChannels.get(bufferOrEvent.receiverId);
+			// 如果没有接收者，则释放buffer。 并且通知服务端 取消请求
 			if (inputChannel == null) {
 				bufferOrEvent.releaseBuffer();
 
@@ -261,7 +262,7 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 
 				return true;
 			}
-
+			// 数据解析
 			return decodeBufferOrEvent(inputChannel, bufferOrEvent, isStagedBuffer);
 		}
 		// ---- Error ---------------------------------------------------------

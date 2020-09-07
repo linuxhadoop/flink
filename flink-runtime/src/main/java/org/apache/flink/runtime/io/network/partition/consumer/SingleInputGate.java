@@ -189,6 +189,7 @@ public class SingleInputGate implements InputGate {
 
 	private final boolean isCreditBased;
 
+	// 是否已经接收完所有分区数据  事件
 	private boolean hasReceivedAllEndOfPartitionEvents;
 
 	/** Flag indicating whether partitions have been requested. */
@@ -551,10 +552,12 @@ public class SingleInputGate implements InputGate {
 	}
 
 	private Optional<BufferOrEvent> getNextBufferOrEvent(boolean blocking) throws IOException, InterruptedException {
+		// 是否已经接收完所有分区数据
 		if (hasReceivedAllEndOfPartitionEvents) {
 			return Optional.empty();
 		}
 
+		// 资源是否被释放
 		if (isReleased) {
 			throw new IllegalStateException("Released");
 		}

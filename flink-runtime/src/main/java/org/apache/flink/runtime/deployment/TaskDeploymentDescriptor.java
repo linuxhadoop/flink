@@ -39,6 +39,8 @@ import java.util.Collection;
 
 /**
  * A task deployment descriptor contains all the information necessary to deploy a task on a task manager.
+ *
+ * 任务部署描述符 包含了task运行的所有必要信息
  */
 public final class TaskDeploymentDescriptor implements Serializable {
 

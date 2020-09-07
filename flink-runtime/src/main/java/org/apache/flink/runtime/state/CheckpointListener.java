@@ -24,6 +24,8 @@ import org.apache.flink.annotation.PublicEvolving;
  * This interface must be implemented by functions/operations that want to receive
  * a commit notification once a checkpoint has been completely acknowledged by all
  * participants.
+ *
+ * checkpoint监听接口
  */
 @PublicEvolving
 public interface CheckpointListener {

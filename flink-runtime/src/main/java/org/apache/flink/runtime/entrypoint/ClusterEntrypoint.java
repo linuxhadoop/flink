@@ -105,9 +105,13 @@ public abstract class ClusterEntrypoint implements AutoCloseableAsync, FatalErro
 
 	protected static final Logger LOG = LoggerFactory.getLogger(ClusterEntrypoint.class);
 
+	// 启动失败返回码
 	protected static final int STARTUP_FAILURE_RETURN_CODE = 1;
+
+	// 运行时失败返回码
 	protected static final int RUNTIME_FAILURE_RETURN_CODE = 2;
 
+	// 初始化shutdown超时时间30秒
 	private static final Time INITIALIZATION_SHUTDOWN_TIMEOUT = Time.seconds(30L);
 
 	/** The lock to guard startup / shutdown / manipulation methods. */
@@ -117,6 +121,7 @@ public abstract class ClusterEntrypoint implements AutoCloseableAsync, FatalErro
 
 	private final CompletableFuture<ApplicationStatus> terminationFuture;
 
+	// 是否关闭
 	private final AtomicBoolean isShutDown = new AtomicBoolean(false);
 
 	@GuardedBy("lock")
@@ -162,6 +167,9 @@ public abstract class ClusterEntrypoint implements AutoCloseableAsync, FatalErro
 		return terminationFuture;
 	}
 
+	/**
+	 * 启动集群
+	 * */
 	public void startCluster() throws ClusterEntrypointException {
 		LOG.info("Starting {}.", getClass().getSimpleName());
 
@@ -194,6 +202,9 @@ public abstract class ClusterEntrypoint implements AutoCloseableAsync, FatalErro
 		}
 	}
 
+	/**
+	 * 配置文件系统
+	 * */
 	private void configureFileSystems(Configuration configuration) throws Exception {
 		LOG.info("Install default filesystem.");
 
@@ -255,26 +266,40 @@ public abstract class ClusterEntrypoint implements AutoCloseableAsync, FatalErro
 		}
 	}
 
+	/**
+	 * 初始化集群服务
+	 * */
 	protected void initializeServices(Configuration configuration) throws Exception {
 
 		LOG.info("Initializing cluster services.");
 
 		synchronized (lock) {
+			// jobManager地址
 			final String bindAddress = configuration.getString(JobManagerOptions.ADDRESS);
+
+			// 默认6123端口
 			final String portRange = getRPCPortRange(configuration);
 
+			// 创建akka服务
 			commonRpcService = createRpcService(configuration, bindAddress, portRange);
 
-			// update the configuration used to create the high availability services
+			// update the configuration used to create the high availability services 更新配置，用来创建高可用服务
 			configuration.setString(JobManagerOptions.ADDRESS, commonRpcService.getAddress());
 			configuration.setInteger(JobManagerOptions.PORT, commonRpcService.getPort());
 
+			// 根据当前机器cpu核数，创建线程池
 			ioExecutor = Executors.newFixedThreadPool(
 				Hardware.getNumberCPUCores(),
 				new ExecutorThreadFactory("cluster-io"));
+
+			// 高可用服务
 			haServices = createHaServices(configuration, ioExecutor);
+
+			// 文件服务
 			blobServer = new BlobServer(configuration, haServices.createBlobStore());
 			blobServer.start();
+
+			// 心跳服务
 			heartbeatServices = createHeartbeatServices(configuration);
 			metricRegistry = createMetricRegistry(configuration);
 

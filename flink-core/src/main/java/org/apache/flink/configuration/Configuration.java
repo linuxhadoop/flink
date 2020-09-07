@@ -39,6 +39,8 @@ import java.util.Set;
 
 /**
  * Lightweight configuration object which stores key/value pairs.
+ *
+ * 轻量级配置对象
  */
 @Public
 public class Configuration extends ExecutionConfig.GlobalJobParameters

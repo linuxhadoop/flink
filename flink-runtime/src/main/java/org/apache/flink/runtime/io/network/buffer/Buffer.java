@@ -50,18 +50,23 @@ public interface Buffer {
 	/**
 	 * Returns whether this buffer represents a buffer or an event.
 	 *
+	 * 判断当前buffer表示一个buffer还是event
+	 *
 	 * @return <tt>true</tt> if this is a real buffer, <tt>false</tt> if this is an event
 	 */
 	boolean isBuffer();
 
 	/**
 	 * Tags this buffer to represent an event.
+	 * 标记当前buffer 表示event
 	 */
 	void tagAsEvent();
 
 	/**
 	 * Returns the underlying memory segment. This method is dangerous since it ignores read only protections and omits
 	 * slices. Use it only along the {@link #getMemorySegmentOffset()}.
+	 *
+	 * 返回底层的memorySegment
 	 *
 	 * <p>This method will be removed in the future. For writing use {@link BufferBuilder}.
 	 *

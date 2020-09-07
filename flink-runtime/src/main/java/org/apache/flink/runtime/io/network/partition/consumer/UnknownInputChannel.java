@@ -34,6 +34,9 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * An input channel place holder to be replaced by either a {@link RemoteInputChannel}
  * or {@link LocalInputChannel} at runtime.
+ *
+ * 主要用于占位目的
+ * 最终还是会使用 LocalInputChannel 或 RemoteInputChannel
  */
 class UnknownInputChannel extends InputChannel {
 

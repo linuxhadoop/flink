@@ -792,7 +792,7 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 			@Nullable JobManagerTaskRestore taskRestore,
 			int attemptNumber) throws ExecutionGraphException {
 
-		// Produced intermediate results 生成的中间结果分区
+		// Produced intermediate results 根据resultPartition数量 生成resultPartition描述符
 		List<ResultPartitionDeploymentDescriptor> producedPartitions = new ArrayList<>(resultPartitions.size());
 
 		// Consumed intermediate results 消费的中间结果分区

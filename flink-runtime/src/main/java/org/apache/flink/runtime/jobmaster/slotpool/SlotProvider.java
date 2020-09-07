@@ -46,6 +46,8 @@ public interface SlotProvider {
 	/**
 	 * Allocating slot with specific requirement.
 	 *
+	 * 按需分配slot
+	 *
 	 * @param slotRequestId identifying the slot request
 	 * @param task The task to allocate the slot for
 	 * @param allowQueued Whether allow the task be queued if we do not have enough resource

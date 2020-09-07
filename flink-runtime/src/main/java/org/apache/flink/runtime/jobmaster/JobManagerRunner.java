@@ -328,7 +328,11 @@ public class JobManagerRunner implements LeaderContender, OnCompletionActions, A
 		}
 	}
 
+	/**
+	 * 验证job调度状态，并启动jobManager
+	 * */
 	private void verifyJobSchedulingStatusAndStartJobManager(UUID leaderSessionId) throws Exception {
+		// 根据jobId获取job调度状态
 		final JobSchedulingStatus jobSchedulingStatus = runningJobsRegistry.getJobSchedulingStatus(jobGraph.getJobID());
 
 		if (jobSchedulingStatus == JobSchedulingStatus.DONE) {
@@ -340,6 +344,7 @@ public class JobManagerRunner implements LeaderContender, OnCompletionActions, A
 
 			runningJobsRegistry.setJobRunning(jobGraph.getJobID());
 
+			// 启动jobMaster
 			final CompletableFuture<Acknowledge> startFuture = jobMaster.start(new JobMasterId(leaderSessionId), rpcTimeout);
 			final CompletableFuture<JobMasterGateway> currentLeaderGatewayFuture = leaderGatewayFuture;
 

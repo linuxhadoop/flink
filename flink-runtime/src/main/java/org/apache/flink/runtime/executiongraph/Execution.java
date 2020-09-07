@@ -612,7 +612,7 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 			// null taskRestore to let it be GC'ed
 			taskRestore = null;
 
-			// 获取taskManager网关
+			// 获取taskManager网关,用于向taskManager提交任务
 			final TaskManagerGateway taskManagerGateway = slot.getTaskManagerGateway();
 
 			// 通过taskManagerGateway将task desc提交至taskManager

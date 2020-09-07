@@ -87,12 +87,16 @@ public final class JobSubmitHandler extends AbstractRestHandler<DispatcherGatewa
 	 * */
 	@Override
 	protected CompletableFuture<JobSubmitResponseBody> handleRequest(@Nonnull HandlerRequest<JobSubmitRequestBody, EmptyMessageParameters> request, @Nonnull DispatcherGateway gateway) throws RestHandlerException {
+		// 获取上传的文件列表
 		final Collection<File> uploadedFiles = request.getUploadedFiles();
+
+		// 生成文件名称 与 文件路径的映射
 		final Map<String, Path> nameToFile = uploadedFiles.stream().collect(Collectors.toMap(
 			File::getName,
 			Path::fromLocalFile
 		));
 
+		// 文件数量不一致，则报错
 		if (uploadedFiles.size() != nameToFile.size()) {
 			throw new RestHandlerException(
 				String.format("The number of uploaded files was %s than the expected count. Expected: %s Actual %s",
@@ -103,8 +107,10 @@ public final class JobSubmitHandler extends AbstractRestHandler<DispatcherGatewa
 			);
 		}
 
+		// 获取job提交请求体
 		final JobSubmitRequestBody requestBody = request.getRequestBody();
 
+		// 判断jobGraph文件名是否为空
 		if (requestBody.jobGraphFileName == null) {
 			throw new RestHandlerException(
 				String.format("The %s field must not be omitted or be null.",

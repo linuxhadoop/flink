@@ -189,7 +189,7 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 	}
 
 	//------------------------------------------------------
-	// Lifecycle methods
+	// Lifecycle methods 生命周期方法
 	//------------------------------------------------------
 
 	@Override

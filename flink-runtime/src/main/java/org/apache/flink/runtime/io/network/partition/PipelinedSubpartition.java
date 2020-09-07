@@ -324,6 +324,9 @@ class PipelinedSubpartition extends ResultSubpartition {
 		return readView != null && !flushRequested && getNumberOfFinishedBuffers() == 1;
 	}
 
+	/**
+	 * 通知数据可用
+	 * */
 	private void notifyDataAvailable() {
 		if (readView != null) {
 			readView.notifyDataAvailable();

@@ -27,6 +27,11 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * Either type for {@link Buffer} or {@link AbstractEvent} instances tagged with the channel index,
  * from which they were received.
+ *
+ * buffer用于数据交换
+ * event用于在系统之间进行 交换通知信息
+ *
+ * 通过isBuffer()、isEvent()进行判断消息类型。  实际上就是判断字段buffer、event哪一个不为空
  */
 public class BufferOrEvent {
 

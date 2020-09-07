@@ -36,7 +36,7 @@ public class NettyConnectionManager implements ConnectionManager {
 	// 客户端
 	private final NettyClient client;
 
-	// netty缓冲池
+	// netty buffer缓冲池
 	private final NettyBufferPool bufferPool;
 
 	// 分区请求客户端 工厂类
