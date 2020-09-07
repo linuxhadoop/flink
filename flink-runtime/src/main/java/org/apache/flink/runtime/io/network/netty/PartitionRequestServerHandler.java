@@ -75,6 +75,7 @@ class PartitionRequestServerHandler extends SimpleChannelInboundHandler<NettyMes
 		super.channelUnregistered(ctx);
 	}
 
+	// 处理客户端发过来的消息
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, NettyMessage msg) throws Exception {
 		try {

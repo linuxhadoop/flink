@@ -21,11 +21,15 @@ package org.apache.flink.runtime.io.network.partition;
 /**
  * Listener interface implemented by consumers of {@link ResultSubpartitionView}
  * that want to be notified of availability of further buffers.
+ *
+ * buffer可用监听器
  */
 public interface BufferAvailabilityListener {
 
 	/**
 	 * Called whenever there might be new data available.
+	 *
+	 * 当有新数据可用时被调用
 	 */
 	void notifyDataAvailable();
 }

@@ -20,10 +20,14 @@ package org.apache.flink.runtime.jobgraph;
 
 /**
  * Possible states of a job once it has been accepted by the job manager.
+ *
+ * 一个job被jobManager接收后的可能处于的状态
  */
 public enum JobStatus {
 
-	/** Job is newly created, no task has started to run. */
+	/** Job is newly created, no task has started to run.
+	 * 	新建job 或 没有运行task开始运行
+	 * */
 	CREATED(TerminalState.NON_TERMINAL),
 
 	/** Some tasks are scheduled or running, some may be pending, some may be finished. */

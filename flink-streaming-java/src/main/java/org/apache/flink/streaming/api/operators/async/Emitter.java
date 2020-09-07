@@ -37,6 +37,8 @@ import java.util.Collection;
  * Runnable responsible for consuming elements from the given queue and outputting them to the
  * given output/timestampedCollector.
  *
+ * 消费给定队列的数据，并将它们进行输出
+ *
  * @param <OUT> Type of the output elements
  */
 @Internal

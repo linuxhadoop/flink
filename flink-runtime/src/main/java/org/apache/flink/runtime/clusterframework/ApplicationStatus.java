@@ -22,24 +22,36 @@ import org.apache.flink.runtime.jobgraph.JobStatus;
 
 /**
  * The status of an application.
+ *
+ * 应用状态
  */
 public enum ApplicationStatus {
 
-	/** Application finished successfully */
+	/** Application finished successfully
+	 *  应用成功执行完成
+	 * */
 	SUCCEEDED(0),
 
-	/** Application encountered an unrecoverable failure or error */
+	/** Application encountered an unrecoverable failure or error
+	 * 	应用遇到不可恢复的错误
+	 * */
 	FAILED(1443),
 	
-	/** Application was canceled or killed on request */
+	/** Application was canceled or killed on request
+	 * 	应用被取消或被kill
+	 * */
 	CANCELED(1444),
 
-	/** Application status is not known */
+	/** Application status is not known
+	 * 	未知的应用状态
+	 * */
 	UNKNOWN(1445);
 	
 	// ------------------------------------------------------------------------
 
-	/** The associated process exit code */
+	/** The associated process exit code
+	 * 	相关联的进程退出码
+	 * */
 	private final int processExitCode;
 	
 	private ApplicationStatus(int exitCode) {

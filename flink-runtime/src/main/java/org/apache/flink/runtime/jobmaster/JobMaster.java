@@ -821,6 +821,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 		final TaskManagerLocation taskManagerLocation = taskManager.f0;
 		final TaskExecutorGateway taskExecutorGateway = taskManager.f1;
 
+		// 根据该gateway向taskManager发送任务
 		final RpcTaskManagerGateway rpcTaskManagerGateway = new RpcTaskManagerGateway(taskExecutorGateway, getFencingToken());
 
 		return slotPoolGateway.offerSlots(
@@ -1166,6 +1167,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 		if (executionGraph.getState() == JobStatus.CREATED) {
 			executionGraphAssignedFuture = CompletableFuture.completedFuture(null);
 		} else {
+			// 挂起并清理执行图先关字段
 			suspendAndClearExecutionGraphFields(new FlinkException("ExecutionGraph is being reset in order to be rescheduled."));
 			final JobManagerJobMetricGroup newJobManagerJobMetricGroup = jobMetricGroupFactory.create(jobGraph);
 
@@ -1180,6 +1182,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 				getMainThreadExecutor());
 		}
 
+		// 调度执行图
 		executionGraphAssignedFuture.thenRun(this::scheduleExecutionGraph);
 	}
 

@@ -61,10 +61,13 @@ public abstract class NettyMessage {
 	// ------------------------------------------------------------------------
 	// Note: Every NettyMessage subtype needs to have a public 0-argument
 	// constructor in order to work with the generic deserializer.
+	// 每个nettyMessage子类型需要拥有一个 无参构造器，用来与泛型反序列化器一起工作
 	// ------------------------------------------------------------------------
 
+	// 帧长度4位、魔数4位、消息id 1位
 	static final int FRAME_HEADER_LENGTH = 4 + 4 + 1; // frame length (4), magic number (4), msg ID (1)
 
+	// 10进制数 3134984190
 	static final int MAGIC_NUMBER = 0xBADC0FFE;
 
 	abstract ByteBuf write(ByteBufAllocator allocator) throws Exception;

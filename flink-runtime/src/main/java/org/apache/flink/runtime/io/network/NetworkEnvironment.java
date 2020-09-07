@@ -214,6 +214,9 @@ public class NetworkEnvironment {
 	//  Task operations
 	// --------------------------------------------------------------------------------------------
 
+	/**
+	 * 该函数在Task.java 中执行task时被调用
+	 * */
 	public void registerTask(Task task) throws IOException {
 
 		// 当前任务的结果分区数组
@@ -224,11 +227,12 @@ public class NetworkEnvironment {
 				throw new IllegalStateException("NetworkEnvironment is shut down");
 			}
 
+			// 为每个resultPartition设置bufferPool
 			for (final ResultPartition partition : producedPartitions) {
 				setupPartition(partition);
 			}
 
-			// Setup the buffer pool for each buffer reader
+			// Setup the buffer pool for each buffer reader 为消费端设置bufferPool
 			final SingleInputGate[] inputGates = task.getAllInputGates();
 			for (SingleInputGate gate : inputGates) {
 				setupInputGate(gate);
@@ -251,6 +255,7 @@ public class NetworkEnvironment {
 				maxNumberOfMemorySegments,
 				partition.getPartitionType().hasBackPressure() ? Optional.empty() : Optional.of(partition));
 
+			// 为resultPartition设置bufferPool
 			partition.registerBufferPool(bufferPool);
 
 			resultPartitionManager.registerResultPartition(partition);
@@ -289,6 +294,8 @@ public class NetworkEnvironment {
 				bufferPool = networkBufferPool.createBufferPool(gate.getNumberOfInputChannels(),
 					maxNumberOfMemorySegments);
 			}
+
+			// 为消费端设置bufferPool
 			gate.setBufferPool(bufferPool);
 		} catch (Throwable t) {
 			if (bufferPool != null) {

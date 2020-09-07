@@ -456,6 +456,7 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 
 	/**
 	 * 提交任务
+	 * 调用顺序 Execution -> (RpcTaskManagerGateway类型)taskManagerGateway.submitTask -> taskExecutorGateway -> taskExecutor
 	 * */
 	@Override
 	public CompletableFuture<Acknowledge> submitTask(
@@ -540,7 +541,7 @@ public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 
 			LibraryCacheManager libraryCache = jobManagerConnection.getLibraryCacheManager();
 
-			// 可消费分区的通知接口
+			// 可消费分区的通知接口：如果有数据转备好了， 则通知下游进行消费
 			ResultPartitionConsumableNotifier resultPartitionConsumableNotifier = jobManagerConnection.getResultPartitionConsumableNotifier();
 
 			PartitionProducerStateChecker partitionStateChecker = jobManagerConnection.getPartitionStateChecker();
