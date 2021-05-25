@@ -23,12 +23,14 @@ import org.apache.flink.annotation.Public;
 /**
  * Collects a record and forwards it. The collector is the "push" counterpart of the
  * {@link java.util.Iterator}, which "pulls" data in.
+ *
+ * 获取一条记录并发送
  */
 @Public
 public interface Collector<T> {
 
 	/**
-	 * Emits a record.
+	 * Emits a record. 发送记录
 	 *
 	 * @param record The record to collect.
 	 */
@@ -36,6 +38,8 @@ public interface Collector<T> {
 
 	/**
 	 * Closes the collector. If any data was buffered, that data will be flushed.
+	 *
+	 * 关闭collector。 如果有任何数据被buffered， buffer中的数据就会被flush
 	 */
 	void close();
 }
