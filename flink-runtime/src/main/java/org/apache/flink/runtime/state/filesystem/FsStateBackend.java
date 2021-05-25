@@ -94,7 +94,9 @@ public class FsStateBackend extends AbstractFileStateBackend implements Configur
 
 	private static final long serialVersionUID = -8191916350224044011L;
 
-	/** Maximum size of state that is stored with the metadata, rather than in files (1 MiByte). */
+	/** Maximum size of state that is stored with the metadata, rather than in files (1 MiByte).
+	 *  最大文件状态字节数
+	 * */
 	private static final int MAX_FILE_STATE_THRESHOLD = 1024 * 1024;
 
 	// ------------------------------------------------------------------------
@@ -239,7 +241,7 @@ public class FsStateBackend extends AbstractFileStateBackend implements Configur
 	 */
 	public FsStateBackend(URI checkpointDataUri, boolean asynchronousSnapshots) {
 		this(checkpointDataUri, null, -1,
-				TernaryBoolean.fromBoolean(asynchronousSnapshots));
+			TernaryBoolean.fromBoolean(asynchronousSnapshots));
 	}
 
 	/**
@@ -280,12 +282,12 @@ public class FsStateBackend extends AbstractFileStateBackend implements Configur
 	 * @param asynchronousSnapshots Switch to enable asynchronous snapshots.
 	 */
 	public FsStateBackend(
-			URI checkpointDataUri,
-			int fileStateSizeThreshold,
-			boolean asynchronousSnapshots) {
+		URI checkpointDataUri,
+		int fileStateSizeThreshold,
+		boolean asynchronousSnapshots) {
 
 		this(checkpointDataUri, null, fileStateSizeThreshold,
-				TernaryBoolean.fromBoolean(asynchronousSnapshots));
+			TernaryBoolean.fromBoolean(asynchronousSnapshots));
 	}
 
 	/**
@@ -312,17 +314,17 @@ public class FsStateBackend extends AbstractFileStateBackend implements Configur
 	 *                                   runtime configuration will be used.
 	 */
 	public FsStateBackend(
-			URI checkpointDirectory,
-			@Nullable URI defaultSavepointDirectory,
-			int fileStateSizeThreshold,
-			TernaryBoolean asynchronousSnapshots) {
+		URI checkpointDirectory,
+		@Nullable URI defaultSavepointDirectory,
+		int fileStateSizeThreshold,
+		TernaryBoolean asynchronousSnapshots) {
 
 		super(checkNotNull(checkpointDirectory, "checkpoint directory is null"), defaultSavepointDirectory);
 
 		checkNotNull(asynchronousSnapshots, "asynchronousSnapshots");
 		checkArgument(fileStateSizeThreshold >= -1 && fileStateSizeThreshold <= MAX_FILE_STATE_THRESHOLD,
-				"The threshold for file state size must be in [-1, %s], where '-1' means to use " +
-						"the value from the deployment's configuration.", MAX_FILE_STATE_THRESHOLD);
+			"The threshold for file state size must be in [-1, %s], where '-1' means to use " +
+				"the value from the deployment's configuration.", MAX_FILE_STATE_THRESHOLD);
 
 		this.fileStateThreshold = fileStateSizeThreshold;
 		this.asynchronousSnapshots = asynchronousSnapshots;
@@ -340,11 +342,11 @@ public class FsStateBackend extends AbstractFileStateBackend implements Configur
 		// if asynchronous snapshots were configured, use that setting,
 		// else check the configuration
 		this.asynchronousSnapshots = original.asynchronousSnapshots.resolveUndefined(
-				configuration.getBoolean(CheckpointingOptions.ASYNC_SNAPSHOTS));
+			configuration.getBoolean(CheckpointingOptions.ASYNC_SNAPSHOTS));
 
 		final int sizeThreshold = original.fileStateThreshold >= 0 ?
-				original.fileStateThreshold :
-				configuration.getInteger(CheckpointingOptions.FS_SMALL_FILE_THRESHOLD);
+			original.fileStateThreshold :
+			configuration.getInteger(CheckpointingOptions.FS_SMALL_FILE_THRESHOLD);
 
 		if (sizeThreshold >= 0 && sizeThreshold <= MAX_FILE_STATE_THRESHOLD) {
 			this.fileStateThreshold = sizeThreshold;
@@ -355,9 +357,9 @@ public class FsStateBackend extends AbstractFileStateBackend implements Configur
 			// because this is the only place we (unlikely) ever log, we lazily
 			// create the logger here
 			LoggerFactory.getLogger(AbstractFileStateBackend.class).warn(
-					"Ignoring invalid file size threshold value ({}): {} - using default value {} instead.",
-					CheckpointingOptions.FS_SMALL_FILE_THRESHOLD.key(), sizeThreshold,
-					CheckpointingOptions.FS_SMALL_FILE_THRESHOLD.defaultValue());
+				"Ignoring invalid file size threshold value ({}): {} - using default value {} instead.",
+				CheckpointingOptions.FS_SMALL_FILE_THRESHOLD.key(), sizeThreshold,
+				CheckpointingOptions.FS_SMALL_FILE_THRESHOLD.defaultValue());
 		}
 	}
 
@@ -404,8 +406,8 @@ public class FsStateBackend extends AbstractFileStateBackend implements Configur
 	 */
 	public int getMinFileSizeThreshold() {
 		return fileStateThreshold >= 0 ?
-				fileStateThreshold :
-				CheckpointingOptions.FS_SMALL_FILE_THRESHOLD.defaultValue();
+			fileStateThreshold :
+			CheckpointingOptions.FS_SMALL_FILE_THRESHOLD.defaultValue();
 	}
 
 	/**
@@ -466,16 +468,16 @@ public class FsStateBackend extends AbstractFileStateBackend implements Configur
 			new HeapPriorityQueueSetFactory(keyGroupRange, numberOfKeyGroups, 128);
 
 		return new HeapKeyedStateBackend<>(
-				kvStateRegistry,
-				keySerializer,
-				env.getUserClassLoader(),
-				numberOfKeyGroups,
-				keyGroupRange,
-				isUsingAsynchronousSnapshots(),
-				env.getExecutionConfig(),
-				localRecoveryConfig,
-				priorityQueueSetFactory,
-				ttlTimeProvider);
+			kvStateRegistry,
+			keySerializer,
+			env.getUserClassLoader(),
+			numberOfKeyGroups,
+			keyGroupRange,
+			isUsingAsynchronousSnapshots(),
+			env.getExecutionConfig(),
+			localRecoveryConfig,
+			priorityQueueSetFactory,
+			ttlTimeProvider);
 	}
 
 	@Override
@@ -486,7 +488,7 @@ public class FsStateBackend extends AbstractFileStateBackend implements Configur
 		return new DefaultOperatorStateBackend(
 			env.getUserClassLoader(),
 			env.getExecutionConfig(),
-				isUsingAsynchronousSnapshots());
+			isUsingAsynchronousSnapshots());
 	}
 
 	// ------------------------------------------------------------------------
@@ -496,9 +498,9 @@ public class FsStateBackend extends AbstractFileStateBackend implements Configur
 	@Override
 	public String toString() {
 		return "File State Backend (" +
-				"checkpoints: '" + getCheckpointPath() +
-				"', savepoints: '" + getSavepointPath() +
-				"', asynchronous: " + asynchronousSnapshots +
-				", fileStateThreshold: " + fileStateThreshold + ")";
+			"checkpoints: '" + getCheckpointPath() +
+			"', savepoints: '" + getSavepointPath() +
+			"', asynchronous: " + asynchronousSnapshots +
+			", fileStateThreshold: " + fileStateThreshold + ")";
 	}
 }

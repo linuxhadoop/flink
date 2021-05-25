@@ -105,7 +105,9 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 @Public
 public abstract class StreamExecutionEnvironment {
 
-	/** The default name to use for a streaming job if no other name has been specified. */
+	/** The default name to use for a streaming job if no other name has been specified.
+	 * 	未指定流式job时的默认名称
+	 * */
 	public static final String DEFAULT_JOB_NAME = "Flink Streaming Job";
 
 	/**
@@ -115,7 +117,9 @@ public abstract class StreamExecutionEnvironment {
 	 * */
 	private static final TimeCharacteristic DEFAULT_TIME_CHARACTERISTIC = TimeCharacteristic.ProcessingTime;
 
-	/** The default buffer timeout (max delay of records in the network stack). */
+	/** The default buffer timeout (max delay of records in the network stack).
+	 * 	默认buffer超时时间(一条记录在网络栈中的最大延迟)
+	 * */
 	private static final long DEFAULT_NETWORK_BUFFER_TIMEOUT = 100L;
 
 	/**
@@ -125,29 +129,43 @@ public abstract class StreamExecutionEnvironment {
 	 */
 	private static StreamExecutionEnvironmentFactory contextEnvironmentFactory;
 
-	/** The default parallelism used when creating a local environment. */
+	/** The default parallelism used when creating a local environment.
+	 *  本地env的默认并行度: 可用额CPU core个数
+	 * */
 	private static int defaultLocalParallelism = Runtime.getRuntime().availableProcessors();
 
 	// ------------------------------------------------------------------------
 
-	/** The execution configuration for this environment. */
+	/** The execution configuration for this environment.
+	 *  当前环境的执行配置参数
+	 * */
 	private final ExecutionConfig config = new ExecutionConfig();
 
-	/** Settings that control the checkpointing behavior. */
+	/** Settings that control the checkpointing behavior.
+	 * 	控制checkpointing行为的配置
+	 * */
 	private final CheckpointConfig checkpointCfg = new CheckpointConfig();
 
+	// transforms 转换列表
 	protected final List<StreamTransformation<?>> transformations = new ArrayList<>();
 
+	// buffer超时时间
 	private long bufferTimeout = DEFAULT_NETWORK_BUFFER_TIMEOUT;
 
+	// 是否可以对上下游算子进行chaining
 	protected boolean isChainingEnabled = true;
 
-	/** The state backend used for storing k/v state and state snapshots. */
+	/** The state backend used for storing k/v state and state snapshots.
+	 * 	默认状态backend，用来存储kv、状态快照
+	 * */
 	private StateBackend defaultStateBackend;
 
-	/** The time characteristic used by the data streams. */
+	/** The time characteristic used by the data streams.
+	 *  数据流程中的时间处理类型，包含三种类型:处理时间、摄入时间、事件时间
+	 * */
 	private TimeCharacteristic timeCharacteristic = DEFAULT_TIME_CHARACTERISTIC;
 
+	// 缓存文件
 	protected final List<Tuple2<String, DistributedCache.DistributedCacheEntry>> cacheFile = new ArrayList<>();
 
 
@@ -163,8 +181,8 @@ public abstract class StreamExecutionEnvironment {
 	}
 
 	/**
-	* Get the list of cached files that were registered for distribution among the task managers.
-	*/
+	 * Get the list of cached files that were registered for distribution among the task managers.
+	 */
 	public List<Tuple2<String, DistributedCache.DistributedCacheEntry>> getCachedFiles() {
 		return cacheFile;
 	}
@@ -198,9 +216,9 @@ public abstract class StreamExecutionEnvironment {
 	 */
 	public StreamExecutionEnvironment setMaxParallelism(int maxParallelism) {
 		Preconditions.checkArgument(maxParallelism > 0 &&
-						maxParallelism <= KeyGroupRangeAssignment.UPPER_BOUND_MAX_PARALLELISM,
-				"maxParallelism is out of bounds 0 < maxParallelism <= " +
-						KeyGroupRangeAssignment.UPPER_BOUND_MAX_PARALLELISM + ". Found: " + maxParallelism);
+				maxParallelism <= KeyGroupRangeAssignment.UPPER_BOUND_MAX_PARALLELISM,
+			"maxParallelism is out of bounds 0 < maxParallelism <= " +
+				KeyGroupRangeAssignment.UPPER_BOUND_MAX_PARALLELISM + ". Found: " + maxParallelism);
 
 		config.setMaxParallelism(maxParallelism);
 		return this;
@@ -308,9 +326,15 @@ public abstract class StreamExecutionEnvironment {
 	 * dataflow will be periodically snapshotted. In case of a failure, the streaming
 	 * dataflow will be restarted from the latest completed checkpoint. This method selects
 	 * {@link CheckpointingMode#EXACTLY_ONCE} guarantees.
+	 * 为流式应用开始checkpoint。
+	 * 流式数据流的分布式状态会被周期性的进行快照。
+	 * 在失败的情况下，流式数据流会从最近一次已完成的checkpoint中进行恢复。该方法保证exactly_once
+	 *
 	 *
 	 * <p>The job draws checkpoints periodically, in the given interval. The state will be
 	 * stored in the configured state backend.
+	 * 根据给的时间间隔，周期性的执行。
+	 * 状态会被存储在指定的backend中。
 	 *
 	 * <p>NOTE: Checkpointing iterative streaming dataflows in not properly supported at
 	 * the moment. For that reason, iterative jobs will not be started if used
@@ -716,8 +740,8 @@ public abstract class StreamExecutionEnvironment {
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Could not create TypeInformation for type " + data[0].getClass().getName()
-					+ "; please specify the TypeInformation manually via "
-					+ "StreamExecutionEnvironment#fromElements(Collection, TypeInformation)", e);
+				+ "; please specify the TypeInformation manually via "
+				+ "StreamExecutionEnvironment#fromElements(Collection, TypeInformation)", e);
 		}
 		return fromCollection(Arrays.asList(data), typeInfo);
 	}
@@ -749,8 +773,8 @@ public abstract class StreamExecutionEnvironment {
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Could not create TypeInformation for type " + type.getName()
-					+ "; please specify the TypeInformation manually via "
-					+ "StreamExecutionEnvironment#fromElements(Collection, TypeInformation)", e);
+				+ "; please specify the TypeInformation manually via "
+				+ "StreamExecutionEnvironment#fromElements(Collection, TypeInformation)", e);
 		}
 		return fromCollection(Arrays.asList(data), typeInfo);
 	}
@@ -790,8 +814,8 @@ public abstract class StreamExecutionEnvironment {
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Could not create TypeInformation for type " + first.getClass()
-					+ "; please specify the TypeInformation manually via "
-					+ "StreamExecutionEnvironment#fromElements(Collection, TypeInformation)", e);
+				+ "; please specify the TypeInformation manually via "
+				+ "StreamExecutionEnvironment#fromElements(Collection, TypeInformation)", e);
 		}
 		return fromCollection(data, typeInfo);
 	}
@@ -918,19 +942,21 @@ public abstract class StreamExecutionEnvironment {
 	 * @return A data stream representing the elements in the iterator
 	 */
 	public <OUT> DataStreamSource<OUT> fromParallelCollection(SplittableIterator<OUT> iterator, TypeInformation<OUT>
-			typeInfo) {
+		typeInfo) {
 		return fromParallelCollection(iterator, typeInfo, "Parallel Collection Source");
 	}
 
 	// private helper for passing different names
 	private <OUT> DataStreamSource<OUT> fromParallelCollection(SplittableIterator<OUT> iterator, TypeInformation<OUT>
-			typeInfo, String operatorName) {
+		typeInfo, String operatorName) {
 		return addSource(new FromSplittableIteratorFunction<>(iterator), operatorName, typeInfo);
 	}
 
 	/**
 	 * Reads the given file line-by-line and creates a data stream that contains a string with the
 	 * contents of each such line. The file will be read with the system's default character set.
+	 *
+	 * 通过文件类创建数据流
 	 *
 	 * <p><b>NOTES ON CHECKPOINTING: </b> The source monitors the path, creates the
 	 * {@link org.apache.flink.core.fs.FileInputSplit FileInputSplits} to be processed, forwards
@@ -969,7 +995,7 @@ public abstract class StreamExecutionEnvironment {
 
 		TextInputFormat format = new TextInputFormat(new Path(filePath));
 		format.setFilesFilter(FilePathFilter.createDefaultFilter());
-		TypeInformation<String> typeInfo = BasicTypeInfo.STRING_TYPE_INFO;
+		TypeInformation<String> typeInfo = BasicTypeInfo.STRING_TYPE_INFO;//typeInformation为字符串类型
 		format.setCharsetName(charsetName);
 
 		return readFile(format, filePath, FileProcessingMode.PROCESS_ONCE, -1, typeInfo);
@@ -1042,8 +1068,8 @@ public abstract class StreamExecutionEnvironment {
 			typeInformation = TypeExtractor.getInputFormatTypes(inputFormat);
 		} catch (Exception e) {
 			throw new InvalidProgramException("The type returned by the input format could not be " +
-					"automatically determined. Please specify the TypeInformation of the produced type " +
-					"explicitly by using the 'createInput(InputFormat, TypeInformation)' method instead.");
+				"automatically determined. Please specify the TypeInformation of the produced type " +
+				"explicitly by using the 'createInput(InputFormat, TypeInformation)' method instead.");
 		}
 		return readFile(inputFormat, filePath, watchType, interval, typeInformation);
 	}
@@ -1092,8 +1118,8 @@ public abstract class StreamExecutionEnvironment {
 			typeInformation = TypeExtractor.getInputFormatTypes(inputFormat);
 		} catch (Exception e) {
 			throw new InvalidProgramException("The type returned by the input format could not be " +
-					"automatically determined. Please specify the TypeInformation of the produced type " +
-					"explicitly by using the 'createInput(InputFormat, TypeInformation)' method instead.");
+				"automatically determined. Please specify the TypeInformation of the produced type " +
+				"explicitly by using the 'createInput(InputFormat, TypeInformation)' method instead.");
 		}
 		return readFile(inputFormat, filePath, watchType, interval, typeInformation);
 	}
@@ -1121,7 +1147,7 @@ public abstract class StreamExecutionEnvironment {
 	@SuppressWarnings("deprecation")
 	public DataStream<String> readFileStream(String filePath, long intervalMillis, FileMonitoringFunction.WatchType watchType) {
 		DataStream<Tuple3<String, Long, Long>> source = addSource(new FileMonitoringFunction(
-				filePath, intervalMillis, watchType), "Read File Stream source");
+			filePath, intervalMillis, watchType), "Read File Stream source");
 
 		return source.flatMap(new FileReadFunction());
 	}
@@ -1222,7 +1248,7 @@ public abstract class StreamExecutionEnvironment {
 	@PublicEvolving
 	public DataStreamSource<String> socketTextStream(String hostname, int port, String delimiter, long maxRetry) {
 		return addSource(new SocketTextStreamFunction(hostname, port, delimiter, maxRetry),
-				"Socket Stream");
+			"Socket Stream");
 	}
 
 	/**
@@ -1344,7 +1370,7 @@ public abstract class StreamExecutionEnvironment {
 			FileInputFormat<OUT> format = (FileInputFormat<OUT>) inputFormat;
 
 			source = createFileInput(format, typeInfo, "Custom File source",
-					FileProcessingMode.PROCESS_ONCE, -1);
+				FileProcessingMode.PROCESS_ONCE, -1);
 		} else {
 			source = createInput(inputFormat, typeInfo, "Custom Source");
 		}
@@ -1359,30 +1385,39 @@ public abstract class StreamExecutionEnvironment {
 		return addSource(function, sourceName, typeInfo);
 	}
 
+	/**
+	 * 创建文件输入
+	 * */
 	private <OUT> DataStreamSource<OUT> createFileInput(FileInputFormat<OUT> inputFormat,
 														TypeInformation<OUT> typeInfo,
 														String sourceName,
 														FileProcessingMode monitoringMode,
 														long interval) {
 
+		// 空值判断
 		Preconditions.checkNotNull(inputFormat, "Unspecified file input format.");
 		Preconditions.checkNotNull(typeInfo, "Unspecified output type information.");
 		Preconditions.checkNotNull(sourceName, "Unspecified name for the source.");
 		Preconditions.checkNotNull(monitoringMode, "Unspecified monitoring mode.");
 
+		// 参数判断
 		Preconditions.checkArgument(monitoringMode.equals(FileProcessingMode.PROCESS_ONCE) ||
 				interval >= ContinuousFileMonitoringFunction.MIN_MONITORING_INTERVAL,
 			"The path monitoring interval cannot be less than " +
-					ContinuousFileMonitoringFunction.MIN_MONITORING_INTERVAL + " ms.");
+				ContinuousFileMonitoringFunction.MIN_MONITORING_INTERVAL + " ms.");
 
+		// 连续的文件监控函数
 		ContinuousFileMonitoringFunction<OUT> monitoringFunction =
 			new ContinuousFileMonitoringFunction<>(inputFormat, monitoringMode, getParallelism(), interval);
 
+		// 连续的文件读取算子
 		ContinuousFileReaderOperator<OUT> reader =
 			new ContinuousFileReaderOperator<>(inputFormat);
 
+		// 重要
+		// 生成单输出流算子(一个source 只有一个输出)
 		SingleOutputStreamOperator<OUT> source = addSource(monitoringFunction, sourceName)
-				.transform("Split Reader: " + sourceName, typeInfo, reader);
+			.transform("Split Reader: " + sourceName, typeInfo, reader);
 
 		return new DataStreamSource<>(source);
 	}
@@ -1467,8 +1502,8 @@ public abstract class StreamExecutionEnvironment {
 			} else {
 				try {
 					typeInfo = TypeExtractor.createTypeInfo(
-							SourceFunction.class,
-							function.getClass(), 0, null, null);
+						SourceFunction.class,
+						function.getClass(), 0, null, null);
 				} catch (final InvalidTypesException e) {
 					typeInfo = (TypeInformation<OUT>) new MissingTypeInfo(sourceName, e);
 				}
@@ -1620,6 +1655,7 @@ public abstract class StreamExecutionEnvironment {
 	 * executed.
 	 */
 	public static StreamExecutionEnvironment getExecutionEnvironment() {
+		// 首次执行为空, 该值是在ExecutionEnvironment.getExecutionEnvironment()进行初始化的
 		if (contextEnvironmentFactory != null) {
 			return contextEnvironmentFactory.createExecutionEnvironment();
 		}
@@ -1628,6 +1664,7 @@ public abstract class StreamExecutionEnvironment {
 		// we currently need to intercept the data set environment and create a dependent stream env.
 		// this should be fixed once we rework the project dependencies
 
+		// 返回执行环境，并初始化contextEnvironmentFactory
 		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		if (env instanceof ContextEnvironment) {
 			return new StreamContextEnvironment((ContextEnvironment) env);
@@ -1732,7 +1769,7 @@ public abstract class StreamExecutionEnvironment {
 	 * @return A remote environment that executes the program on a cluster.
 	 */
 	public static StreamExecutionEnvironment createRemoteEnvironment(
-			String host, int port, String... jarFiles) {
+		String host, int port, String... jarFiles) {
 		return new RemoteStreamEnvironment(host, port, jarFiles);
 	}
 
@@ -1758,7 +1795,7 @@ public abstract class StreamExecutionEnvironment {
 	 * @return A remote environment that executes the program on a cluster.
 	 */
 	public static StreamExecutionEnvironment createRemoteEnvironment(
-			String host, int port, int parallelism, String... jarFiles) {
+		String host, int port, int parallelism, String... jarFiles) {
 		RemoteStreamEnvironment env = new RemoteStreamEnvironment(host, port, jarFiles);
 		env.setParallelism(parallelism);
 		return env;
@@ -1786,7 +1823,7 @@ public abstract class StreamExecutionEnvironment {
 	 * @return A remote environment that executes the program on a cluster.
 	 */
 	public static StreamExecutionEnvironment createRemoteEnvironment(
-			String host, int port, Configuration clientConfig, String... jarFiles) {
+		String host, int port, Configuration clientConfig, String... jarFiles) {
 		return new RemoteStreamEnvironment(host, port, clientConfig, jarFiles);
 	}
 

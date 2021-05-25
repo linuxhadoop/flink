@@ -54,6 +54,7 @@ public abstract class InputChannel {
 	// 要读取的 结果分区的ID
 	protected final ResultPartitionID partitionId;
 
+	// 当前InputChannel属于哪一个inputGate
 	protected final SingleInputGate inputGate;
 
 	// - Asynchronous error notification --------------------------------------
@@ -86,13 +87,13 @@ public abstract class InputChannel {
 	private int currentBackoff;
 
 	protected InputChannel(
-			SingleInputGate inputGate,
-			int channelIndex,
-			ResultPartitionID partitionId,
-			int initialBackoff,
-			int maxBackoff,
-			Counter numBytesIn,
-			Counter numBuffersIn) {
+		SingleInputGate inputGate,
+		int channelIndex,
+		ResultPartitionID partitionId,
+		int initialBackoff,
+		int maxBackoff,
+		Counter numBytesIn,
+		Counter numBuffersIn) {
 
 		checkArgument(channelIndex >= 0);
 

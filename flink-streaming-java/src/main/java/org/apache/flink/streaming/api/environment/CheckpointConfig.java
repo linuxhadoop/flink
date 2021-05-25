@@ -53,7 +53,9 @@ public class CheckpointConfig implements java.io.Serializable {
 	/** Checkpointing mode (exactly-once vs. at-least-once). */
 	private CheckpointingMode checkpointingMode = DEFAULT_MODE;
 
-	/** Periodic checkpoint triggering interval. */
+	/** Periodic checkpoint triggering interval.
+	 * 	checkpoint的周期性间隔
+	 * */
 	private long checkpointInterval = -1; // disabled
 
 	/** Maximum time checkpoint may take before being discarded. */

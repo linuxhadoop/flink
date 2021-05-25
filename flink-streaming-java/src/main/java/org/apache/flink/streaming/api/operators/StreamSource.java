@@ -40,12 +40,13 @@ import java.util.concurrent.ScheduledFuture;
  */
 @Internal
 public class StreamSource<OUT, SRC extends SourceFunction<OUT>>
-		extends AbstractUdfStreamOperator<OUT, SRC> implements StreamOperator<OUT> {
+	extends AbstractUdfStreamOperator<OUT, SRC> implements StreamOperator<OUT> {
 
 	private static final long serialVersionUID = 1L;
 
 	private transient SourceFunction.SourceContext<OUT> ctx;
 
+	// 是否被取消或停止
 	private transient volatile boolean canceledOrStopped = false;
 
 	public StreamSource(SRC sourceFunction) {
@@ -60,9 +61,10 @@ public class StreamSource<OUT, SRC extends SourceFunction<OUT>>
 	}
 
 	public void run(final Object lockingObject,
-			final StreamStatusMaintainer streamStatusMaintainer,
-			final Output<StreamRecord<OUT>> collector) throws Exception {
+					final StreamStatusMaintainer streamStatusMaintainer,
+					final Output<StreamRecord<OUT>> collector) throws Exception {
 
+		// 数据流程中的时间处理类型，包含三种类型:处理时间、摄入时间、事件时间
 		final TimeCharacteristic timeCharacteristic = getOperatorConfig().getTimeCharacteristic();
 
 		final Configuration configuration = this.getContainingTask().getEnvironment().getTaskManagerInfo().getConfiguration();
@@ -144,11 +146,11 @@ public class StreamSource<OUT, SRC extends SourceFunction<OUT>>
 		private final ScheduledFuture<?> latencyMarkTimer;
 
 		public LatencyMarksEmitter(
-				final ProcessingTimeService processingTimeService,
-				final Output<StreamRecord<OUT>> output,
-				long latencyTrackingInterval,
-				final OperatorID operatorId,
-				final int subtaskIndex) {
+			final ProcessingTimeService processingTimeService,
+			final Output<StreamRecord<OUT>> output,
+			long latencyTrackingInterval,
+			final OperatorID operatorId,
+			final int subtaskIndex) {
 
 			latencyMarkTimer = processingTimeService.scheduleAtFixedRate(
 				new ProcessingTimeCallback() {

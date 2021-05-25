@@ -137,7 +137,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	 * 	原子状态更新
 	 * */
 	private static final AtomicReferenceFieldUpdater<Task, ExecutionState> STATE_UPDATER =
-			AtomicReferenceFieldUpdater.newUpdater(Task.class, ExecutionState.class, "executionState");
+		AtomicReferenceFieldUpdater.newUpdater(Task.class, ExecutionState.class, "executionState");
 
 	// ------------------------------------------------------------------------
 	//  Constant fields that are part of the initial Task construction
@@ -291,7 +291,9 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	/** The observed exception, in case the task execution failed. */
 	private volatile Throwable failureCause;
 
-	/** Serial executor for asynchronous calls (checkpoints, etc), lazily initialized. */
+	/** Serial executor for asynchronous calls (checkpoints, etc), lazily initialized.
+	 * 	用于异步调用 （该变量 通过懒加载实例化)
+	 * */
 	private volatile ExecutorService asyncCallDispatcher;
 
 	/** Initialized from the Flink configuration. May also be set at the ExecutionConfig */
@@ -345,12 +347,12 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 		Preconditions.checkArgument(0 <= targetSlotNumber, "The target slot number must be positive.");
 
 		this.taskInfo = new TaskInfo(
-				taskInformation.getTaskName(),
-				taskInformation.getMaxNumberOfSubtaks(),
-				subtaskIndex,
-				taskInformation.getNumberOfSubtasks(),
-				attemptNumber,
-				String.valueOf(slotAllocationId));
+			taskInformation.getTaskName(),
+			taskInformation.getMaxNumberOfSubtaks(),
+			subtaskIndex,
+			taskInformation.getNumberOfSubtasks(),
+			attemptNumber,
+			String.valueOf(slotAllocationId));
 
 		this.jobId = jobInformation.getJobId();
 		this.vertexId = taskInformation.getJobVertexId();
@@ -441,7 +443,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 
 		invokableHasBeenCanceled = new AtomicBoolean(false);
 
-		// finally, create the executing thread, but do not start it
+		// finally, create the executing thread, but do not start it 创建执行线程，但是不运行
 		executingThread = new Thread(TASK_THREADS_GROUP, this, taskNameWithSubtask);
 	}
 
@@ -535,8 +537,8 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	 */
 	public boolean isCanceledOrFailed() {
 		return executionState == ExecutionState.CANCELING ||
-				executionState == ExecutionState.CANCELED ||
-				executionState == ExecutionState.FAILED;
+			executionState == ExecutionState.CANCELED ||
+			executionState == ExecutionState.FAILED;
 	}
 
 	/**
@@ -550,7 +552,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	}
 
 	/**
-	 * Starts the task's thread.
+	 * Starts the task's thread. 启动task线程
 	 */
 	public void startTaskThread() {
 		executingThread.start();
@@ -686,7 +688,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			// next, kick off the background copying of files for the distributed cache
 			try {
 				for (Map.Entry<String, DistributedCache.DistributedCacheEntry> entry :
-						DistributedCache.readFileInfoFromConfig(jobConfiguration)) {
+					DistributedCache.readFileInfoFromConfig(jobConfiguration)) {
 					LOG.info("Obtaining local cache file for '{}'.", entry.getKey());
 					Future<Path> cp = fileCache.createTmpFile(entry.getKey(), entry.getValue(), jobId, executionId);
 					distributedCacheEntries.put(entry.getKey(), cp);
@@ -796,7 +798,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			try {
 				// check if the exception is unrecoverable
 				if (ExceptionUtils.isJvmFatalError(t) ||
-						(t instanceof OutOfMemoryError && taskManagerConfig.shouldExitJvmOnOutOfMemoryError())) {
+					(t instanceof OutOfMemoryError && taskManagerConfig.shouldExitJvmOnOutOfMemoryError())) {
 
 					// terminate the JVM immediately
 					// don't attempt a clean shutdown, because we cannot expect the clean shutdown to complete
@@ -906,6 +908,9 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 		}
 	}
 
+	/**
+	 * 创建用用户代码类加载器
+	 * */
 	private ClassLoader createUserCodeClassloader() throws Exception {
 		long startDownloadTime = System.currentTimeMillis();
 
@@ -913,7 +918,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 		libraryCache.registerTask(jobId, executionId, requiredJarFiles, requiredClasspaths);
 
 		LOG.debug("Getting user code class loader for task {} at library cache manager took {} milliseconds",
-				executionId, System.currentTimeMillis() - startDownloadTime);
+			executionId, System.currentTimeMillis() - startDownloadTime);
 
 		ClassLoader userCodeClassLoader = libraryCache.getClassLoader(jobId);
 		if (userCodeClassLoader == null) {
@@ -1077,17 +1082,17 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 
 						// The canceller calls cancel and interrupts the executing thread once
 						Runnable canceler = new TaskCanceler(
-								LOG,
-								invokable,
-								executingThread,
-								taskNameWithSubtask,
-								producedPartitions,
-								inputGates);
+							LOG,
+							invokable,
+							executingThread,
+							taskNameWithSubtask,
+							producedPartitions,
+							inputGates);
 
 						Thread cancelThread = new Thread(
-								executingThread.getThreadGroup(),
-								canceler,
-								String.format("Canceler for %s (%s).", taskNameWithSubtask, executionId));
+							executingThread.getThreadGroup(),
+							canceler,
+							String.format("Canceler for %s (%s).", taskNameWithSubtask, executionId));
 						cancelThread.setDaemon(true);
 						cancelThread.setUncaughtExceptionHandler(FatalExitExceptionHandler.INSTANCE);
 						cancelThread.start();
@@ -1096,16 +1101,16 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 						// the application code does blocking stuff in its cancellation paths.
 						if (invokable.shouldInterruptOnCancel()) {
 							Runnable interrupter = new TaskInterrupter(
-									LOG,
-									invokable,
-									executingThread,
-									taskNameWithSubtask,
-									taskCancellationInterval);
+								LOG,
+								invokable,
+								executingThread,
+								taskNameWithSubtask,
+								taskCancellationInterval);
 
 							Thread interruptingThread = new Thread(
-									executingThread.getThreadGroup(),
-									interrupter,
-									String.format("Canceler/Interrupts for %s (%s).", taskNameWithSubtask, executionId));
+								executingThread.getThreadGroup(),
+								interrupter,
+								String.format("Canceler/Interrupts for %s (%s).", taskNameWithSubtask, executionId));
 							interruptingThread.setDaemon(true);
 							interruptingThread.setUncaughtExceptionHandler(FatalExitExceptionHandler.INSTANCE);
 							interruptingThread.start();
@@ -1115,16 +1120,16 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 						// if graceful cancellation does not succeed
 						if (taskCancellationTimeout > 0) {
 							Runnable cancelWatchdog = new TaskCancelerWatchDog(
-									executingThread,
-									taskManagerActions,
-									taskCancellationTimeout,
-									LOG);
+								executingThread,
+								taskManagerActions,
+								taskCancellationTimeout,
+								LOG);
 
 							Thread watchDogThread = new Thread(
-									executingThread.getThreadGroup(),
-									cancelWatchdog,
-									String.format("Cancellation Watchdog for %s (%s).",
-											taskNameWithSubtask, executionId));
+								executingThread.getThreadGroup(),
+								cancelWatchdog,
+								String.format("Cancellation Watchdog for %s (%s).",
+									taskNameWithSubtask, executionId));
 							watchDogThread.setDaemon(true);
 							watchDogThread.setUncaughtExceptionHandler(FatalExitExceptionHandler.INSTANCE);
 							watchDogThread.start();
@@ -1141,7 +1146,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	}
 
 	// ------------------------------------------------------------------------
-	//  Partition State Listeners
+	//  Partition State Listeners (Partition状态监听器)
 	// ------------------------------------------------------------------------
 
 	@Override
@@ -1190,16 +1195,16 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Calls the invokable to trigger a checkpoint.
+	 * Calls the invokable to trigger a checkpoint. 触发checkpoint
 	 *
 	 * @param checkpointID The ID identifying the checkpoint.
 	 * @param checkpointTimestamp The timestamp associated with the checkpoint.
 	 * @param checkpointOptions Options for performing this checkpoint.
 	 */
 	public void triggerCheckpointBarrier(
-			final long checkpointID,
-			long checkpointTimestamp,
-			final CheckpointOptions checkpointOptions) {
+		final long checkpointID,
+		long checkpointTimestamp,
+		final CheckpointOptions checkpointOptions) {
 
 		final AbstractInvokable invokable = this.invokable;
 		final CheckpointMetaData checkpointMetaData = new CheckpointMetaData(checkpointID, checkpointTimestamp);
@@ -1222,8 +1227,8 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 						boolean success = invokable.triggerCheckpoint(checkpointMetaData, checkpointOptions);
 						if (!success) {
 							checkpointResponder.declineCheckpoint(
-									getJobID(), getExecutionId(), checkpointID,
-									new CheckpointDeclineTaskNotReadyException(taskName));
+								getJobID(), getExecutionId(), checkpointID,
+								new CheckpointDeclineTaskNotReadyException(taskName));
 						}
 					}
 					catch (Throwable t) {
@@ -1233,7 +1238,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 									taskNameWithSubtask, t));
 						} else {
 							LOG.debug("Encountered error while triggering checkpoint {} for " +
-								"{} ({}) while being not in state running.", checkpointID,
+									"{} ({}) while being not in state running.", checkpointID,
 								taskNameWithSubtask, executionId, t);
 						}
 					} finally {
@@ -1248,7 +1253,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 
 			// send back a message that we did not do the checkpoint
 			checkpointResponder.declineCheckpoint(jobId, executionId, checkpointID,
-					new CheckpointDeclineTaskNotReadyException(taskNameWithSubtask));
+				new CheckpointDeclineTaskNotReadyException(taskNameWithSubtask));
 		}
 	}
 
@@ -1289,9 +1294,9 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	 */
 	@VisibleForTesting
 	void onPartitionStateUpdate(
-			IntermediateDataSetID intermediateDataSetId,
-			ResultPartitionID resultPartitionId,
-			ExecutionState producerState) throws IOException, InterruptedException {
+		IntermediateDataSetID intermediateDataSetId,
+		ResultPartitionID resultPartitionId,
+		ExecutionState producerState) throws IOException, InterruptedException {
 
 		if (executionState == ExecutionState.RUNNING) {
 			final SingleInputGate inputGate = inputGatesById.get(intermediateDataSetId);
@@ -1335,7 +1340,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 				}
 			} else {
 				failExternally(new IllegalStateException("Received partition producer state for " +
-						"unknown input gate " + intermediateDataSetId + "."));
+					"unknown input gate " + intermediateDataSetId + "."));
 			}
 		} else {
 			LOG.debug("Task {} ignored a partition producer state notification, because it's not running.", taskNameWithSubtask);
@@ -1344,6 +1349,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 
 	/**
 	 * Utility method to dispatch an asynchronous call on the invokable.
+	 * 工具方法：异步调用
 	 *
 	 * @param runnable The async call runnable.
 	 * @param callName The name of the call, for logging purposes.
@@ -1361,10 +1367,10 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 				// first time use, initialize
 				checkState(userCodeClassLoader != null, "userCodeClassLoader must not be null");
 				executor = Executors.newSingleThreadExecutor(
-						new DispatcherThreadFactory(
-							TASK_THREADS_GROUP,
-							"Async calls on " + taskNameWithSubtask,
-							userCodeClassLoader));
+					new DispatcherThreadFactory(
+						TASK_THREADS_GROUP,
+						"Async calls on " + taskNameWithSubtask,
+						userCodeClassLoader));
 				this.asyncCallDispatcher = executor;
 
 				// double-check for execution state, and make sure we clean up after ourselves
@@ -1499,12 +1505,12 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 		private final SingleInputGate[] inputGates;
 
 		public TaskCanceler(
-				Logger logger,
-				AbstractInvokable invokable,
-				Thread executer,
-				String taskName,
-				ResultPartition[] producedPartitions,
-				SingleInputGate[] inputGates) {
+			Logger logger,
+			AbstractInvokable invokable,
+			Thread executer,
+			String taskName,
+			ResultPartition[] producedPartitions,
+			SingleInputGate[] inputGates) {
 
 			this.logger = logger;
 			this.invokable = invokable;
@@ -1584,11 +1590,11 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 		private final long interruptIntervalMillis;
 
 		TaskInterrupter(
-				Logger log,
-				AbstractInvokable task,
-				Thread executerThread,
-				String taskName,
-				long interruptIntervalMillis) {
+			Logger log,
+			AbstractInvokable task,
+			Thread executerThread,
+			String taskName,
+			long interruptIntervalMillis) {
 
 			this.log = log;
 			this.task = task;
@@ -1616,7 +1622,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 					}
 
 					log.warn("Task '{}' did not react to cancelling signal for {} seconds, but is stuck in method:\n {}",
-							taskName, (interruptIntervalMillis / 1000), bld);
+						taskName, (interruptIntervalMillis / 1000), bld);
 
 					executerThread.interrupt();
 					try {
@@ -1654,10 +1660,10 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 		private final long timeoutMillis;
 
 		TaskCancelerWatchDog(
-				Thread executerThread,
-				TaskManagerActions taskManager,
-				long timeoutMillis,
-				Logger log) {
+			Thread executerThread,
+			TaskManagerActions taskManager,
+			long timeoutMillis,
+			Logger log) {
 
 			checkArgument(timeoutMillis > 0);
 
@@ -1674,7 +1680,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 
 				long millisLeft;
 				while (executerThread.isAlive()
-						&& (millisLeft = (hardKillDeadline - System.nanoTime()) / 1_000_000) > 0) {
+					&& (millisLeft = (hardKillDeadline - System.nanoTime()) / 1_000_000) > 0) {
 
 					try {
 						executerThread.join(millisLeft);

@@ -57,7 +57,7 @@ public enum ChainingStrategy {
 	/**
 	 * The operator will not be chained to the predecessor, but successors may chain to this
 	 * operator.
-	 * 算子不会与前驱算子进行链接, 但是后继节点可能会链接到该节点
+	 * 算子不会与前驱算子进行链接, 但是后继节点可能会链接到该节点。 比如source
 	 */
 	HEAD
 }

@@ -60,7 +60,9 @@ public class RemoteInputChannel extends InputChannel implements BufferRecycler, 
 	/** ID to distinguish this channel from other channels sharing the same TCP connection. */
 	private final InputChannelID id = new InputChannelID();
 
-	/** The connection to use to request the remote partition. */
+	/** The connection to use to request the remote partition.
+	 *  用来请求远程分区的连接
+	 * */
 	private final ConnectionID connectionId;
 
 	/** The connection manager to use connect to the remote partition provider.

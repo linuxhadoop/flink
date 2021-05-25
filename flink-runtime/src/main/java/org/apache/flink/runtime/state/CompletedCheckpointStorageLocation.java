@@ -24,6 +24,8 @@ import java.io.IOException;
  * The CompletedCheckpointStorageLocation describes the storage aspect of a completed checkpoint.
  * It can be used to obtain access to the metadata, get a reference pointer to the checkpoint,
  * or to dispose the storage location.
+ * 用来描述一个已完成的checkpoint的存储信息。
+ * 可以用来访问元数据、checkpoint的引用指针、dispose(处理？)存储位置
  */
 public interface CompletedCheckpointStorageLocation extends java.io.Serializable {
 

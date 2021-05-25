@@ -33,6 +33,8 @@ import java.util.Objects;
 /**
  * Request for submitting a job.
  *
+ * 提交一个Job的请求
+ *
  * <p>This request only contains the names of files that must be present on the server, and defines how these files are
  * interpreted.
  */
@@ -56,9 +58,9 @@ public final class JobSubmitRequestBody implements RequestBody {
 
 	@JsonCreator
 	public JobSubmitRequestBody(
-			@Nullable @JsonProperty(FIELD_NAME_JOB_GRAPH) String jobGraphFileName,
-			@Nullable @JsonProperty(FIELD_NAME_JOB_JARS) Collection<String> jarFileNames,
-			@Nullable @JsonProperty(FIELD_NAME_JOB_ARTIFACTS) Collection<DistributedCacheFile> artifactFileNames) {
+		@Nullable @JsonProperty(FIELD_NAME_JOB_GRAPH) String jobGraphFileName,
+		@Nullable @JsonProperty(FIELD_NAME_JOB_JARS) Collection<String> jarFileNames,
+		@Nullable @JsonProperty(FIELD_NAME_JOB_ARTIFACTS) Collection<DistributedCacheFile> artifactFileNames) {
 		this.jobGraphFileName = jobGraphFileName;
 		if (jarFileNames == null) {
 			this.jarFileNames = Collections.emptyList();

@@ -95,7 +95,7 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
 		// worst case (network consumes faster than the producer) each buffer
 		// will trigger a separate event loop task being scheduled.
 
-		// 调用了userEventTriggered
+		// 调用了本类中的userEventTriggered方法
 		ctx.executor().execute(() -> ctx.pipeline().fireUserEventTriggered(reader));
 	}
 

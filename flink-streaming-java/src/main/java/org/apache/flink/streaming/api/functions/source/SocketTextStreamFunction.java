@@ -49,27 +49,31 @@ public class SocketTextStreamFunction implements SourceFunction<String> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SocketTextStreamFunction.class);
 
-	/** Default delay between successive connection attempts. */
+	/** Default delay between successive connection attempts.
+	 *  连续的连接重试 间隔时间
+	 * */
 	private static final int DEFAULT_CONNECTION_RETRY_SLEEP = 500;
 
-	/** Default connection timeout when connecting to the server socket (infinite). */
+	/** Default connection timeout when connecting to the server socket (infinite).
+	 *  默认超时时间
+	 * */
 	private static final int CONNECTION_TIMEOUT_TIME = 0;
 
+	private final String hostname;//主机
+	private final int port;//端口
+	private final String delimiter;//分隔符
+	private final long maxNumRetries;//最大重试次数
+	private final long delayBetweenRetries;// 延迟重试间隔时间
 
-	private final String hostname;
-	private final int port;
-	private final String delimiter;
-	private final long maxNumRetries;
-	private final long delayBetweenRetries;
+	private transient Socket currentSocket;//当前socket
 
-	private transient Socket currentSocket;
-
-	private volatile boolean isRunning = true;
+	private volatile boolean isRunning = true;//是否运行中
 
 	public SocketTextStreamFunction(String hostname, int port, String delimiter, long maxNumRetries) {
 		this(hostname, port, delimiter, maxNumRetries, DEFAULT_CONNECTION_RETRY_SLEEP);
 	}
 
+	//SocketTextStreamFunction source = new SocketTextStreamFunction(LOCALHOST, server.getLocalPort(), "\n", 10, 100);
 	public SocketTextStreamFunction(String hostname, int port, String delimiter, long maxNumRetries, long delayBetweenRetries) {
 		checkArgument(port > 0 && port < 65536, "port is out of range");
 		checkArgument(maxNumRetries >= -1, "maxNumRetries must be zero or larger (num retries), or -1 (infinite retries)");
@@ -92,6 +96,7 @@ public class SocketTextStreamFunction implements SourceFunction<String> {
 			try (Socket socket = new Socket()) {
 				currentSocket = socket;
 
+				// 连接服务器
 				LOG.info("Connecting to server socket " + hostname + ':' + port);
 				socket.connect(new InetSocketAddress(hostname, port), CONNECTION_TIMEOUT_TIME);
 				try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {

@@ -354,7 +354,7 @@ public class SingleInputGate implements InputGate {
 	public void setInputChannel(IntermediateResultPartitionID partitionId, InputChannel inputChannel) {
 		synchronized (requestLock) {
 			if (inputChannels.put(checkNotNull(partitionId), checkNotNull(inputChannel)) == null
-					&& inputChannel instanceof UnknownInputChannel) {
+				&& inputChannel instanceof UnknownInputChannel) {
 
 				numberOfUninitializedChannels++;
 			}
@@ -385,6 +385,7 @@ public class SingleInputGate implements InputGate {
 
 				ResultPartitionLocation partitionLocation = icdd.getConsumedPartitionLocation();
 
+				// 是否是本地
 				if (partitionLocation.isLocal()) {
 					newChannel = unknownChannel.toLocalInputChannel();
 				}
@@ -408,6 +409,7 @@ public class SingleInputGate implements InputGate {
 
 				// 请求分区数据
 				if (requestedPartitionsFlag) {
+					// 实际上调用的是LocalInputChannel或RemoteInputChannel中的requestSubpartition
 					newChannel.requestSubpartition(consumedSubpartitionIndex);
 				}
 
@@ -453,7 +455,7 @@ public class SingleInputGate implements InputGate {
 				}
 				else {
 					throw new IllegalStateException(
-							"Unexpected type of channel to retrigger partition: " + ch.getClass());
+						"Unexpected type of channel to retrigger partition: " + ch.getClass());
 				}
 			}
 		}
@@ -524,8 +526,8 @@ public class SingleInputGate implements InputGate {
 				// Sanity checks
 				if (numberOfInputChannels != inputChannels.size()) {
 					throw new IllegalStateException("Bug in input gate setup logic: mismatch between" +
-							"number of total input channels and the currently set number of input " +
-							"channels.");
+						"number of total input channels and the currently set number of input " +
+						"channels.");
 				}
 
 				for (InputChannel inputChannel : inputChannels.values()) {

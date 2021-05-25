@@ -61,9 +61,14 @@ public class LocalInputChannel extends InputChannel implements BufferAvailabilit
 	/** Task event dispatcher for backwards events. */
 	private final TaskEventDispatcher taskEventDispatcher;
 
-	/** The consumed subpartition. */
+	/** The consumed subpartition.
+	 * 	消费的子分区
+	 * */
 	private volatile ResultSubpartitionView subpartitionView;
 
+	/**
+	 * 是否已被释放
+	 * */
 	private volatile boolean isReleased;
 
 	public LocalInputChannel(
@@ -121,7 +126,7 @@ public class LocalInputChannel extends InputChannel implements BufferAvailabilit
 						throw new IOException("Error requesting subpartition.");
 					}
 
-					// make the subpartition view visible 是自分区view可见
+					// make the subpartition view visible 使子分区view可见
 					this.subpartitionView = subpartitionView;
 
 					// check if the channel was released in the meantime
@@ -149,6 +154,7 @@ public class LocalInputChannel extends InputChannel implements BufferAvailabilit
 
 	/**
 	 * Retriggers a subpartition request.
+	 * 重新出发子分区请求
 	 */
 	void retriggerSubpartitionRequest(Timer timer, final int subpartitionIndex) {
 		synchronized (requestLock) {

@@ -27,11 +27,13 @@ public interface StartStoppable {
 
 	/**
 	 * Starts the processing of remote procedure calls.
+	 * 开始RPC处理
 	 */
 	void start();
 
 	/**
 	 * Stops the processing of remote procedure calls.
+	 * 停止RPC处理
 	 */
 	void stop();
 }

@@ -31,6 +31,7 @@ import javax.annotation.Nullable;
 
 /**
  * The default CLI which is used for interaction with standalone clusters.
+ * 与standalone集群进行交互的默认客户端
  */
 public class DefaultCLI extends AbstractCustomCommandLine<StandaloneClusterId> {
 
@@ -56,7 +57,7 @@ public class DefaultCLI extends AbstractCustomCommandLine<StandaloneClusterId> {
 
 	@Override
 	public StandaloneClusterDescriptor createClusterDescriptor(
-			CommandLine commandLine) throws FlinkException {
+		CommandLine commandLine) throws FlinkException {
 		final Configuration effectiveConfiguration = applyCommandLineOptionsToConfiguration(commandLine);
 
 		return new StandaloneClusterDescriptor(effectiveConfiguration);

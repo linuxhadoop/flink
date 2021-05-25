@@ -31,7 +31,7 @@ import org.apache.flink.shaded.netty4.io.netty.channel.ChannelHandler;
  */
 public class NettyProtocol {
 
-	// netty消息编码器
+	// netty消息编码器 (ChannelOutboundHandlerAdapter)
 	private final NettyMessage.NettyMessageEncoder
 		messageEncoder = new NettyMessage.NettyMessageEncoder();
 

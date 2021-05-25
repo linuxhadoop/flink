@@ -124,8 +124,8 @@ public class CliFrontend {
 	private final int defaultParallelism;
 
 	public CliFrontend(
-			Configuration configuration,
-			List<CustomCommandLine<?>> customCommandLines) throws Exception {
+		Configuration configuration,
+		List<CustomCommandLine<?>> customCommandLines) throws Exception {
 		this.configuration = Preconditions.checkNotNull(configuration);
 		this.customCommandLines = Preconditions.checkNotNull(customCommandLines);
 
@@ -173,7 +173,7 @@ public class CliFrontend {
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Executions the run action.
+	 * Executions the run action. 执行run操作
 	 *
 	 * @param args Command line arguments for the run action.
 	 */
@@ -184,6 +184,7 @@ public class CliFrontend {
 
 		final Options commandLineOptions = CliFrontendParser.mergeOptions(commandOptions, customCommandLineOptions);
 
+		// 解析命令函
 		final CommandLine commandLine = CliFrontendParser.parse(commandLineOptions, args, true);
 
 		final RunOptions runOptions = new RunOptions(commandLine);
@@ -217,10 +218,10 @@ public class CliFrontend {
 	}
 
 	private <T> void runProgram(
-			CustomCommandLine<T> customCommandLine,
-			CommandLine commandLine,
-			RunOptions runOptions,
-			PackagedProgram program) throws ProgramInvocationException, FlinkException {
+		CustomCommandLine<T> customCommandLine,
+		CommandLine commandLine,
+		RunOptions runOptions,
+		PackagedProgram program) throws ProgramInvocationException, FlinkException {
 		final ClusterDescriptor<T> clusterDescriptor = customCommandLine.createClusterDescriptor(commandLine);
 
 		try {
@@ -232,6 +233,7 @@ public class CliFrontend {
 			if (clusterId == null && runOptions.getDetachedMode()) {
 				int parallelism = runOptions.getParallelism() == -1 ? defaultParallelism : runOptions.getParallelism();
 
+				// 创建jobGraph
 				final JobGraph jobGraph = PackagedProgramUtils.createJobGraph(program, configuration, parallelism);
 
 				final ClusterSpecification clusterSpecification = customCommandLine.getClusterSpecification(commandLine);
@@ -411,7 +413,7 @@ public class CliFrontend {
 		final boolean showScheduled;
 		final boolean showAll;
 
-		// print running and scheduled jobs if not option supplied
+		// print running and scheduled jobs if not option supplied 打印running、scheduled job
 		if (!listOptions.showRunning() && !listOptions.showScheduled() && !listOptions.showAll()) {
 			showRunning = true;
 			showScheduled = true;
@@ -432,10 +434,10 @@ public class CliFrontend {
 	}
 
 	private <T> void listJobs(
-			ClusterClient<T> clusterClient,
-			boolean showRunning,
-			boolean showScheduled,
-			boolean showAll) throws FlinkException {
+		ClusterClient<T> clusterClient,
+		boolean showRunning,
+		boolean showScheduled,
+		boolean showAll) throws FlinkException {
 		Collection<JobStatusMessage> jobDetails;
 		try {
 			CompletableFuture<Collection<JobStatusMessage>> jobDetailsFuture = clusterClient.listJobs();
@@ -834,34 +836,41 @@ public class CliFrontend {
 
 	/**
 	 * Creates a Packaged program from the given command line options.
+	 * 根据指定的命令行选项，创建一个打包的程序
 	 *
 	 * @return A PackagedProgram (upon success)
 	 */
 	PackagedProgram buildProgram(ProgramOptions options) throws FileNotFoundException, ProgramInvocationException {
+		// 程序参数
 		String[] programArgs = options.getProgramArgs();
+
+		// jar包路径
 		String jarFilePath = options.getJarFilePath();
+
+		// classpath
 		List<URL> classpaths = options.getClasspaths();
 
+		// 未指定jar包，则提示
 		if (jarFilePath == null) {
 			throw new IllegalArgumentException("The program JAR file was not specified.");
 		}
 
 		File jarFile = new File(jarFilePath);
 
-		// Check if JAR file exists
+		// Check if JAR file exists 检测jar包是否存在
 		if (!jarFile.exists()) {
 			throw new FileNotFoundException("JAR file does not exist: " + jarFile);
 		}
-		else if (!jarFile.isFile()) {
+		else if (!jarFile.isFile()) {// 检测是否是文件类型
 			throw new FileNotFoundException("JAR file is not a file: " + jarFile);
 		}
 
-		// Get assembler class
+		// Get assembler class 获取入口类
 		String entryPointClass = options.getEntryPointClassName();
 
 		PackagedProgram program = entryPointClass == null ?
-				new PackagedProgram(jarFile, classpaths, programArgs) :
-				new PackagedProgram(jarFile, classpaths, entryPointClass, programArgs);
+			new PackagedProgram(jarFile, classpaths, programArgs) :
+			new PackagedProgram(jarFile, classpaths, entryPointClass, programArgs);
 
 		program.setSavepointRestoreSettings(options.getSavepointRestoreSettings());
 
@@ -1024,6 +1033,7 @@ public class CliFrontend {
 
 	/**
 	 * Parses the command line arguments and starts the requested action.
+	 * 解析命令行参数，并进行相关操作
 	 *
 	 * @param args command line arguments of the client.
 	 * @return The return code of the program
@@ -1037,10 +1047,10 @@ public class CliFrontend {
 			return 1;
 		}
 
-		// get action
+		// get action 获取action【eg: ACTION_RUN 等】
 		String action = args[0];
 
-		// remove action from parameters
+		// remove action from parameters 从参数中将action去掉
 		final String[] params = Arrays.copyOfRange(args, 1, args.length);
 
 		try {
@@ -1101,17 +1111,19 @@ public class CliFrontend {
 
 	/**
 	 * Submits the job based on the arguments.
+	 * 基于参数 提交job
 	 */
 	public static void main(final String[] args) {
+		// 记录环境信息，例如代码修订、当前用户、java版本以及jvm参数
 		EnvironmentInformation.logEnvironmentInfo(LOG, "Command Line Client", args);
 
-		// 1. find the configuration directory
+		// 1. find the configuration directory 获取配置目录
 		final String configurationDirectory = getConfigurationDirectoryFromEnv();
 
-		// 2. load the global configuration
+		// 2. load the global configuration 加载全局配置
 		final Configuration configuration = GlobalConfiguration.loadConfiguration(configurationDirectory);
 
-		// 3. load the custom command lines
+		// 3. load the custom command lines 加载自定义命令行(包含yarn、default两种)
 		final List<CustomCommandLine<?>> customCommandLines = loadCustomCommandLines(
 			configuration,
 			configurationDirectory);
@@ -1123,7 +1135,7 @@ public class CliFrontend {
 
 			SecurityUtils.install(new SecurityConfiguration(cli.configuration));
 			int retCode = SecurityUtils.getInstalledContext()
-					.runSecured(() -> cli.parseParameters(args));
+				.runSecured(() -> cli.parseParameters(args));
 			System.exit(retCode);
 		}
 		catch (Throwable t) {
@@ -1158,7 +1170,7 @@ public class CliFrontend {
 		}
 		else {
 			throw new RuntimeException("The configuration directory was not specified. " +
-					"Please specify the directory containing the configuration file through the '" +
+				"Please specify the directory containing the configuration file through the '" +
 				ConfigConstants.ENV_FLINK_CONF_DIR + "' environment variable.");
 		}
 		return location;

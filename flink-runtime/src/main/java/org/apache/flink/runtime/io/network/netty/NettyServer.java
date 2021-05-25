@@ -44,6 +44,7 @@ import static org.apache.flink.util.Preconditions.checkState;
 
 class NettyServer {
 
+	// 使用guava的ThreadFactoryBuilder来创建线程池
 	private static final ThreadFactoryBuilder THREAD_FACTORY_BUILDER =
 		new ThreadFactoryBuilder()
 			.setDaemon(true)
@@ -51,12 +52,16 @@ class NettyServer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
 
+	// netty配置
 	private final NettyConfig config;
 
+	// ServerBootstrap作为一个启动辅助类，通过他可以很方便的创建一个Netty服务端
 	private ServerBootstrap bootstrap;
 
+	// 用来保存Channel异步操作的结果
 	private ChannelFuture bindFuture;
 
+	// 本地地址
 	private InetSocketAddress localAddress;
 
 	NettyServer(NettyConfig config) {
@@ -68,6 +73,7 @@ class NettyServer {
 	 * 初始化服务端
 	 * */
 	void init(final NettyProtocol protocol, NettyBufferPool nettyBufferPool) throws IOException {
+		// 检测netty服务是否已经启动
 		checkState(bootstrap == null, "Netty server has already been initialized.");
 
 		final long start = System.nanoTime();
@@ -78,6 +84,7 @@ class NettyServer {
 		// Transport-specific configuration
 		// --------------------------------------------------------------------
 
+		// getTransportType 默认是NIO
 		switch (config.getTransportType()) {
 			case NIO:
 				initNioBootstrap();
@@ -102,25 +109,36 @@ class NettyServer {
 		// Configuration
 		// --------------------------------------------------------------------
 
-		// Server bind address 服务端地址绑定
+		// Server bind address 服务端地址、端口绑定
 		bootstrap.localAddress(config.getServerAddress(), config.getServerPort());
 
+		// Netty为了提升报文的读写性能，默认会采用“零拷贝”模式，即消息读取时使用非堆的DirectBuffer来减少ByteBuffer的内存拷贝
+		// 如果需要修改接收Buffer的类型，需要进行如下配置
 		// Pooled allocators for Netty's ByteBuf instances
 		bootstrap.option(ChannelOption.ALLOCATOR, nettyBufferPool);
 		bootstrap.childOption(ChannelOption.ALLOCATOR, nettyBufferPool);
 
+		/**
+		 * ChannelOption.SO_BACKLOG对应的是tcp/ip协议listen函数中的backlog参数，
+		 * 函数listen(int socketfd,int backlog)用来初始化服务端可连接队列，服务端处理客户端连接请求是顺序处理的，
+		 * 所以同一时间只能处理一个客户端连接，多个客户端来的时候，服务端将不能处理的客户端连接请求放在队列中等待处理，backlog参数指定了队列的大小
+		 *
+		 * BACKLOG用于构造服务端套接字ServerSocket对象，
+		 * 标识当服务器请求处理线程全满时，用于临时存放已完成三次握手的请求的队列的最大长度。
+		 * 如果未设置或所设置的值小于1，Java将使用默认值50
+		 * */
 		if (config.getServerConnectBacklog() > 0) {
 			bootstrap.option(ChannelOption.SO_BACKLOG, config.getServerConnectBacklog());
 		}
 
-		// Receive and send buffer size 接收与发送buffer大小
+		// Receive and send buffer size 设置接收与发送缓冲区的大小
 		int receiveAndSendBufferSize = config.getSendAndReceiveBufferSize();
 		if (receiveAndSendBufferSize > 0) {
 			bootstrap.childOption(ChannelOption.SO_SNDBUF, receiveAndSendBufferSize);
 			bootstrap.childOption(ChannelOption.SO_RCVBUF, receiveAndSendBufferSize);
 		}
 
-		// Low and high water marks for flow control
+		// Low and high water marks for flow control 高低水位控制
 		// hack around the impossibility (in the current netty version) to set both watermarks at
 		// the same time:
 		final int defaultHighWaterMark = 64 * 1024; // from DefaultChannelConfig (not exposed)

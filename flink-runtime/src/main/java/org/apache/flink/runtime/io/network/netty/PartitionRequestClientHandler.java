@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * 从生产者读取buffer响应信息或错误信息
  *
- * <p>It is used in the old network mode.
+ * <p>It is used in the old network mode. 用于老的网络模式(新模式credit-based)
  */
 class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter implements NetworkClientHandler {
 
@@ -137,9 +137,9 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 			final SocketAddress remoteAddr = ctx.channel().remoteAddress();
 
 			notifyAllChannelsOfErrorAndClose(new RemoteTransportException(
-					"Connection unexpectedly closed by remote task manager '" + remoteAddr + "'. "
-							+ "This might indicate that the remote task manager was lost.",
-					remoteAddr));
+				"Connection unexpectedly closed by remote task manager '" + remoteAddr + "'. "
+					+ "This might indicate that the remote task manager was lost.",
+				remoteAddr));
 		}
 
 		super.channelInactive(ctx);
@@ -163,11 +163,11 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 
 			// Improve on the connection reset by peer error message
 			if (cause instanceof IOException
-					&& cause.getMessage().equals("Connection reset by peer")) {
+				&& cause.getMessage().equals("Connection reset by peer")) {
 
 				tex = new RemoteTransportException(
-						"Lost connection to task manager '" + remoteAddr + "'. This indicates "
-								+ "that the remote task manager was lost.", remoteAddr, cause);
+					"Lost connection to task manager '" + remoteAddr + "'. This indicates "
+						+ "that the remote task manager was lost.", remoteAddr, cause);
 			}
 			else {
 				SocketAddress localAddr = ctx.channel().localAddress();
@@ -183,6 +183,8 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 
 	/**
 	 * 从PartitionRequestQueue#writeAndFlushNextMessageIfPossible发送的数据
+	 *
+	 * 收到消息时的回调方法，可以作为数据传输入口来分析
 	 * */
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -210,7 +212,7 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 			catch (Throwable t) {
 				// We can only swallow the Exception at this point. :(
 				LOG.warn("An Exception was thrown during error notification of a "
-						+ "remote input channel.", t);
+					+ "remote input channel.", t);
 			}
 			finally {
 				inputChannels.clear();
@@ -245,6 +247,7 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 		super.channelReadComplete(ctx);
 	}
 
+	// 消息解码
 	private boolean decodeMsg(Object msg, boolean isStagedBuffer) throws Throwable {
 		final Class<?> msgClazz = msg.getClass();
 
@@ -273,8 +276,8 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 
 			if (error.isFatalError()) {
 				notifyAllChannelsOfErrorAndClose(new RemoteTransportException(
-						"Fatal error at remote task manager '" + remoteAddr + "'.",
-						remoteAddr, error.cause));
+					"Fatal error at remote task manager '" + remoteAddr + "'.",
+					remoteAddr, error.cause));
 			}
 			else {
 				RemoteInputChannel inputChannel = inputChannels.get(error.receiverId);
@@ -285,8 +288,8 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 					}
 					else {
 						inputChannel.onError(new RemoteTransportException(
-								"Error at remote task manager '" + remoteAddr + "'.",
-										remoteAddr, error.cause));
+							"Error at remote task manager '" + remoteAddr + "'.",
+							remoteAddr, error.cause));
 					}
 				}
 			}
@@ -385,9 +388,11 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 	/**
 	 * A buffer availability listener, which subscribes/unsubscribes the NIO
 	 * read event.
+	 * buffer可用性监听器，用来订阅NIO read事件
 	 *
 	 * <p>If no buffer is available, the channel read event will be unsubscribed
 	 * until one becomes available again.
+	 * 如果没有可用的buffer，channel read event会被取消订阅 之道一个buffer变为可用
 	 *
 	 * <p>After a buffer becomes available again, the buffer is handed over by
 	 * the thread calling {@link #notifyBufferAvailable(Buffer)} to the network I/O

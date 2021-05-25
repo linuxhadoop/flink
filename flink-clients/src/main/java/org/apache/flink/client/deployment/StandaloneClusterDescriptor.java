@@ -27,6 +27,7 @@ import org.apache.flink.util.Preconditions;
 
 /**
  * A deployment descriptor for an existing cluster.
+ * 已存在的集群部署描述符
  */
 public class StandaloneClusterDescriptor implements ClusterDescriptor<StandaloneClusterId> {
 
@@ -59,9 +60,9 @@ public class StandaloneClusterDescriptor implements ClusterDescriptor<Standalone
 
 	@Override
 	public RestClusterClient<StandaloneClusterId> deployJobCluster(
-			ClusterSpecification clusterSpecification,
-			JobGraph jobGraph,
-			boolean detached) {
+		ClusterSpecification clusterSpecification,
+		JobGraph jobGraph,
+		boolean detached) {
 		throw new UnsupportedOperationException("Can't deploy a standalone per-job cluster.");
 	}
 

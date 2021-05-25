@@ -60,6 +60,7 @@ public class WordCount {
 		env.getConfig().setGlobalJobParameters(params);
 
 		// get input data
+		// readTextFile、fromElements最终都会生成一个DataStreamSource，代表这是一个数据流的源头
 		DataStream<String> text;
 		if (params.has("input")) {
 			// read the text file from given input path
@@ -74,8 +75,8 @@ public class WordCount {
 		DataStream<Tuple2<String, Integer>> counts =
 			// split up the lines in pairs (2-tuples) containing: (word,1)
 			text.flatMap(new Tokenizer())
-			// group by the tuple field "0" and sum up tuple field "1"
-			.keyBy(0).sum(1);
+				// group by the tuple field "0" and sum up tuple field "1"
+				.keyBy(0).sum(1);
 
 		// emit result
 		if (params.has("output")) {
@@ -98,6 +99,14 @@ public class WordCount {
 	 * user-defined FlatMapFunction. The function takes a line (String) and
 	 * splits it into multiple pairs in the form of "(word,1)" ({@code Tuple2<String,
 	 * Integer>}).
+	 *
+	 * 注：在FlatMapFunction<String, Tuple2<String, Integer>>中
+	 *    String 是输入类型T
+	 *    Tuple2<String, Integer> 是输出类型O
+	 *
+	 *    它使用的collector为TimestampedCollector
+	 *
+	 *    在text.flatMap函数中， 会使用反射拿到该算子的输出类型
 	 */
 	public static final class Tokenizer implements FlatMapFunction<String, Tuple2<String, Integer>> {
 

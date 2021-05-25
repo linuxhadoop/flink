@@ -180,12 +180,13 @@ public class PackagedProgram {
 			throw new IllegalArgumentException("The jar file path is invalid.");
 		}
 
-		checkJarFile(jarFileUrl);
+		checkJarFile(jarFileUrl);//检测文件是否合法
 
 		this.jarFile = jarFileUrl;
 		this.args = args == null ? new String[0] : args;
 
 		// if no entryPointClassName name was given, we try and look one up through the manifest
+		// 如果未指定入口类，尝试在manifest中查找
 		if (entryPointClassName == null) {
 			entryPointClassName = getEntryPointClassNameFromJar(jarFileUrl);
 		}
@@ -208,8 +209,8 @@ public class PackagedProgram {
 				// the main method possibly instantiates the program properly
 				if (!hasMainMethod(mainClass)) {
 					throw new ProgramInvocationException("The given program class implements the " +
-							Program.class.getName() + " interface, but cannot be instantiated. " +
-							"It also declares no main(String[]) method as alternative entry point", e);
+						Program.class.getName() + " interface, but cannot be instantiated. " +
+						"It also declares no main(String[]) method as alternative entry point", e);
 				}
 			} catch (Throwable t) {
 				throw new ProgramInvocationException("Error while trying to instantiate program class.", t);
@@ -219,7 +220,7 @@ public class PackagedProgram {
 			this.program = null;
 		} else {
 			throw new ProgramInvocationException("The given program class neither has a main(String[]) method, nor does it implement the " +
-					Program.class.getName() + " interface.");
+				Program.class.getName() + " interface.");
 		}
 	}
 
@@ -244,8 +245,8 @@ public class PackagedProgram {
 				// the main method possibly instantiates the program properly
 				if (!hasMainMethod(mainClass)) {
 					throw new ProgramInvocationException("The given program class implements the " +
-							Program.class.getName() + " interface, but cannot be instantiated. " +
-							"It also declares no main(String[]) method as alternative entry point", e);
+						Program.class.getName() + " interface, but cannot be instantiated. " +
+						"It also declares no main(String[]) method as alternative entry point", e);
 				}
 			} catch (Throwable t) {
 				throw new ProgramInvocationException("Error while trying to instantiate program class.", t);
@@ -255,7 +256,7 @@ public class PackagedProgram {
 			this.program = null;
 		} else {
 			throw new ProgramInvocationException("The given program class neither has a main(String[]) method, nor does it implement the " +
-					Program.class.getName() + " interface.");
+				Program.class.getName() + " interface.");
 		}
 	}
 
@@ -309,7 +310,7 @@ public class PackagedProgram {
 			return new JobWithJars(getPlan(), getAllLibraries(), classpaths, userCodeClassLoader);
 		} else {
 			throw new ProgramInvocationException("Cannot create a " + JobWithJars.class.getSimpleName() +
-					" for a program that is using the interactive mode.", getPlan().getJobId());
+				" for a program that is using the interactive mode.", getPlan().getJobId());
 		}
 	}
 
@@ -404,7 +405,7 @@ public class PackagedProgram {
 			}
 			catch (Throwable t) {
 				throw new ProgramInvocationException("Error while getting the program description" +
-						(t.getMessage() == null ? "." : ": " + t.getMessage()), t);
+					(t.getMessage() == null ? "." : ": " + t.getMessage()), t);
 			}
 
 		} else {
@@ -496,7 +497,7 @@ public class PackagedProgram {
 		}
 		catch (Throwable t) {
 			throw new RuntimeException("Could not look up the main(String[]) method from the class " +
-					entryClass.getName() + ": " + t.getMessage(), t);
+				entryClass.getName() + ": " + t.getMessage(), t);
 		}
 
 		return Modifier.isStatic(mainMethod.getModifiers()) && Modifier.isPublic(mainMethod.getModifiers());
@@ -515,7 +516,7 @@ public class PackagedProgram {
 		}
 		catch (Throwable t) {
 			throw new ProgramInvocationException("Could not look up the main(String[]) method from the class " +
-					entryClass.getName() + ": " + t.getMessage(), t);
+				entryClass.getName() + ": " + t.getMessage(), t);
 		}
 
 		if (!Modifier.isStatic(mainMethod.getModifiers())) {
@@ -568,7 +569,7 @@ public class PackagedProgram {
 
 		// jar file must be closed at the end
 		try {
-			// Read from jar manifest
+			// Read from jar manifest 读取manifest配置文件
 			try {
 				manifest = jar.getManifest();
 			} catch (IOException ioex) {
@@ -588,13 +589,13 @@ public class PackagedProgram {
 				return className;
 			}
 
-			// check for a main class
+			// check for a main class 入口类Main-Class
 			className = attributes.getValue(PackagedProgram.MANIFEST_ATTRIBUTE_MAIN_CLASS);
 			if (className != null) {
 				return className;
 			} else {
 				throw new ProgramInvocationException("Neither a '" + MANIFEST_ATTRIBUTE_MAIN_CLASS + "', nor a '" +
-						MANIFEST_ATTRIBUTE_ASSEMBLER_CLASS + "' entry was found in the jar file.");
+					MANIFEST_ATTRIBUTE_ASSEMBLER_CLASS + "' entry was found in the jar file.");
 			}
 		}
 		finally {
@@ -708,7 +709,7 @@ public class PackagedProgram {
 						catch (IOException e) {
 							throw new ProgramInvocationException(
 								"An I/O error occurred while creating temporary file to extract nested library '" +
-										entry.getName() + "'.", e);
+									entry.getName() + "'.", e);
 						}
 
 						extractedTempLibraries.add(tempFile);
@@ -728,7 +729,7 @@ public class PackagedProgram {
 						}
 						catch (IOException e) {
 							throw new ProgramInvocationException("An I/O error occurred while extracting nested library '"
-									+ entry.getName() + "' to temporary file '" + tempFile.getAbsolutePath() + "'.");
+								+ entry.getName() + "' to temporary file '" + tempFile.getAbsolutePath() + "'.");
 						}
 						finally {
 							if (out != null) {

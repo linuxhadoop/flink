@@ -59,6 +59,7 @@ public class RpcUtils {
 
 		while (clazz != null) {
 			for (Class<?> interfaze : clazz.getInterfaces()) {
+				//父类.class.isAssignableFrom(子类.class)
 				if (RpcGateway.class.isAssignableFrom(interfaze)) {
 					interfaces.add((Class<? extends RpcGateway>) interfaze);
 				}
@@ -113,8 +114,8 @@ public class RpcUtils {
 	 * @throws TimeoutException if a timeout occurred
 	 */
 	public static void terminateRpcServices(
-			Time timeout,
-			RpcService... rpcServices) throws InterruptedException, ExecutionException, TimeoutException {
+		Time timeout,
+		RpcService... rpcServices) throws InterruptedException, ExecutionException, TimeoutException {
 		final Collection<CompletableFuture<?>> terminationFutures = new ArrayList<>(rpcServices.length);
 
 		for (RpcService service : rpcServices) {

@@ -28,8 +28,8 @@ import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
  */
 @Internal
 public class StreamFlatMap<IN, OUT>
-		extends AbstractUdfStreamOperator<OUT, FlatMapFunction<IN, OUT>>
-		implements OneInputStreamOperator<IN, OUT> {
+	extends AbstractUdfStreamOperator<OUT, FlatMapFunction<IN, OUT>>
+	implements OneInputStreamOperator<IN, OUT> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -43,6 +43,8 @@ public class StreamFlatMap<IN, OUT>
 	@Override
 	public void open() throws Exception {
 		super.open();
+
+		// output 类型是 Output<StreamRecord<OUT>>
 		collector = new TimestampedCollector<>(output);
 	}
 
